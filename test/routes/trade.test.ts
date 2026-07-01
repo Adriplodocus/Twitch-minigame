@@ -125,3 +125,116 @@ it("lists offers sent and received by the current user", async () => {
   expect(json.sent).toHaveLength(1);
   expect(json.received).toHaveLength(0);
 });
+
+it("accepts an offer and swaps card ownership atomically", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer2",
+        offerCards: [{ cardId: "c1", quantity: 1 }],
+        requestCards: [{ cardId: "c1", quantity: 1 }],
+      }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  const acceptRes = await app.request(
+    `/api/trade/offers/${offerId}/accept`,
+    { method: "POST", headers: { Cookie: cookieTo } },
+    env
+  );
+  expect(acceptRes.status).toBe(200);
+
+  const offer = await env.DB.prepare("SELECT status FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ status: string }>();
+  expect(offer?.status).toBe("accepted");
+
+  const fromQty = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ quantity: number }>();
+  const toQty = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("2", "c1")
+    .first<{ quantity: number }>();
+  expect(fromQty?.quantity).toBe(3);
+  expect(toQty?.quantity).toBe(1);
+});
+
+it("rejects accept from a user who is not the offer recipient", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  const res = await app.request(
+    `/api/trade/offers/${offerId}/accept`,
+    { method: "POST", headers: { Cookie: cookieFrom } },
+    env
+  );
+  expect(res.status).toBe(404);
+});
+
+it("declines an offer", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  const res = await app.request(
+    `/api/trade/offers/${offerId}/decline`,
+    { method: "POST", headers: { Cookie: cookieTo } },
+    env
+  );
+  expect(res.status).toBe(200);
+  const offer = await env.DB.prepare("SELECT status FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ status: string }>();
+  expect(offer?.status).toBe("declined");
+});
+
+it("cancels an offer", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  const res = await app.request(
+    `/api/trade/offers/${offerId}/cancel`,
+    { method: "POST", headers: { Cookie: cookieFrom } },
+    env
+  );
+  expect(res.status).toBe(200);
+  const offer = await env.DB.prepare("SELECT status FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ status: string }>();
+  expect(offer?.status).toBe("cancelled");
+});

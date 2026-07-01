@@ -111,4 +111,81 @@ trade.get("/offers", requireAuth, async (c) => {
   return c.json({ sent: sent.results, received: received.results });
 });
 
+interface TradeItemRow {
+  side: "from" | "to";
+  card_id: string;
+  quantity: number;
+}
+
+trade.post("/offers/:id/accept", requireAuth, async (c) => {
+  const user = c.get("user");
+  const offerId = Number(c.req.param("id"));
+  const offer = await c.env.DB.prepare("SELECT id, from_user, to_user, status FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ id: number; from_user: string; to_user: string; status: string }>();
+  if (!offer || offer.to_user !== user.twitchId) return c.json({ error: "Not found" }, 404);
+  if (offer.status !== "pending") return c.json({ error: "Offer is not pending" }, 409);
+
+  const items = await c.env.DB.prepare("SELECT side, card_id, quantity FROM trade_items WHERE offer_id = ?")
+    .bind(offerId)
+    .all<TradeItemRow>();
+
+  for (const item of items.results) {
+    const ownerId = item.side === "from" ? offer.from_user : offer.to_user;
+    const owned = await ownedQuantity(c.env, ownerId, item.card_id);
+    if (owned < item.quantity) {
+      return c.json({ error: `Insufficient quantity for card ${item.card_id}` }, 409);
+    }
+  }
+
+  const statements = [];
+  for (const item of items.results) {
+    const giver = item.side === "from" ? offer.from_user : offer.to_user;
+    const receiver = item.side === "from" ? offer.to_user : offer.from_user;
+    statements.push(
+      c.env.DB.prepare("UPDATE user_cards SET quantity = quantity - ? WHERE user_id = ? AND card_id = ?").bind(
+        item.quantity,
+        giver,
+        item.card_id
+      )
+    );
+    statements.push(
+      c.env.DB.prepare(
+        `INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)
+         ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + ?`
+      ).bind(receiver, item.card_id, item.quantity, item.quantity)
+    );
+  }
+  statements.push(c.env.DB.prepare("UPDATE trade_offers SET status = 'accepted' WHERE id = ?").bind(offerId));
+  await c.env.DB.batch(statements);
+
+  return c.json({ status: "accepted" });
+});
+
+trade.post("/offers/:id/decline", requireAuth, async (c) => {
+  const user = c.get("user");
+  const offerId = Number(c.req.param("id"));
+  const offer = await c.env.DB.prepare("SELECT to_user, status FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ to_user: string; status: string }>();
+  if (!offer || offer.to_user !== user.twitchId) return c.json({ error: "Not found" }, 404);
+  if (offer.status !== "pending") return c.json({ error: "Offer is not pending" }, 409);
+
+  await c.env.DB.prepare("UPDATE trade_offers SET status = 'declined' WHERE id = ?").bind(offerId).run();
+  return c.json({ status: "declined" });
+});
+
+trade.post("/offers/:id/cancel", requireAuth, async (c) => {
+  const user = c.get("user");
+  const offerId = Number(c.req.param("id"));
+  const offer = await c.env.DB.prepare("SELECT from_user, status FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ from_user: string; status: string }>();
+  if (!offer || offer.from_user !== user.twitchId) return c.json({ error: "Not found" }, 404);
+  if (offer.status !== "pending") return c.json({ error: "Offer is not pending" }, 409);
+
+  await c.env.DB.prepare("UPDATE trade_offers SET status = 'cancelled' WHERE id = ?").bind(offerId).run();
+  return c.json({ status: "cancelled" });
+});
+
 export default trade;
