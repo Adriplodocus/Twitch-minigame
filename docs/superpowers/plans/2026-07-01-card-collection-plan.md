@@ -2393,7 +2393,8 @@ Create 4 placeholder 1x1 PNG files at `public/cards/placeholder-1.png` through `
 Run: `npm run catalog:build`
 Expected: creates `catalog.json` and `tools/catalog/seed-cards.sql` at the project root without errors
 
-Run: `npx wrangler d1 execute twitch-card-collection --local --file=./tools/catalog/seed-cards.sql`
+Run: `npx wrangler d1 migrations apply twitch-cards-db --local` (creates the local D1 schema, if not already applied)
+Run: `npx wrangler d1 execute twitch-cards-db --local --file=./tools/catalog/seed-cards.sql`
 Expected: reports 4 rows written, no errors
 
 - [ ] **Step 6: Commit**
@@ -3004,7 +3005,7 @@ Expected: all suites PASS (health, jwt, twitch, eventsub, packs, auth, webhook, 
 
 1. `npm install`
 2. Create a D1 database: `npx wrangler d1 create twitch-cards-db`, paste the returned `database_id` into `wrangler.jsonc`.
-3. `npx wrangler d1 migrations apply twitch-card-collection --local` (and `--remote` after first deploy).
+3. `npx wrangler d1 migrations apply twitch-cards-db --local` (and `--remote` after first deploy) — use the D1 database name from `wrangler.jsonc` (`twitch-cards-db`), not the Worker's project name.
 4. Copy `.dev.vars.example` to `.dev.vars` and fill in Twitch app credentials (create the app at https://dev.twitch.tv/console/apps) and a random `JWT_SECRET`/`TWITCH_EVENTSUB_SECRET`.
 5. Design card artwork, drop PNGs into `public/cards/`, list them in `tools/catalog/cards.csv`, then run `npm run catalog:build` and apply `tools/catalog/seed-cards.sql` with `wrangler d1 execute`.
 6. `npm run dev` to develop locally.
