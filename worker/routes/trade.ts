@@ -35,6 +35,14 @@ async function ownedQuantity(env: Env, userId: string, cardId: string): Promise<
   return row?.quantity ?? 0;
 }
 
+function mergeByCardId(items: TradeCardInput[]): TradeCardInput[] {
+  const byCardId = new Map<string, number>();
+  for (const item of items) {
+    byCardId.set(item.cardId, (byCardId.get(item.cardId) ?? 0) + item.quantity);
+  }
+  return Array.from(byCardId, ([cardId, quantity]) => ({ cardId, quantity }));
+}
+
 trade.post("/offers", requireAuth, async (c) => {
   const user = c.get("user");
   const body = await c.req.json<{
@@ -43,16 +51,19 @@ trade.post("/offers", requireAuth, async (c) => {
     requestCards: TradeCardInput[];
   }>();
 
+  const offerCards = mergeByCardId(body.offerCards);
+  const requestCards = mergeByCardId(body.requestCards);
+
   const toUser = await c.env.DB.prepare("SELECT twitch_id FROM users WHERE username = ?")
     .bind(body.toUsername)
     .first<{ twitch_id: string }>();
   if (!toUser) return c.json({ error: "Target user not found" }, 404);
 
-  for (const item of body.offerCards) {
+  for (const item of offerCards) {
     const owned = await ownedQuantity(c.env, user.twitchId, item.cardId);
     if (owned < item.quantity) return c.json({ error: `You do not own enough of card ${item.cardId}` }, 409);
   }
-  for (const item of body.requestCards) {
+  for (const item of requestCards) {
     const owned = await ownedQuantity(c.env, toUser.twitch_id, item.cardId);
     if (owned < item.quantity) return c.json({ error: `Target does not own enough of card ${item.cardId}` }, 409);
   }
@@ -65,14 +76,14 @@ trade.post("/offers", requireAuth, async (c) => {
   const offerId = offerResult!.id;
 
   const statements = [
-    ...body.offerCards.map((item) =>
+    ...offerCards.map((item) =>
       c.env.DB.prepare("INSERT INTO trade_items (offer_id, side, card_id, quantity) VALUES (?, 'from', ?, ?)").bind(
         offerId,
         item.cardId,
         item.quantity
       )
     ),
-    ...body.requestCards.map((item) =>
+    ...requestCards.map((item) =>
       c.env.DB.prepare("INSERT INTO trade_items (offer_id, side, card_id, quantity) VALUES (?, 'to', ?, ?)").bind(
         offerId,
         item.cardId,
