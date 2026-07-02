@@ -6,11 +6,17 @@
   "assets": {
     "run_worker_first": ["/api/*", "/webhook/*"]
   },
+  "routes": [
+    {
+      "pattern": "cards.mrklypp.com",
+      "custom_domain": true
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "twitch-cards-db",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "1175a1bd-c034-48a0-8e3b-db3c049ad35e",
       "migrations_dir": "migrations"
     }
   ]
