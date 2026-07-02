@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { Env, Rarity } from "../types";
+import type { Category, Env, Rarity } from "../types";
 import { requireAuth } from "../middleware/auth";
 import { pickRandomCards } from "../lib/packs";
 
@@ -37,7 +37,11 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   if (!pack || pack.user_id !== user.twitchId) return c.json({ error: "Not found" }, 404);
   if (pack.opened_at) return c.json({ error: "Pack already opened" }, 409);
 
-  const catalog = await c.env.DB.prepare("SELECT id, rarity FROM cards").all<{ id: string; rarity: Rarity }>();
+  const catalog = await c.env.DB.prepare("SELECT id, rarity, category FROM cards").all<{
+    id: string;
+    rarity: Rarity;
+    category: Category;
+  }>();
   if (!catalog.results || catalog.results.length === 0) {
     return c.json({ error: "Catalog is empty" }, 500);
   }
