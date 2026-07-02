@@ -1,5 +1,6 @@
 import { getCollection, openPack, logout, type CardView, type PendingPack } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName, compareCards, type SortField } from "./card";
+import { attachTradeLinkButton } from "./trade-link";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
@@ -109,5 +110,7 @@ document.getElementById("logout-btn")!.addEventListener("click", async () => {
   await logout();
   window.location.href = "/";
 });
+
+attachTradeLinkButton("trade-link-btn");
 
 load();
