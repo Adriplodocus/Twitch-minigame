@@ -1,0 +1,28 @@
+{
+  "name": "twitch-card-collection",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "deploy": "vite build && wrangler deploy",
+    "test": "vitest run --config vitest.config.ts",
+    "test:worker": "vitest run --config vitest.workers.config.ts",
+    "catalog:build": "tsx tools/catalog/build-catalog.ts"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "jose": "^5.9.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "latest",
+    "@cloudflare/vitest-pool-workers": "^0.17.0",
+    "@cloudflare/workers-types": "latest",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0",
+    "tsx": "^4.19.0",
+    "vite": "^6.0.0",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.0.0"
+  }
+}
