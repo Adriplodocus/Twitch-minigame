@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Russo+One&family=Quicksand:wght@500;700&family=JetBrains+Mono:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+    <title>Ofertas</title>
+  </head>
+  <body>
+    <div class="container" style="padding: 2rem 1rem;">
+      <h1>Ofertas</h1>
+      <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+        <a class="btn" href="/collection.html">Volver a Colección</a>
+        <button class="btn" id="logout-btn">Cerrar sesión</button>
+      </div>
+
+      <div style="margin-top: 2rem;">
+        <div id="offers-list"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/offers.ts"></script>
+  </body>
+</html>

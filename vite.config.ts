@@ -12,6 +12,7 @@ export default defineConfig({
             main: path.resolve(__dirname, "index.html"),
             collection: path.resolve(__dirname, "collection.html"),
             trade: path.resolve(__dirname, "trade.html"),
+            offers: path.resolve(__dirname, "offers.html"),
             album: path.resolve(__dirname, "album.html"),
             admin: path.resolve(__dirname, "admin.html"),
           },
