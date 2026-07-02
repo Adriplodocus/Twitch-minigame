@@ -27,6 +27,24 @@ admin.post("/logout", (c) => {
   return c.json({ ok: true });
 });
 
+admin.get("/users/all", requireAdmin, async (c) => {
+  const pageParam = Number(c.req.query("page"));
+  const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+  const offset = (page - 1) * 20;
+
+  const result = await c.env.DB.prepare(
+    `SELECT twitch_id AS twitchId, username, avatar_url AS avatarUrl
+     FROM users ORDER BY username LIMIT 21 OFFSET ?`
+  )
+    .bind(offset)
+    .all<{ twitchId: string; username: string; avatarUrl: string | null }>();
+
+  const hasMore = result.results.length > 20;
+  const users = result.results.slice(0, 20);
+
+  return c.json({ users, page, hasMore });
+});
+
 admin.get("/users", requireAdmin, async (c) => {
   const q = c.req.query("q") ?? "";
   const users = await c.env.DB.prepare(

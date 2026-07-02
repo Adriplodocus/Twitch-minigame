@@ -116,3 +116,39 @@ it("logs out by clearing the admin session cookie", async () => {
   expect(res.status).toBe(200);
   expect(res.headers.get("set-cookie")).toContain("admin_session=");
 });
+
+it("lists all users alphabetically on page 1 with hasMore false when there are 20 or fewer", async () => {
+  const cookie = await adminCookie();
+  const res = await app.request("/api/admin/users/all", { headers: { Cookie: cookie } }, env);
+  expect(res.status).toBe(200);
+  const json = await res.json<{ users: { username: string }[]; page: number; hasMore: boolean }>();
+  expect(json.page).toBe(1);
+  expect(json.hasMore).toBe(false);
+  expect(json.users.map((u) => u.username)).toEqual(["viewer1", "viewer2"]);
+});
+
+it("paginates the full user list with hasMore true when a 21st user exists", async () => {
+  const statements = Array.from({ length: 19 }, (_, i) =>
+    env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind(`extra-${i}`, `zzz-user-${String(i).padStart(2, "0")}`)
+  );
+  await env.DB.batch(statements);
+  // Now 21 users total: viewer1, viewer2, and 19 "zzz-user-*" (alphabetically last).
+
+  const cookie = await adminCookie();
+  const page1 = await app.request("/api/admin/users/all?page=1", { headers: { Cookie: cookie } }, env);
+  const page1Json = await page1.json<{ users: { username: string }[]; page: number; hasMore: boolean }>();
+  expect(page1Json.page).toBe(1);
+  expect(page1Json.users).toHaveLength(20);
+  expect(page1Json.hasMore).toBe(true);
+
+  const page2 = await app.request("/api/admin/users/all?page=2", { headers: { Cookie: cookie } }, env);
+  const page2Json = await page2.json<{ users: { username: string }[]; page: number; hasMore: boolean }>();
+  expect(page2Json.page).toBe(2);
+  expect(page2Json.users).toHaveLength(1);
+  expect(page2Json.hasMore).toBe(false);
+});
+
+it("requires an admin session for the full user list", async () => {
+  const res = await app.request("/api/admin/users/all", {}, env);
+  expect(res.status).toBe(401);
+});
