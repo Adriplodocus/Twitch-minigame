@@ -1,5 +1,24 @@
 import type { CardView } from "./api";
 
+export type SortField = "pokedex" | "recent" | "quantity";
+
+export function compareCards(a: CardView, b: CardView, field: SortField): number {
+  switch (field) {
+    case "pokedex":
+      return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+    case "recent":
+      return (a.acquiredAt ?? "").localeCompare(b.acquiredAt ?? "");
+    case "quantity":
+      return a.quantity - b.quantity;
+  }
+}
+
+export function filterCardsByName(cards: CardView[], query: string): CardView[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return cards;
+  return cards.filter((c) => c.name.toLowerCase().includes(q));
+}
+
 const VARIANT_SUFFIXES: { suffix: string; label: string; shiny: boolean }[] = [
   { suffix: " Shiny (Hembra)", label: "Shiny (Hembra)", shiny: true },
   { suffix: " Shiny", label: "Shiny", shiny: true },

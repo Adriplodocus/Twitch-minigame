@@ -1,22 +1,9 @@
 import { getCollection, openPack, logout, type CardView, type PendingPack } from "./api";
-import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName } from "./card";
+import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName, compareCards, type SortField } from "./card";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
 let ownedCards: CardView[] = [];
-
-type SortField = "pokedex" | "recent" | "quantity";
-
-function compareCards(a: CardView, b: CardView, field: SortField): number {
-  switch (field) {
-    case "pokedex":
-      return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
-    case "recent":
-      return (a.acquiredAt ?? "").localeCompare(b.acquiredAt ?? "");
-    case "quantity":
-      return a.quantity - b.quantity;
-  }
-}
 
 function renderOwnedGrid(): void {
   const field = (document.getElementById("sort-field") as HTMLSelectElement).value as SortField;
