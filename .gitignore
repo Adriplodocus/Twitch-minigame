@@ -7,3 +7,4 @@ tools/catalog/seed-cards.sql
 tools/catalog/.pokeapi-cache.json
 
 .superpowers/
+.worktrees/
