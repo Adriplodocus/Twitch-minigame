@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Russo+One&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+    <title>Trading</title>
+  </head>
+  <body>
+    <div class="container" style="padding: 2rem 1rem;">
+      <h1>Trading</h1>
+      <a class="btn" href="/collection.html" style="margin-top: 1rem;">Volver a Colección</a>
+
+      <div style="margin-top: 2rem;">
+        <input class="input" id="search-username" placeholder="Buscar username de Twitch" />
+        <button class="btn" id="search-btn">Buscar</button>
+      </div>
+
+      <div id="offer-builder" style="display: none; margin-top: 1.5rem;">
+        <h2>Tú ofreces</h2>
+        <div id="my-cards" class="card-grid"></div>
+        <h2 style="margin-top: 1.5rem;">Tú pides</h2>
+        <div id="target-collection" class="card-grid"></div>
+        <button class="btn" id="send-offer-btn" style="margin-top: 1.5rem;">Enviar oferta</button>
+      </div>
+
+      <div style="margin-top: 2rem;">
+        <h2>Ofertas</h2>
+        <div id="offers-list"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/trade.ts"></script>
+  </body>
+</html>
