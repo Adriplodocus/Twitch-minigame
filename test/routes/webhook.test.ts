@@ -85,6 +85,41 @@ it("creates a pending pack on a matching reward redemption notification", async 
   expect(pack).toEqual({ user_id: "42", opened_at: null });
 });
 
+it("defaults new pack rows to source 'reward'", async () => {
+  const body = JSON.stringify({
+    subscription: { type: "channel.channel_points_custom_reward_redemption.add" },
+    event: {
+      user_id: "42",
+      user_login: "mrklypp",
+      user_name: "mrklypp",
+      reward: { id: "reward-1" },
+    },
+  });
+  const messageId = "msg-source-1";
+  const timestamp = new Date().toISOString();
+  const signature = await signBody(messageId, timestamp, body);
+
+  await app.request(
+    "/webhook/eventsub",
+    {
+      method: "POST",
+      body,
+      headers: {
+        "Twitch-Eventsub-Message-Id": messageId,
+        "Twitch-Eventsub-Message-Timestamp": timestamp,
+        "Twitch-Eventsub-Message-Signature": signature,
+        "Twitch-Eventsub-Message-Type": "notification",
+      },
+    },
+    env
+  );
+
+  const pack = await env.DB.prepare("SELECT source FROM packs WHERE user_id = ?")
+    .bind("42")
+    .first<{ source: string }>();
+  expect(pack?.source).toBe("reward");
+});
+
 it("rejects a notification with an invalid signature", async () => {
   const body = JSON.stringify({ event: { user_id: "42", reward: { id: "reward-1" } } });
   const res = await app.request(
