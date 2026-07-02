@@ -1,5 +1,5 @@
 import { getCollection, openPack, type CardView, type PendingPack } from "./api";
-import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels } from "./card";
+import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName } from "./card";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
@@ -84,6 +84,9 @@ async function revealPack(cards: CardView[]): Promise<void> {
     const cardEl = wrapper.firstElementChild!;
     cardEl.classList.add("card-reveal");
     cardsRow.appendChild(cardEl);
+    if (splitCardName(cards[i].name).isShiny) {
+      new Audio("/shiny-sound.mp3").play().catch(() => {});
+    }
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
 
