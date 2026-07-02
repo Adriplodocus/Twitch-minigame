@@ -1,0 +1,205 @@
+interface AdminUser {
+  twitchId: string;
+  username: string;
+  avatarUrl: string | null;
+}
+
+interface HistoryRow {
+  id: number;
+  userId: string;
+  username: string;
+  createdAt: string;
+}
+
+const BASE = "/api/admin";
+
+type RequestResult<T> = { ok: true; data: T } | { ok: false; status: number };
+
+async function request<T>(path: string, init?: RequestInit): Promise<RequestResult<T>> {
+  const res = await fetch(`${BASE}${path}`, { credentials: "include", ...init });
+  if (!res.ok) return { ok: false, status: res.status };
+  return { ok: true, data: (await res.json()) as T };
+}
+
+let selectedUser: AdminUser | null = null;
+let searchDebounce: ReturnType<typeof setTimeout> | undefined;
+
+function showLoginView(): void {
+  document.getElementById("login-view")!.style.display = "block";
+  document.getElementById("panel-view")!.style.display = "none";
+}
+
+function showPanelView(): void {
+  document.getElementById("login-view")!.style.display = "none";
+  document.getElementById("panel-view")!.style.display = "block";
+}
+
+function renderHistory(history: HistoryRow[]): void {
+  document.getElementById("history-body")!.innerHTML = history
+    .map((h) => `<tr><td style="padding: 0.4rem;">${h.username}</td><td style="padding: 0.4rem;">${h.createdAt}</td></tr>`)
+    .join("");
+}
+
+function renderSearchResults(users: AdminUser[]): void {
+  const container = document.getElementById("search-results")!;
+  if (users.length === 0) {
+    container.innerHTML = "";
+    return;
+  }
+  container.innerHTML = users
+    .map((u) => `<span class="badge" data-twitch-id="${u.twitchId}" style="cursor: pointer; margin: 0.2rem;">${u.username}</span>`)
+    .join("");
+  container.querySelectorAll<HTMLElement>("[data-twitch-id]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const user = users.find((u) => u.twitchId === el.dataset.twitchId)!;
+      selectUser(user);
+    });
+  });
+}
+
+function selectUser(user: AdminUser): void {
+  selectedUser = user;
+  document.getElementById("selected-user")!.style.display = "flex";
+  document.getElementById("selected-user-name")!.textContent = user.username;
+  document.getElementById("search-results")!.innerHTML = "";
+  (document.getElementById("search-input") as HTMLInputElement).value = "";
+  (document.getElementById("grant-btn") as HTMLButtonElement).disabled = false;
+}
+
+function clearSelection(): void {
+  selectedUser = null;
+  document.getElementById("selected-user")!.style.display = "none";
+  (document.getElementById("grant-btn") as HTMLButtonElement).disabled = true;
+}
+
+async function runSearch(query: string): Promise<void> {
+  if (!query) {
+    renderSearchResults([]);
+    return;
+  }
+  const result = await request<{ users: AdminUser[] }>(`/users?q=${encodeURIComponent(query)}`);
+  if (!result.ok) {
+    if (result.status === 401) showLoginView();
+    return;
+  }
+  renderSearchResults(result.data.users);
+}
+
+function showConfirmModal(message: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.style.cssText =
+      "position: fixed; inset: 0; background: rgba(59,46,34,0.80); display: flex; align-items: center; justify-content: center; z-index: 10; padding: 1rem;";
+    const box = document.createElement("div");
+    box.className = "card";
+    box.style.cssText = "max-width: 320px; text-align: center;";
+    box.innerHTML = `<p style="margin-bottom: 1rem;">${message}</p>`;
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.className = "btn";
+    confirmBtn.textContent = "Confirmar";
+    confirmBtn.style.marginRight = "0.5rem";
+    confirmBtn.addEventListener("click", () => {
+      overlay.remove();
+      resolve(true);
+    });
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "btn";
+    cancelBtn.textContent = "Cancelar";
+    cancelBtn.addEventListener("click", () => {
+      overlay.remove();
+      resolve(false);
+    });
+
+    box.appendChild(confirmBtn);
+    box.appendChild(cancelBtn);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+  });
+}
+
+async function loadHistory(): Promise<void> {
+  const result = await request<{ history: HistoryRow[] }>("/history");
+  if (!result.ok) {
+    if (result.status === 401) showLoginView();
+    return;
+  }
+  renderHistory(result.data.history);
+}
+
+async function grantPacks(): Promise<void> {
+  if (!selectedUser) return;
+  const quantity = Number((document.getElementById("quantity-input") as HTMLInputElement).value);
+  const messageEl = document.getElementById("grant-message")!;
+
+  const confirmed = await showConfirmModal(`¿Dar ${quantity} blíster(s) a ${selectedUser.username}?`);
+  if (!confirmed) return;
+
+  const result = await request<{ ok: true }>("/grant-packs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ twitchId: selectedUser.twitchId, quantity }),
+  });
+
+  if (!result.ok) {
+    if (result.status === 401) {
+      showLoginView();
+      return;
+    }
+    messageEl.textContent = "Error al dar blíster(s).";
+    return;
+  }
+
+  messageEl.textContent = `Blíster(s) entregado(s) a ${selectedUser.username}.`;
+  clearSelection();
+  await loadHistory();
+}
+
+async function login(): Promise<void> {
+  const password = (document.getElementById("login-password") as HTMLInputElement).value;
+  const errorEl = document.getElementById("login-error")!;
+
+  const result = await request<{ ok: true }>("/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+
+  if (!result.ok) {
+    errorEl.textContent = "Clave incorrecta.";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  errorEl.style.display = "none";
+  showPanelView();
+  await loadHistory();
+}
+
+async function logout(): Promise<void> {
+  await request("/logout", { method: "POST" });
+  showLoginView();
+}
+
+document.getElementById("login-btn")!.addEventListener("click", login);
+document.getElementById("logout-btn")!.addEventListener("click", logout);
+document.getElementById("clear-selection-btn")!.addEventListener("click", clearSelection);
+document.getElementById("grant-btn")!.addEventListener("click", grantPacks);
+document.getElementById("search-input")!.addEventListener("input", (e) => {
+  clearTimeout(searchDebounce);
+  const query = (e.target as HTMLInputElement).value;
+  searchDebounce = setTimeout(() => runSearch(query), 250);
+});
+
+async function init(): Promise<void> {
+  const result = await request<{ history: HistoryRow[] }>("/history");
+  if (result.ok) {
+    showPanelView();
+    renderHistory(result.data.history);
+  } else {
+    showLoginView();
+  }
+}
+
+init();

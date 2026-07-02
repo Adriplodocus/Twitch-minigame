@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Russo+One&family=Quicksand:wght@500;700&family=JetBrains+Mono:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+    <title>Admin</title>
+  </head>
+  <body>
+    <div class="container" style="padding: 2rem 1rem;">
+      <h1>Admin</h1>
+
+      <div id="login-view" style="margin-top: 1.5rem; max-width: 320px;">
+        <input class="input" id="login-password" type="password" placeholder="Clave" style="width: 100%;" />
+        <button class="btn" id="login-btn" style="margin-top: 0.75rem;">Entrar</button>
+        <p id="login-error" style="color: #C2477F; margin-top: 0.5rem; display: none;"></p>
+      </div>
+
+      <div id="panel-view" style="display: none; margin-top: 1.5rem;">
+        <button class="btn" id="logout-btn">Cerrar sesión</button>
+
+        <div style="margin-top: 1.5rem;">
+          <h2>Dar blíster</h2>
+          <input
+            class="input"
+            id="search-input"
+            placeholder="Buscar username de Twitch"
+            style="margin-top: 0.75rem; width: 100%; max-width: 320px;"
+          />
+          <div id="search-results" style="margin-top: 0.5rem;"></div>
+
+          <div id="selected-user" style="display: none; margin-top: 0.75rem; align-items: center; gap: 0.5rem;">
+            <span class="badge" id="selected-user-name"></span>
+            <button class="btn" id="clear-selection-btn" style="padding: 0.3rem 0.8rem;">x</button>
+          </div>
+
+          <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            <input class="input" id="quantity-input" type="number" min="1" max="50" value="1" style="width: 80px;" />
+            <button class="btn" id="grant-btn" disabled>Dar blíster(s)</button>
+          </div>
+          <p id="grant-message" style="margin-top: 0.5rem;"></p>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <h2>Historial</h2>
+          <table style="width: 100%; margin-top: 0.75rem; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 0.4rem;">Usuario</th>
+                <th style="text-align: left; padding: 0.4rem;">Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/admin.ts"></script>
+  </body>
+</html>
