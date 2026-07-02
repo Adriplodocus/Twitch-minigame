@@ -1,5 +1,5 @@
 import { it, expect } from "vitest";
-import { parseCsv, buildCatalog } from "./build-catalog";
+import { parseCsv, buildCatalog, computeCategory } from "./build-catalog";
 
 it("parses CSV rows", () => {
   const csv = "id,name,rarity,image_filename\nc1,Common Card,common,c1.png\nr1,Rare Card,rare,r1.png\n";
@@ -23,8 +23,8 @@ it("builds a catalog and seed SQL from valid rows", () => {
   const { catalog, seedSql } = buildCatalog(rows, new Set(["c1.png", "r1.png"]));
 
   expect(catalog).toEqual([
-    { id: "c1", name: "Common Card", rarity: "common", imagePath: "/cards/c1.png", sortOrder: 1 },
-    { id: "r1", name: "Rare Card", rarity: "rare", imagePath: "/cards/r1.png", sortOrder: 2 },
+    { id: "c1", name: "Common Card", rarity: "common", category: "normal", imagePath: "/cards/c1.png", sortOrder: 1 },
+    { id: "r1", name: "Rare Card", rarity: "rare", category: "normal", imagePath: "/cards/r1.png", sortOrder: 2 },
   ]);
   expect(seedSql).toContain("INSERT OR REPLACE INTO cards");
   expect(seedSql).toContain("'c1'");
@@ -48,4 +48,41 @@ it("throws on duplicate card ids", () => {
     { id: "c1", name: "Duplicate", rarity: "rare" as const, imageFilename: "c1.png" },
   ];
   expect(() => buildCatalog(rows, new Set(["c1.png"]))).toThrow(/duplicate/i);
+});
+
+it("categorizes starter-line species as inicial", () => {
+  expect(computeCategory("Bulbasaur")).toBe("inicial");
+  expect(computeCategory("Ivysaur")).toBe("inicial");
+  expect(computeCategory("Venusaur")).toBe("inicial");
+  expect(computeCategory("Venusaur Shiny")).toBe("inicial");
+  expect(computeCategory("Venusaur (Hembra)")).toBe("inicial");
+});
+
+it("gives inicial precedence over mega/gmax for starter-line species", () => {
+  expect(computeCategory("Venusaur Mega")).toBe("inicial");
+  expect(computeCategory("Venusaur Mega (Hembra)")).toBe("inicial");
+  expect(computeCategory("Venusaur Gmax")).toBe("inicial");
+});
+
+it("categorizes non-starter Mega/Gmax cards correctly", () => {
+  expect(computeCategory("Alakazam Mega")).toBe("mega");
+  expect(computeCategory("Gengar Mega")).toBe("mega");
+  expect(computeCategory("Pikachu Gmax")).toBe("gmax");
+  expect(computeCategory("Lapras Gmax")).toBe("gmax");
+});
+
+it("gives inicial precedence even for a starter's Mega/Gmax forms not caught by the earlier test (Charizard, a starter final evolution)", () => {
+  expect(computeCategory("Charizard Mega X")).toBe("inicial");
+  expect(computeCategory("Charizard Mega Y")).toBe("inicial");
+});
+
+it("does not false-positive-match Meganium as mega (word boundary), but still categorizes it as inicial", () => {
+  expect(computeCategory("Meganium")).toBe("inicial");
+  expect(computeCategory("Meganium Shiny")).toBe("inicial");
+});
+
+it("categorizes everything else as normal", () => {
+  expect(computeCategory("Pidgey")).toBe("normal");
+  expect(computeCategory("Mewtwo")).toBe("normal");
+  expect(computeCategory("Mewtwo Mega X")).toBe("mega");
 });

@@ -5,6 +5,31 @@ import { fileURLToPath } from "node:url";
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 const VALID_RARITIES: Rarity[] = ["common", "rare", "epic", "legendary"];
 
+export type Category = "normal" | "inicial" | "mega" | "gmax";
+
+const STARTER_SPECIES = [
+  "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", "Charizard", "Squirtle", "Wartortle", "Blastoise",
+  "Chikorita", "Bayleef", "Meganium", "Cyndaquil", "Quilava", "Typhlosion", "Totodile", "Croconaw", "Feraligatr",
+  "Treecko", "Grovyle", "Sceptile", "Torchic", "Combusken", "Blaziken", "Mudkip", "Marshtomp", "Swampert",
+  "Turtwig", "Grotle", "Torterra", "Chimchar", "Monferno", "Infernape", "Piplup", "Prinplup", "Empoleon",
+  "Snivy", "Servine", "Serperior", "Tepig", "Pignite", "Emboar", "Oshawott", "Dewott", "Samurott",
+  "Chespin", "Quilladin", "Chesnaught", "Fennekin", "Braixen", "Delphox", "Froakie", "Frogadier", "Greninja",
+  "Rowlet", "Dartrix", "Decidueye", "Litten", "Torracat", "Incineroar", "Popplio", "Brionne", "Primarina",
+  "Grookey", "Thwackey", "Rillaboom", "Scorbunny", "Raboot", "Cinderace", "Sobble", "Drizzile", "Inteleon",
+  "Sprigatito", "Floragato", "Meowscarada", "Fuecoco", "Crocalor", "Skeledirge", "Quaxly", "Quaxwell", "Quaquaval",
+];
+
+const STARTER_PREFIX_RE = new RegExp(`^(${STARTER_SPECIES.join("|")})\\b`);
+const MEGA_RE = /\bMega\b/;
+const GMAX_RE = /\bGmax\b/;
+
+export function computeCategory(name: string): Category {
+  if (STARTER_PREFIX_RE.test(name)) return "inicial";
+  if (MEGA_RE.test(name)) return "mega";
+  if (GMAX_RE.test(name)) return "gmax";
+  return "normal";
+}
+
 export interface CardRow {
   id: string;
   name: string;
@@ -17,6 +42,7 @@ export interface CatalogEntry {
   id: string;
   name: string;
   rarity: Rarity;
+  category: Category;
   imagePath: string;
   sortOrder: number;
 }
@@ -58,6 +84,7 @@ export function buildCatalog(
       id: row.id,
       name: row.name,
       rarity: row.rarity,
+      category: computeCategory(row.name),
       imagePath: `/cards/${row.imageFilename}`,
       sortOrder: row.sortOrder ?? 0,
     });
@@ -70,11 +97,11 @@ export function buildCatalog(
     const values = chunk
       .map(
         (card) =>
-          `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.imagePath}', ${card.sortOrder})`
+          `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.category}', '${card.imagePath}', ${card.sortOrder})`
       )
       .join(",\n  ");
     statements.push(
-      `INSERT OR REPLACE INTO cards (id, name, rarity, image_path, sort_order) VALUES\n  ${values};`
+      `INSERT OR REPLACE INTO cards (id, name, rarity, category, image_path, sort_order) VALUES\n  ${values};`
     );
   }
   const seedSql = statements.join("\n") + "\n";
