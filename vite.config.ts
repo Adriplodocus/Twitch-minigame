@@ -4,12 +4,16 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
   plugins: [cloudflare()],
-  build: {
-    rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, "index.html"),
-        collection: path.resolve(__dirname, "collection.html"),
-        trade: path.resolve(__dirname, "trade.html"),
+  environments: {
+    client: {
+      build: {
+        rollupOptions: {
+          input: {
+            main: path.resolve(__dirname, "index.html"),
+            collection: path.resolve(__dirname, "collection.html"),
+            trade: path.resolve(__dirname, "trade.html"),
+          },
+        },
       },
     },
   },
