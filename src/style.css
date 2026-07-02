@@ -90,12 +90,12 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
 .card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.4rem;
   margin-top: 0.5rem;
   min-height: 1.1rem;
 }
 .card-footer-slot:empty { display: none; }
+.card-footer-slot:last-child { margin-left: auto; }
 .card-qty {
   padding: 0.15rem 0.55rem;
   border-radius: 100px;

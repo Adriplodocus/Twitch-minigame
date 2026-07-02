@@ -66,7 +66,7 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
     .all<{ id: string; name: string; rarity: Rarity; imagePath: string }>();
 
   const detailsById = new Map(cardDetails.results.map((card) => [card.id, card]));
-  const cards = picked.map((card) => detailsById.get(card.id)!);
+  const cards = picked.map((card) => ({ ...detailsById.get(card.id)!, quantity: 1 }));
 
   return c.json({ cards });
 });
