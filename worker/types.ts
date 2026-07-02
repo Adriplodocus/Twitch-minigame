@@ -9,6 +9,7 @@ export interface Env {
   TWITCH_BROADCASTER_ID: string;
   TWITCH_REWARD_ID: string;
   JWT_SECRET: string;
+  ADMIN_PASSWORD: string;
 }
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
