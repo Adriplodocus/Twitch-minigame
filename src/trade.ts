@@ -83,13 +83,13 @@ async function init(): Promise<void> {
   const params = new URLSearchParams(window.location.search);
   const targetUsername = params.get("with");
   if (!targetUsername) {
-    showError("Falta el usuario con quien comerciar. Pedile a alguien su enlace de trade.");
+    showError("Falta el usuario con quien comerciar. Pídele a alguien su enlace de trade.");
     return;
   }
 
   const me = await getMe();
   if (me.username === targetUsername) {
-    showError("No podés intercambiar con vos mismo.");
+    showError("No puedes intercambiar contigo mismo.");
     return;
   }
 
