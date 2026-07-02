@@ -147,11 +147,11 @@ async function loadHistory(): Promise<void> {
   renderHistory(result.data.history);
 }
 
-async function performGrant(twitchId: string, quantity: number, username: string): Promise<void> {
+async function performGrant(twitchId: string, quantity: number, username: string): Promise<boolean> {
   const messageEl = document.getElementById("grant-message")!;
 
   const confirmed = await showConfirmModal(quantity, username);
-  if (!confirmed) return;
+  if (!confirmed) return false;
 
   const result = await request<{ ok: true }>("/grant-packs", {
     method: "POST",
@@ -162,21 +162,22 @@ async function performGrant(twitchId: string, quantity: number, username: string
   if (!result.ok) {
     if (result.status === 401) {
       showLoginView();
-      return;
+      return false;
     }
     messageEl.textContent = "Error al dar blíster(s).";
-    return;
+    return false;
   }
 
   messageEl.textContent = `Blíster(s) entregado(s) a ${username}.`;
   await loadHistory();
+  return true;
 }
 
 async function grantPacks(): Promise<void> {
   if (!selectedUser) return;
   const quantity = Number((document.getElementById("quantity-input") as HTMLInputElement).value);
-  await performGrant(selectedUser.twitchId, quantity, selectedUser.username);
-  clearSelection();
+  const succeeded = await performGrant(selectedUser.twitchId, quantity, selectedUser.username);
+  if (succeeded) clearSelection();
 }
 
 function renderAllUsers(users: AdminUser[]): void {
