@@ -1,23 +1,29 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --pink: #FF56B4;
-  --blue: #00CCFF;
-  --bg: #1E1E1E;
-  --surface: #252525;
-  --surface2: #2D2D2D;
-  --border: rgba(255, 255, 255, 0.07);
-  --text: #858585;
-  --text-em: #F0F0F0;
-  --muted: #9A9A9A;
-  --dim: #555555;
+  --pink: #F2739E;
+  --blue: #5AC8D8;
+  --gold: #E8B93A;
+  --purple: #B79AF0;
+
+  --bg: #FAF3E6;
+  --surface: #FFFFFF;
+  --surface2: #F3E8D6;
+
+  --border: rgba(120, 90, 60, 0.14);
+
+  --text: #6E5C4C;
+  --text-em: #3B2E22;
+  --muted: #9C8874;
+  --dim: #C9B79E;
 }
 
-html { background: #0A0A0A; font-size: 16px; }
+html { background: #F3E8D6; font-size: 16px; }
 @media (min-width: 700px) { html { font-size: 20px; } }
 
 body {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 500;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -28,6 +34,7 @@ a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
 
 h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
+h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 
 .container {
   max-width: 860px;
@@ -39,13 +46,14 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 1.15rem 1.4rem;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  box-shadow: 0 4px 16px rgba(120, 90, 60, 0.10);
+  transition: transform 0.18s, box-shadow 0.18s;
 }
 .card:hover {
-  border-color: rgba(255, 86, 180, 0.35);
-  box-shadow: 0 0 20px rgba(255, 86, 180, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 26px rgba(120, 90, 60, 0.18);
 }
 .card.unowned { opacity: 0.7; }
 .card.unowned img { filter: grayscale(1) brightness(0.65); }
@@ -54,20 +62,21 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   width: 100%;
   aspect-ratio: 1;
   object-fit: contain;
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 8px;
+  background: var(--surface2);
+  border-radius: 14px;
 }
 
 .card-reveal { width: 140px; flex: 0 0 auto; }
 
 .card.card-rarity-rare { border-color: var(--blue); }
-.card.card-rarity-epic { border-color: #8B5CF6; }
-.card.card-rarity-legendary { border-color: #FFD700; }
+.card.card-rarity-epic { border-color: var(--purple); }
+.card.card-rarity-legendary { border-color: var(--gold); }
 
 .card-name {
   margin-top: 0.5rem;
   color: var(--text-em);
   font-size: 0.6rem;
+  font-weight: 700;
   line-height: 1.2;
   text-align: center;
   overflow-wrap: break-word;
@@ -85,7 +94,7 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   border-radius: 50%;
   font-size: 0.7rem;
   font-weight: 700;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--surface2);
 }
 .gender-icon.gender-male { color: var(--blue); }
 .gender-icon.gender-female { color: var(--pink); }
@@ -95,7 +104,7 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   left: 0.5rem;
   width: 26px;
   height: 26px;
-  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 0 3px rgba(120, 90, 60, 0.35));
 }
 .card-footer {
   display: flex;
@@ -109,10 +118,11 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
 .card-qty {
   padding: 0.15rem 0.55rem;
   border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.6rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-em);
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--surface2);
   white-space: nowrap;
 }
 .info-btn {
@@ -122,7 +132,7 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   border: 1px solid var(--border);
   background: var(--surface2);
   color: var(--muted);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Quicksand', sans-serif;
   font-size: 0.65rem;
   font-weight: 700;
   font-style: italic;
@@ -135,7 +145,7 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   transition: border-color 0.15s, color 0.15s;
 }
 .info-btn:hover {
-  border-color: rgba(0, 204, 255, 0.30);
+  border-color: var(--pink);
   color: var(--text-em);
 }
 .info-tooltip {
@@ -145,11 +155,11 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   right: 0.5rem;
   z-index: 20;
   min-width: 130px;
-  background: var(--surface2);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 0.5rem 0.65rem;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.70);
+  box-shadow: 0 6px 20px rgba(120, 90, 60, 0.20);
   font-size: 0.6rem;
   line-height: 1.5;
   text-align: left;
@@ -165,27 +175,34 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-em);
 }
-.section-heading .count { color: var(--muted); font-weight: 400; }
+.section-heading .count {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  font-weight: 600;
+}
 
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.25rem;
+  padding: 0.7rem 1.6rem;
   border-radius: 100px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Quicksand', sans-serif;
   font-weight: 700;
-  font-size: 0.85rem;
-  background: var(--surface2);
-  color: var(--text);
-  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(242, 115, 158, 0.35);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 .btn:hover {
-  background: var(--surface);
-  border-color: rgba(0, 204, 255, 0.30);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(242, 115, 158, 0.45);
 }
 
 .badge {
@@ -197,9 +214,9 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  background: rgba(255, 86, 180, 0.15);
-  color: var(--pink);
-  border: 1px solid rgba(255, 86, 180, 0.30);
+  background: rgba(232, 185, 58, 0.18);
+  color: #9C7A17;
+  border: none;
 }
 .card-grid {
   display: grid;
@@ -207,6 +224,19 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   gap: 1rem;
   margin-top: 1.5rem;
 }
+
+.input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem 0.85rem;
+  color: var(--text);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.18s;
+  outline: none;
+}
+.input:focus { border-color: rgba(242, 115, 158, 0.5); }
 
 @keyframes card-in {
   from { opacity: 0; transform: translateY(12px); }
