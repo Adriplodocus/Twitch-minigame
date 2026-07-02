@@ -3,6 +3,30 @@ import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels } from
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
+let ownedCards: CardView[] = [];
+
+type SortField = "pokedex" | "recent" | "quantity";
+
+function compareCards(a: CardView, b: CardView, field: SortField): number {
+  switch (field) {
+    case "pokedex":
+      return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+    case "recent":
+      return (a.acquiredAt ?? "").localeCompare(b.acquiredAt ?? "");
+    case "quantity":
+      return a.quantity - b.quantity;
+  }
+}
+
+function renderOwnedGrid(): void {
+  const field = (document.getElementById("sort-field") as HTMLSelectElement).value as SortField;
+  const direction = (document.getElementById("sort-direction") as HTMLSelectElement).value;
+  const sign = direction === "desc" ? -1 : 1;
+  const sorted = [...ownedCards].sort((a, b) => compareCards(a, b, field) * sign);
+  document.getElementById("owned-grid")!.innerHTML = sorted
+    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels))
+    .join("");
+}
 
 function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => Promise<void>): void {
   const container = document.getElementById("pending-packs")!;
@@ -74,14 +98,12 @@ async function load(): Promise<void> {
   const data = await getCollection();
   femaleVariantBaseNames = collectFemaleVariantBaseNames(data.cards);
   formLabels = computeFormLabels(data.cards);
-  const owned = data.cards.filter((c) => c.quantity > 0);
+  ownedCards = data.cards.filter((c) => c.quantity > 0);
   const unowned = data.cards.filter((c) => c.quantity === 0);
 
   document.getElementById("owned-heading")!.innerHTML =
-    `Obtenidas <span class="count">(${owned.length}/${data.cards.length})</span>`;
-  document.getElementById("owned-grid")!.innerHTML = owned
-    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels))
-    .join("");
+    `Obtenidas <span class="count">(${ownedCards.length}/${data.cards.length})</span>`;
+  renderOwnedGrid();
 
   document.getElementById("unowned-heading")!.innerHTML = `Por conseguir <span class="count">(${unowned.length})</span>`;
   document.getElementById("unowned-grid")!.innerHTML = unowned
@@ -94,5 +116,8 @@ async function load(): Promise<void> {
     await load();
   });
 }
+
+document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
+document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
 
 load();

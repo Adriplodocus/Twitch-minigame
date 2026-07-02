@@ -9,7 +9,8 @@ collection.get("/", requireAuth, async (c) => {
   const user = c.get("user");
 
   const cards = await c.env.DB.prepare(
-    `SELECT c.id, c.name, c.rarity, c.image_path AS imagePath, c.sort_order AS sortOrder, COALESCE(uc.quantity, 0) AS quantity
+    `SELECT c.id, c.name, c.rarity, c.image_path AS imagePath, c.sort_order AS sortOrder,
+            COALESCE(uc.quantity, 0) AS quantity, uc.updated_at AS acquiredAt
      FROM cards c
      LEFT JOIN user_cards uc ON uc.card_id = c.id AND uc.user_id = ?
      ORDER BY c.sort_order, c.id`
@@ -49,8 +50,8 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   for (const card of picked) {
     statements.push(
       c.env.DB.prepare(
-        `INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, 1)
-         ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + 1`
+        `INSERT INTO user_cards (user_id, card_id, quantity, updated_at) VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+         ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + 1, updated_at = CURRENT_TIMESTAMP`
       ).bind(user.twitchId, card.id)
     );
   }

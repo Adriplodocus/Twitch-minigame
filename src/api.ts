@@ -9,6 +9,7 @@ export interface CardView {
   imagePath: string;
   quantity: number;
   sortOrder?: number;
+  acquiredAt?: string | null;
 }
 
 export interface PendingPack {

@@ -192,8 +192,8 @@ trade.post("/offers/:id/accept", requireAuth, async (c) => {
     );
     statements.push(
       c.env.DB.prepare(
-        `INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)
-         ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + ?`
+        `INSERT INTO user_cards (user_id, card_id, quantity, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+         ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + ?, updated_at = CURRENT_TIMESTAMP`
       ).bind(receiver, item.card_id, item.quantity, item.quantity)
     );
   }

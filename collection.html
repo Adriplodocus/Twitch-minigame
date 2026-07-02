@@ -23,6 +23,17 @@
       <div id="pending-packs" style="margin-top: 2rem;"></div>
 
       <h2 id="owned-heading" class="section-heading"></h2>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
+        <select id="sort-field" class="input">
+          <option value="pokedex">Pokédex</option>
+          <option value="recent">Recientes</option>
+          <option value="quantity">Cantidad</option>
+        </select>
+        <select id="sort-direction" class="input">
+          <option value="asc">Ascendente</option>
+          <option value="desc">Descendente</option>
+        </select>
+      </div>
       <div id="owned-grid" class="card-grid"></div>
 
       <h2 id="unowned-heading" class="section-heading"></h2>
