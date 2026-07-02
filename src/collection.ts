@@ -42,7 +42,7 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => Promis
   packs.forEach((pack) => {
     const img = document.createElement("img");
     img.className = "pack-open-img";
-    img.src = "/pack.png";
+    img.src = "/pack.webp";
     img.alt = "Abrir sobre";
     img.addEventListener("click", () => {
       img.classList.add("opening");
