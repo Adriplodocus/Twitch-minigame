@@ -10,9 +10,9 @@ export const RARITY_WEIGHTS: Record<Rarity, number> = {
 export const SHINY_CHANCE = 0.01;
 
 export const CATEGORY_WEIGHTS: Record<Exclude<Category, "normal">, number> = {
-  inicial: 0.15,
-  mega: 0.1,
-  gmax: 0.1,
+  inicial: 0.1,
+  mega: 0.05,
+  gmax: 0.05,
 };
 
 export function isShinyCard(id: string): boolean {

@@ -66,7 +66,7 @@ describe("pickRandomCards", () => {
     expect(legendaryPick[0].id).toBe("p2");
   });
 
-  it("splits a rarity's weight budget across categories ~65/15/10/10 (normal/inicial/mega/gmax)", () => {
+  it("splits a rarity's weight budget across categories ~80/10/5/5 (normal/inicial/mega/gmax)", () => {
     const catalog: TestCard[] = [
       { id: "normal1", rarity: "common", category: "normal" },
       { id: "inicial1", rarity: "common", category: "inicial" },
@@ -77,18 +77,18 @@ describe("pickRandomCards", () => {
     const picks = pickRandomCards(catalog, rolls.length, sequenceRandom(rolls));
     const ratio = (id: string) => picks.filter((c) => c.id === id).length / picks.length;
 
-    expect(ratio("normal1")).toBeGreaterThan(0.63);
-    expect(ratio("normal1")).toBeLessThan(0.67);
-    expect(ratio("inicial1")).toBeGreaterThan(0.13);
-    expect(ratio("inicial1")).toBeLessThan(0.17);
-    expect(ratio("mega1")).toBeGreaterThan(0.08);
-    expect(ratio("mega1")).toBeLessThan(0.12);
-    expect(ratio("gmax1")).toBeGreaterThan(0.08);
-    expect(ratio("gmax1")).toBeLessThan(0.12);
+    expect(ratio("normal1")).toBeGreaterThan(0.78);
+    expect(ratio("normal1")).toBeLessThan(0.82);
+    expect(ratio("inicial1")).toBeGreaterThan(0.08);
+    expect(ratio("inicial1")).toBeLessThan(0.12);
+    expect(ratio("mega1")).toBeGreaterThan(0.03);
+    expect(ratio("mega1")).toBeLessThan(0.07);
+    expect(ratio("gmax1")).toBeGreaterThan(0.03);
+    expect(ratio("gmax1")).toBeLessThan(0.07);
   });
 
   it("folds an absent category's weight budget entirely into normal for that rarity", () => {
-    // No "mega" or "gmax" cards exist for "rare" — their 10%+10% should fold into normal, not vanish.
+    // No "mega" or "gmax" cards exist for "rare" — their 5%+5% should fold into normal, not vanish.
     const catalog: TestCard[] = [
       { id: "normal1", rarity: "rare", category: "normal" },
       { id: "inicial1", rarity: "rare", category: "inicial" },
@@ -97,11 +97,11 @@ describe("pickRandomCards", () => {
     const picks = pickRandomCards(catalog, rolls.length, sequenceRandom(rolls));
     const ratio = (id: string) => picks.filter((c) => c.id === id).length / picks.length;
 
-    // normal should get 100% - 15% (inicial) = 85%, not 65%, since mega/gmax are absent
-    expect(ratio("normal1")).toBeGreaterThan(0.83);
-    expect(ratio("normal1")).toBeLessThan(0.87);
-    expect(ratio("inicial1")).toBeGreaterThan(0.13);
-    expect(ratio("inicial1")).toBeLessThan(0.17);
+    // normal should get 100% - 10% (inicial) = 90%, not 80%, since mega/gmax are absent
+    expect(ratio("normal1")).toBeGreaterThan(0.88);
+    expect(ratio("normal1")).toBeLessThan(0.92);
+    expect(ratio("inicial1")).toBeGreaterThan(0.08);
+    expect(ratio("inicial1")).toBeLessThan(0.12);
   });
 
   it("applies shiny ~1% within a non-normal category too", () => {

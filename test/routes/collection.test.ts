@@ -69,7 +69,7 @@ it("opens a pending pack and grants 5 cards", async () => {
   );
   expect(res.status).toBe(200);
   const json = await res.json<{ cards: { id: string }[] }>();
-  expect(json.cards).toHaveLength(5);
+  expect(json.cards).toHaveLength(10);
 
   const pack = await env.DB.prepare("SELECT opened_at FROM packs WHERE id = ?")
     .bind(packResult!.id)

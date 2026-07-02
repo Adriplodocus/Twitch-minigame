@@ -46,7 +46,7 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
     return c.json({ error: "Catalog is empty" }, 500);
   }
 
-  const picked = pickRandomCards(catalog.results, 5);
+  const picked = pickRandomCards(catalog.results, 10);
 
   const statements = picked.map((card) =>
     c.env.DB.prepare("INSERT INTO pack_cards (pack_id, card_id) VALUES (?, ?)").bind(packId, card.id)
