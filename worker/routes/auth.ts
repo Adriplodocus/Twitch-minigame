@@ -7,7 +7,7 @@ import { requireAuth } from "../middleware/auth";
 
 const auth = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
 
-auth.get("/me", requireAuth, (c) => c.json({ ok: true }));
+auth.get("/me", requireAuth, (c) => c.json({ ok: true, username: c.get("user").username }));
 
 auth.get("/login", (c) => {
   const state = crypto.randomUUID();

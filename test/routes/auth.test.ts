@@ -19,6 +19,8 @@ it("accepts /me with a valid session cookie", async () => {
   const token = await signSession({ twitchId: "1", username: "viewer1" }, env.JWT_SECRET);
   const res = await app.request("/api/auth/me", { headers: { Cookie: `session=${token}` } }, env);
   expect(res.status).toBe(200);
+  const json = await res.json<{ ok: boolean; username: string }>();
+  expect(json.username).toBe("viewer1");
 });
 
 it("redirects to Twitch authorize URL on login", async () => {
