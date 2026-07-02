@@ -20,7 +20,7 @@ trade.get("/users/:username", requireAuth, async (c) => {
     `SELECT c.id, c.name, c.rarity, c.image_path AS imagePath, COALESCE(uc.quantity, 0) AS quantity
      FROM cards c
      LEFT JOIN user_cards uc ON uc.card_id = c.id AND uc.user_id = ?
-     ORDER BY c.id`
+     ORDER BY c.sort_order, c.id`
   )
     .bind(targetUser.twitch_id)
     .all();

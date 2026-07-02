@@ -4,7 +4,7 @@ function renderCard(card: CardView): string {
   const ownedClass = card.quantity > 0 ? "" : "unowned";
   return `
     <div class="card ${ownedClass} card-in">
-      <img src="${card.imagePath}" alt="${card.name}" />
+      <img src="${card.imagePath}" alt="${card.name}" loading="lazy" />
       <p style="margin-top: 0.5rem; color: var(--text-em);">${card.name}</p>
       <span class="badge rarity-${card.rarity}">${card.rarity}</span>
       ${card.quantity > 0 ? `<p style="margin-top: 0.25rem;">x${card.quantity}</p>` : ""}
@@ -30,7 +30,7 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => void):
 }
 
 async function revealPack(cards: CardView[]): Promise<void> {
-  const grid = document.getElementById("card-grid")!;
+  const grid = document.getElementById("owned-grid")!;
   const overlay = document.createElement("div");
   overlay.style.cssText =
     "position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; gap: 1rem; z-index: 10;";
@@ -50,8 +50,15 @@ async function revealPack(cards: CardView[]): Promise<void> {
 
 async function load(): Promise<void> {
   const data = await getCollection();
-  const grid = document.getElementById("card-grid")!;
-  grid.innerHTML = data.cards.map(renderCard).join("");
+  const owned = data.cards.filter((c) => c.quantity > 0);
+  const unowned = data.cards.filter((c) => c.quantity === 0);
+
+  document.getElementById("owned-heading")!.innerHTML =
+    `Obtenidas <span class="count">(${owned.length}/${data.cards.length})</span>`;
+  document.getElementById("owned-grid")!.innerHTML = owned.map(renderCard).join("");
+
+  document.getElementById("unowned-heading")!.innerHTML = `Por conseguir <span class="count">(${unowned.length})</span>`;
+  document.getElementById("unowned-grid")!.innerHTML = unowned.map(renderCard).join("");
 
   renderPendingPacks(data.pendingPacks, async (packId) => {
     const result = await openPack(packId);

@@ -10,6 +10,7 @@ export interface CardRow {
   name: string;
   rarity: Rarity;
   imageFilename: string;
+  sortOrder?: number;
 }
 
 export interface CatalogEntry {
@@ -17,17 +18,24 @@ export interface CatalogEntry {
   name: string;
   rarity: Rarity;
   imagePath: string;
+  sortOrder: number;
 }
 
 export function parseCsv(content: string): CardRow[] {
   const lines = content.trim().split("\n").filter((line) => line.length > 0);
   const [, ...dataLines] = lines;
   return dataLines.map((line) => {
-    const [id, name, rarity, imageFilename] = line.split(",").map((field) => field.trim());
+    const [id, name, rarity, imageFilename, sortOrder] = line.split(",").map((field) => field.trim());
     if (!VALID_RARITIES.includes(rarity as Rarity)) {
       throw new Error(`Invalid rarity "${rarity}" for card "${id}". Must be one of: ${VALID_RARITIES.join(", ")}`);
     }
-    return { id, name, rarity: rarity as Rarity, imageFilename };
+    return {
+      id,
+      name,
+      rarity: rarity as Rarity,
+      imageFilename,
+      ...(sortOrder !== undefined ? { sortOrder: Number(sortOrder) } : {}),
+    };
   });
 }
 
@@ -46,7 +54,13 @@ export function buildCatalog(
       throw new Error(`Image file not found in public/cards/: ${row.imageFilename}`);
     }
 
-    catalog.push({ id: row.id, name: row.name, rarity: row.rarity, imagePath: `/cards/${row.imageFilename}` });
+    catalog.push({
+      id: row.id,
+      name: row.name,
+      rarity: row.rarity,
+      imagePath: `/cards/${row.imageFilename}`,
+      sortOrder: row.sortOrder ?? 0,
+    });
   }
 
   const CHUNK_SIZE = 200;
@@ -54,9 +68,14 @@ export function buildCatalog(
   for (let i = 0; i < catalog.length; i += CHUNK_SIZE) {
     const chunk = catalog.slice(i, i + CHUNK_SIZE);
     const values = chunk
-      .map((card) => `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.imagePath}')`)
+      .map(
+        (card) =>
+          `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.imagePath}', ${card.sortOrder})`
+      )
       .join(",\n  ");
-    statements.push(`INSERT OR REPLACE INTO cards (id, name, rarity, image_path) VALUES\n  ${values};`);
+    statements.push(
+      `INSERT OR REPLACE INTO cards (id, name, rarity, image_path, sort_order) VALUES\n  ${values};`
+    );
   }
   const seedSql = statements.join("\n") + "\n";
 

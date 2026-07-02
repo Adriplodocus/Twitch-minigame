@@ -22,6 +22,7 @@ interface SpriteEntry {
 
 interface SpeciesInfo {
   name: string;
+  dexNumber: number;
   isLegendary: boolean;
   isMythical: boolean;
   evolvesFrom: string | null;
@@ -68,6 +69,7 @@ async function getSpecies(cache: Cache, speciesName: string): Promise<SpeciesInf
   const data = await fetchJson(`https://pokeapi.co/api/v2/pokemon-species/${speciesName}`);
   const info: SpeciesInfo = {
     name: speciesName,
+    dexNumber: data?.id ?? 0,
     isLegendary: !!data?.is_legendary,
     isMythical: !!data?.is_mythical,
     evolvesFrom: data?.evolves_from_species?.name ?? null,
@@ -139,6 +141,7 @@ interface CardRow {
   rarity: Rarity;
   imageFilename: string;
   sourcePath: string;
+  sortOrder: number;
 }
 
 function slugSuffix(variantSuffix: string): string {
@@ -146,15 +149,34 @@ function slugSuffix(variantSuffix: string): string {
 }
 
 async function main(): Promise<void> {
-  const groups: { key: string; dir: string; nameSuffix: (n: string) => string; idSuffix: string }[] = [
-    { key: "base", dir: SPRITE_ROOT, nameSuffix: (n) => n, idSuffix: "" },
-    { key: "female", dir: path.join(SPRITE_ROOT, "female"), nameSuffix: (n) => `${n} (Hembra)`, idSuffix: "-female" },
-    { key: "shiny", dir: path.join(SPRITE_ROOT, "shiny"), nameSuffix: (n) => `${n} Shiny`, idSuffix: "-shiny" },
+  const groups: {
+    key: string;
+    dir: string;
+    nameSuffix: (n: string) => string;
+    idSuffix: string;
+    variantRank: number;
+  }[] = [
+    { key: "base", dir: SPRITE_ROOT, nameSuffix: (n) => n, idSuffix: "", variantRank: 0 },
+    {
+      key: "female",
+      dir: path.join(SPRITE_ROOT, "female"),
+      nameSuffix: (n) => `${n} (Hembra)`,
+      idSuffix: "-female",
+      variantRank: 1,
+    },
+    {
+      key: "shiny",
+      dir: path.join(SPRITE_ROOT, "shiny"),
+      nameSuffix: (n) => `${n} Shiny`,
+      idSuffix: "-shiny",
+      variantRank: 2,
+    },
     {
       key: "shinyFemale",
       dir: path.join(SPRITE_ROOT, "shiny", "female"),
       nameSuffix: (n) => `${n} Shiny (Hembra)`,
       idSuffix: "-shiny-female",
+      variantRank: 3,
     },
   ];
 
@@ -178,11 +200,14 @@ async function main(): Promise<void> {
   saveCache(cache);
 
   const rarityBySpecies = new Map<string, Rarity>();
+  const dexNumberBySpecies = new Map<string, number>();
   const uniqueSpeciesNames = [...new Set([...pokemonInfo.values()].map((p) => p.speciesName))];
   done = 0;
   await pool(uniqueSpeciesNames, 10, async (speciesName) => {
     const r = await getRarity(cache, speciesName);
     rarityBySpecies.set(speciesName, r);
+    const species = await getSpecies(cache, speciesName);
+    dexNumberBySpecies.set(speciesName, species.dexNumber);
     done++;
     if (done % 100 === 0) {
       console.log(`resolved ${done}/${uniqueSpeciesNames.length} rarities`);
@@ -204,12 +229,15 @@ async function main(): Promise<void> {
       const formIdPart = entry.suffix ? `-form-${slugSuffix(entry.suffix)}` : "";
       const cardId = `p${entry.id}${formIdPart}${g.idSuffix}`;
       const imageFilename = `${cardId}.png`;
+      const dexNumber = dexNumberBySpecies.get(info.speciesName) ?? entry.id;
+      const sortOrder = dexNumber * 1_000_000 + (entry.id % 1_000_000) * 10 + g.variantRank;
       rows.push({
         id: cardId,
         name: displayName,
         rarity,
         imageFilename,
         sourcePath: path.join(g.dir, entry.filename),
+        sortOrder,
       });
     }
   }
@@ -219,9 +247,9 @@ async function main(): Promise<void> {
     copyFileSync(row.sourcePath, path.join(CARDS_OUT_DIR, row.imageFilename));
   }
 
-  const csvLines = ["id,name,rarity,image_filename"];
+  const csvLines = ["id,name,rarity,image_filename,sort_order"];
   for (const row of rows) {
-    csvLines.push(`${row.id},${row.name},${row.rarity},${row.imageFilename}`);
+    csvLines.push(`${row.id},${row.name},${row.rarity},${row.imageFilename},${row.sortOrder}`);
   }
   writeFileSync(CSV_OUT_PATH, csvLines.join("\n") + "\n");
 

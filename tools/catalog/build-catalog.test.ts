@@ -17,18 +17,24 @@ it("throws on an unknown rarity", () => {
 
 it("builds a catalog and seed SQL from valid rows", () => {
   const rows = [
-    { id: "c1", name: "Common Card", rarity: "common" as const, imageFilename: "c1.png" },
-    { id: "r1", name: "Rare Card", rarity: "rare" as const, imageFilename: "r1.png" },
+    { id: "c1", name: "Common Card", rarity: "common" as const, imageFilename: "c1.png", sortOrder: 1 },
+    { id: "r1", name: "Rare Card", rarity: "rare" as const, imageFilename: "r1.png", sortOrder: 2 },
   ];
   const { catalog, seedSql } = buildCatalog(rows, new Set(["c1.png", "r1.png"]));
 
   expect(catalog).toEqual([
-    { id: "c1", name: "Common Card", rarity: "common", imagePath: "/cards/c1.png" },
-    { id: "r1", name: "Rare Card", rarity: "rare", imagePath: "/cards/r1.png" },
+    { id: "c1", name: "Common Card", rarity: "common", imagePath: "/cards/c1.png", sortOrder: 1 },
+    { id: "r1", name: "Rare Card", rarity: "rare", imagePath: "/cards/r1.png", sortOrder: 2 },
   ]);
   expect(seedSql).toContain("INSERT OR REPLACE INTO cards");
   expect(seedSql).toContain("'c1'");
   expect(seedSql).toContain("'r1'");
+});
+
+it("defaults sortOrder to 0 when omitted", () => {
+  const rows = [{ id: "c1", name: "Common Card", rarity: "common" as const, imageFilename: "c1.png" }];
+  const { catalog } = buildCatalog(rows, new Set(["c1.png"]));
+  expect(catalog[0].sortOrder).toBe(0);
 });
 
 it("throws when a referenced image file does not exist", () => {
