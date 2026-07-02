@@ -87,24 +87,29 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   height: 26px;
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
 }
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  min-height: 1.1rem;
+}
+.card-footer-slot:empty { display: none; }
 .card-qty {
-  position: absolute;
-  bottom: 0.5rem;
-  left: 0.5rem;
   padding: 0.15rem 0.55rem;
   border-radius: 100px;
   font-size: 0.6rem;
   font-weight: 700;
   color: var(--text-em);
   background: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
 }
 .badge-variant {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
   background: rgba(0, 204, 255, 0.15);
   color: var(--blue);
   border-color: rgba(0, 204, 255, 0.30);
+  white-space: nowrap;
 }
 
 .section-heading {

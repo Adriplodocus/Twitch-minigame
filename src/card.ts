@@ -95,8 +95,10 @@ export function renderCardHtml(
       ${shinyIcon}
       <img src="${card.imagePath}" alt="${baseName}" loading="lazy" />
       <p class="card-name">${baseName}</p>
-      ${variantBadge}
-      ${qtyBadge}
+      <div class="card-footer">
+        <span class="card-footer-slot">${qtyBadge}</span>
+        <span class="card-footer-slot">${variantBadge}</span>
+      </div>
       ${innerExtra}
     </div>
   `;
