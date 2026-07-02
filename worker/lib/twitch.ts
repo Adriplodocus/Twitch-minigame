@@ -46,6 +46,21 @@ export async function getTwitchUser(
   return { id: user.id, login: user.login, profileImageUrl: user.profile_image_url };
 }
 
+export async function getAppAccessToken(
+  opts: { clientId: string; clientSecret: string },
+  fetchImpl: typeof fetch = fetch
+): Promise<string> {
+  const body = new URLSearchParams({
+    client_id: opts.clientId,
+    client_secret: opts.clientSecret,
+    grant_type: "client_credentials",
+  });
+  const res = await fetchImpl("https://id.twitch.tv/oauth2/token", { method: "POST", body });
+  if (!res.ok) throw new Error(`Twitch app token fetch failed: ${res.status}`);
+  const json = (await res.json()) as { access_token: string };
+  return json.access_token;
+}
+
 export async function createEventSubSubscription(
   opts: {
     accessToken: string;

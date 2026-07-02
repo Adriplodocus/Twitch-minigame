@@ -113,8 +113,12 @@ auth.get("/broadcaster-callback", async (c) => {
     .bind(twitchUser.id, token.accessToken, token.refreshToken, expiresAt)
     .run();
 
+  const appAccessToken = await twitch.getAppAccessToken({
+    clientId: c.env.TWITCH_CLIENT_ID,
+    clientSecret: c.env.TWITCH_CLIENT_SECRET,
+  });
   await twitch.createEventSubSubscription({
-    accessToken: token.accessToken,
+    accessToken: appAccessToken,
     clientId: c.env.TWITCH_CLIENT_ID,
     broadcasterId: c.env.TWITCH_BROADCASTER_ID,
     rewardId: c.env.TWITCH_REWARD_ID,

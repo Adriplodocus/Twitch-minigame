@@ -4,6 +4,7 @@ import {
   exchangeCodeForToken,
   getTwitchUser,
   createEventSubSubscription,
+  getAppAccessToken,
 } from "../../worker/lib/twitch";
 
 it("builds an authorize URL with required params", () => {
@@ -70,4 +71,23 @@ it("creates an EventSub subscription", async () => {
   const body = JSON.parse((fetchImpl.mock.calls[0][1] as RequestInit).body as string);
   expect(body.type).toBe("channel.channel_points_custom_reward_redemption.add");
   expect(body.condition).toEqual({ broadcaster_user_id: "99", reward_id: "reward-1" });
+});
+
+it("fetches an app access token via client credentials", async () => {
+  const fetchImpl = vi.fn(async () =>
+    new Response(JSON.stringify({ access_token: "app-token", expires_in: 5011271 }), { status: 200 })
+  );
+  const token = await getAppAccessToken(
+    { clientId: "abc", clientSecret: "s3cr3t" },
+    fetchImpl as unknown as typeof fetch
+  );
+  expect(token).toBe("app-token");
+  expect(fetchImpl).toHaveBeenCalledWith(
+    "https://id.twitch.tv/oauth2/token",
+    expect.objectContaining({ method: "POST" })
+  );
+  const body = (fetchImpl.mock.calls[0][1] as RequestInit).body as URLSearchParams;
+  expect(body.get("grant_type")).toBe("client_credentials");
+  expect(body.get("client_id")).toBe("abc");
+  expect(body.get("client_secret")).toBe("s3cr3t");
 });

@@ -76,3 +76,29 @@ it("rejects broadcaster callback when the logged-in Twitch user is not the broad
   expect(res.status).toBe(403);
   vi.restoreAllMocks();
 });
+
+it("creates an EventSub subscription with an app access token on a valid broadcaster callback", async () => {
+  vi.spyOn(twitch, "exchangeCodeForToken").mockResolvedValue({
+    accessToken: "broadcaster-user-token",
+    refreshToken: "rt",
+    expiresIn: 14400,
+  });
+  vi.spyOn(twitch, "getTwitchUser").mockResolvedValue({
+    id: env.TWITCH_BROADCASTER_ID,
+    login: "mrklypp",
+    profileImageUrl: "https://img",
+  });
+  vi.spyOn(twitch, "getAppAccessToken").mockResolvedValue("app-token");
+  const createSpy = vi.spyOn(twitch, "createEventSubSubscription").mockResolvedValue(undefined);
+
+  const res = await app.request(
+    "/api/auth/broadcaster-callback?code=abc&state=expected",
+    { headers: { Cookie: "broadcaster_oauth_state=expected" } },
+    env
+  );
+
+  expect(res.status).toBe(200);
+  expect(createSpy).toHaveBeenCalledWith(expect.objectContaining({ accessToken: "app-token" }));
+
+  vi.restoreAllMocks();
+});
