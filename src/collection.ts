@@ -4,7 +4,7 @@ import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels } from
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
 
-function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => void): void {
+function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => Promise<void>): void {
   const container = document.getElementById("pending-packs")!;
   if (packs.length === 0) {
     container.innerHTML = "";
@@ -15,9 +15,26 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => void):
     const btn = document.createElement("button");
     btn.className = "btn";
     btn.style.marginTop = "0.75rem";
-    btn.textContent = packs.length > 1 ? `Abrir sobre ${index + 1}` : "Abrir sobre";
-    btn.addEventListener("click", () => onOpen(pack.id));
+    const label = packs.length > 1 ? `Abrir sobre ${index + 1}` : "Abrir sobre";
+    btn.textContent = label;
+    btn.addEventListener("click", () => {
+      btn.disabled = true;
+      btn.textContent = "Abriendo...";
+      onOpen(pack.id).finally(() => {
+        btn.disabled = false;
+        btn.textContent = label;
+      });
+    });
     container.appendChild(btn);
+  });
+}
+
+function preloadImage(src: string): Promise<void> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = src;
   });
 }
 
@@ -25,17 +42,31 @@ async function revealPack(cards: CardView[]): Promise<void> {
   const grid = document.getElementById("owned-grid")!;
   const overlay = document.createElement("div");
   overlay.style.cssText =
-    "position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; gap: 1rem; z-index: 10;";
+    "position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; z-index: 10; padding: 1rem;";
   document.body.appendChild(overlay);
 
-  for (const card of cards) {
+  const cardsRow = document.createElement("div");
+  cardsRow.style.cssText = "display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem;";
+  overlay.appendChild(cardsRow);
+
+  const preloads = cards.map((c) => preloadImage(c.imagePath));
+
+  for (let i = 0; i < cards.length; i++) {
+    await preloads[i];
     const wrapper = document.createElement("div");
-    wrapper.innerHTML = renderCardHtml(card, "", femaleVariantBaseNames, formLabels);
-    overlay.appendChild(wrapper.firstElementChild!);
+    wrapper.innerHTML = renderCardHtml(cards[i], "", femaleVariantBaseNames, formLabels);
+    const cardEl = wrapper.firstElementChild!;
+    cardEl.classList.add("card-reveal");
+    cardsRow.appendChild(cardEl);
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
 
-  overlay.addEventListener("click", () => overlay.remove());
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "btn";
+  closeBtn.textContent = "Cerrar";
+  closeBtn.addEventListener("click", () => overlay.remove());
+  overlay.appendChild(closeBtn);
+
   grid.dispatchEvent(new Event("reload-collection"));
 }
 

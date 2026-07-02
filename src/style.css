@@ -50,6 +50,16 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
 .card.unowned { opacity: 0.7; }
 .card.unowned img { filter: grayscale(1) brightness(0.65); }
 
+.card-art {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+.card-reveal { width: 140px; flex: 0 0 auto; }
+
 .card.card-rarity-rare { border-color: var(--blue); }
 .card.card-rarity-epic { border-color: #8B5CF6; }
 .card.card-rarity-legendary { border-color: #FFD700; }

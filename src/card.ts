@@ -127,7 +127,7 @@ export function renderCardHtml(
     <div class="card card-rarity-${card.rarity} ${ownedClass} card-in">
       ${genderIcon}
       ${shinyIcon}
-      <img src="${card.imagePath}" alt="${baseName}" loading="lazy" />
+      <img class="card-art" src="${card.imagePath}" alt="${baseName}" loading="lazy" />
       <p class="card-name">${baseName}</p>
       <div class="card-footer">
         <span class="card-footer-slot">${qtyBadge}</span>
