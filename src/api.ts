@@ -40,6 +40,10 @@ export function logout(): Promise<{ ok: boolean }> {
   return request("/auth/logout", { method: "POST" });
 }
 
+export function getMe(): Promise<{ ok: boolean; username: string }> {
+  return request("/auth/me");
+}
+
 export function openPack(packId: number): Promise<{ cards: CardView[] }> {
   return request(`/collection/packs/${packId}/open`, { method: "POST" });
 }
