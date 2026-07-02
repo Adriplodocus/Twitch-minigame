@@ -11,14 +11,14 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => void):
     return;
   }
   container.innerHTML = `<h2>Sobres pendientes (${packs.length})</h2>`;
-  for (const pack of packs) {
+  packs.forEach((pack, index) => {
     const btn = document.createElement("button");
     btn.className = "btn";
     btn.style.marginTop = "0.75rem";
-    btn.textContent = `Abrir sobre #${pack.id}`;
+    btn.textContent = packs.length > 1 ? `Abrir sobre ${index + 1}` : "Abrir sobre";
     btn.addEventListener("click", () => onOpen(pack.id));
     container.appendChild(btn);
-  }
+  });
 }
 
 async function revealPack(cards: CardView[]): Promise<void> {
