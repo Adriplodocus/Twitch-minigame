@@ -39,11 +39,12 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => Promis
   row.style.cssText = "display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem;";
   container.appendChild(row);
 
-  packs.forEach((pack) => {
+  packs.forEach((pack, index) => {
     const img = document.createElement("img");
     img.className = "pack-open-img";
     img.src = "/pack.webp";
     img.alt = "Abrir sobre";
+    img.style.animationDelay = `-${(index * 0.7) % 2.4}s`;
     img.addEventListener("click", () => {
       img.classList.add("opening");
       onOpen(pack.id).finally(() => {
