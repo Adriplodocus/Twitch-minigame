@@ -9,7 +9,7 @@ collection.get("/", requireAuth, async (c) => {
   const user = c.get("user");
 
   const cards = await c.env.DB.prepare(
-    `SELECT c.id, c.name, c.rarity, c.image_path AS imagePath, COALESCE(uc.quantity, 0) AS quantity
+    `SELECT c.id, c.name, c.rarity, c.image_path AS imagePath, c.sort_order AS sortOrder, COALESCE(uc.quantity, 0) AS quantity
      FROM cards c
      LEFT JOIN user_cards uc ON uc.card_id = c.id AND uc.user_id = ?
      ORDER BY c.sort_order, c.id`

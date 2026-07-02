@@ -98,6 +98,14 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   color: var(--text-em);
   background: rgba(0, 0, 0, 0.6);
 }
+.badge-variant {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 204, 255, 0.15);
+  color: var(--blue);
+  border-color: rgba(0, 204, 255, 0.30);
+}
 
 .section-heading {
   margin-top: 2rem;

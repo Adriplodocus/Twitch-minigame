@@ -1,7 +1,8 @@
 import { getCollection, openPack, type CardView, type PendingPack } from "./api";
-import { renderCardHtml, collectFemaleVariantBaseNames } from "./card";
+import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels } from "./card";
 
 let femaleVariantBaseNames = new Set<string>();
+let formLabels = new Map<string, string>();
 
 function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => void): void {
   const container = document.getElementById("pending-packs")!;
@@ -29,7 +30,7 @@ async function revealPack(cards: CardView[]): Promise<void> {
 
   for (const card of cards) {
     const wrapper = document.createElement("div");
-    wrapper.innerHTML = renderCardHtml(card, "", femaleVariantBaseNames);
+    wrapper.innerHTML = renderCardHtml(card, "", femaleVariantBaseNames, formLabels);
     overlay.appendChild(wrapper.firstElementChild!);
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
@@ -41,15 +42,20 @@ async function revealPack(cards: CardView[]): Promise<void> {
 async function load(): Promise<void> {
   const data = await getCollection();
   femaleVariantBaseNames = collectFemaleVariantBaseNames(data.cards);
+  formLabels = computeFormLabels(data.cards);
   const owned = data.cards.filter((c) => c.quantity > 0);
   const unowned = data.cards.filter((c) => c.quantity === 0);
 
   document.getElementById("owned-heading")!.innerHTML =
     `Obtenidas <span class="count">(${owned.length}/${data.cards.length})</span>`;
-  document.getElementById("owned-grid")!.innerHTML = owned.map((c) => renderCardHtml(c, "", femaleVariantBaseNames)).join("");
+  document.getElementById("owned-grid")!.innerHTML = owned
+    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels))
+    .join("");
 
   document.getElementById("unowned-heading")!.innerHTML = `Por conseguir <span class="count">(${unowned.length})</span>`;
-  document.getElementById("unowned-grid")!.innerHTML = unowned.map((c) => renderCardHtml(c, "", femaleVariantBaseNames)).join("");
+  document.getElementById("unowned-grid")!.innerHTML = unowned
+    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels))
+    .join("");
 
   renderPendingPacks(data.pendingPacks, async (packId) => {
     const result = await openPack(packId);

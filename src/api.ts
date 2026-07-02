@@ -8,6 +8,7 @@ export interface CardView {
   rarity: Rarity;
   imagePath: string;
   quantity: number;
+  sortOrder?: number;
 }
 
 export interface PendingPack {

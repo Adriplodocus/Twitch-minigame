@@ -10,11 +10,16 @@ import {
   type TradeOfferItem,
   type TradeOfferSummary,
 } from "./api";
-import { renderCardHtml, collectFemaleVariantBaseNames } from "./card";
+import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels } from "./card";
 
 let currentTargetUsername = "";
 
-function renderSelectableCard(card: CardView, inputClass: string, femaleVariantBaseNames: Set<string>): string {
+function renderSelectableCard(
+  card: CardView,
+  inputClass: string,
+  femaleVariantBaseNames: Set<string>,
+  formLabels: Map<string, string>
+): string {
   if (card.quantity === 0) return "";
   const input = `
     <input
@@ -27,7 +32,7 @@ function renderSelectableCard(card: CardView, inputClass: string, femaleVariantB
       style="margin-top: 0.5rem; width: 100%;"
     />
   `;
-  return renderCardHtml(card, input, femaleVariantBaseNames);
+  return renderCardHtml(card, input, femaleVariantBaseNames, formLabels);
 }
 
 function collectQuantities(containerId: string, inputClass: string): { cardId: string; quantity: number }[] {
@@ -53,12 +58,14 @@ async function searchUser(): Promise<void> {
 
   const myFemaleVariants = collectFemaleVariantBaseNames(myCollection.cards);
   const targetFemaleVariants = collectFemaleVariantBaseNames(targetCollection.cards);
+  const myFormLabels = computeFormLabels(myCollection.cards);
+  const targetFormLabels = computeFormLabels(targetCollection.cards);
 
   document.getElementById("my-cards")!.innerHTML = myCollection.cards
-    .map((card) => renderSelectableCard(card, "offer-qty", myFemaleVariants))
+    .map((card) => renderSelectableCard(card, "offer-qty", myFemaleVariants, myFormLabels))
     .join("");
   document.getElementById("target-collection")!.innerHTML = targetCollection.cards
-    .map((card) => renderSelectableCard(card, "request-qty", targetFemaleVariants))
+    .map((card) => renderSelectableCard(card, "request-qty", targetFemaleVariants, targetFormLabels))
     .join("");
   document.getElementById("offer-builder")!.style.display = "block";
 }
