@@ -9,6 +9,18 @@ beforeEach(async () => {
   await env.DB.exec("DELETE FROM users");
 });
 
+it("rejects /me without a session cookie", async () => {
+  const res = await app.request("/api/auth/me", {}, env);
+  expect(res.status).toBe(401);
+});
+
+it("accepts /me with a valid session cookie", async () => {
+  const { signSession } = await import("../../worker/lib/jwt");
+  const token = await signSession({ twitchId: "1", username: "viewer1" }, env.JWT_SECRET);
+  const res = await app.request("/api/auth/me", { headers: { Cookie: `session=${token}` } }, env);
+  expect(res.status).toBe(200);
+});
+
 it("redirects to Twitch authorize URL on login", async () => {
   const res = await app.request("/api/auth/login", { redirect: "manual" }, env);
   expect(res.status).toBe(302);

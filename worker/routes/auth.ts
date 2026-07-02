@@ -3,8 +3,11 @@ import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import type { Env } from "../types";
 import { signSession } from "../lib/jwt";
 import * as twitch from "../lib/twitch";
+import { requireAuth } from "../middleware/auth";
 
-const auth = new Hono<{ Bindings: Env }>();
+const auth = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
+
+auth.get("/me", requireAuth, (c) => c.json({ ok: true }));
 
 auth.get("/login", (c) => {
   const state = crypto.randomUUID();

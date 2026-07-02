@@ -1,2 +1,3 @@
-// Landing page currently has no client-side behavior beyond the login link.
-export {};
+fetch("/api/auth/me", { credentials: "include" }).then((res) => {
+  if (res.ok) window.location.href = "/collection.html";
+});
