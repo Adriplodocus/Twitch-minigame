@@ -4,6 +4,7 @@
   "compatibility_date": "2025-01-01",
   "main": "./worker/index.ts",
   "assets": {
+    "directory": "./public",
     "run_worker_first": ["/api/*", "/webhook/*"]
   },
   "routes": [

@@ -4,3 +4,4 @@ dist/
 .dev.vars
 catalog.json
 tools/catalog/seed-cards.sql
+tools/catalog/.pokeapi-cache.json

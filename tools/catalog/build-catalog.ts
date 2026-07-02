@@ -49,10 +49,16 @@ export function buildCatalog(
     catalog.push({ id: row.id, name: row.name, rarity: row.rarity, imagePath: `/cards/${row.imageFilename}` });
   }
 
-  const values = catalog
-    .map((card) => `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.imagePath}')`)
-    .join(",\n  ");
-  const seedSql = `INSERT OR REPLACE INTO cards (id, name, rarity, image_path) VALUES\n  ${values};\n`;
+  const CHUNK_SIZE = 200;
+  const statements: string[] = [];
+  for (let i = 0; i < catalog.length; i += CHUNK_SIZE) {
+    const chunk = catalog.slice(i, i + CHUNK_SIZE);
+    const values = chunk
+      .map((card) => `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.imagePath}')`)
+      .join(",\n  ");
+    statements.push(`INSERT OR REPLACE INTO cards (id, name, rarity, image_path) VALUES\n  ${values};`);
+  }
+  const seedSql = statements.join("\n") + "\n";
 
   return { catalog, seedSql };
 }
