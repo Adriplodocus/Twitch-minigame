@@ -55,7 +55,7 @@ Rarity border colors switch from `--blue` / `#8B5CF6` / `#FFD700` to `--blue` / 
   - Hover: `transform: translateY(-4px); box-shadow: 0 10px 26px rgba(120, 90, 60, 0.18);` (drop the `border-color` hover swap — rarity border already carries color)
 - Buttons (`.btn`): keep pill shape (`border-radius: 100px`). Default state becomes a solid warm-pink fill (`background: var(--pink); color: #fff;`) with a soft pink shadow (`0 4px 14px rgba(242,115,158,0.35)`) instead of the current flat `--surface2` + border-hover-glow pattern. Hover: slight lift (`translateY(-2px)`), shadow intensifies.
 - Badges (`.badge`): keep pill shape, restyle to warm gold tone (`background: rgba(232,185,58,0.18); color: #9C7A17;`) — matches the "Rare/Epic/Legendary" corner badge shown in the mockup, reused for the existing `.badge` class.
-- Inputs: border-radius `8px` → `12px`, focus ring uses `--pink` at low alpha instead of `--blue`.
+- Inputs: `.input` is referenced in `collection.html` (`#sort-field`, `#sort-direction`) and `trade.html` (`#search-username`) but was never defined in `src/style.css` — a pre-existing gap where these render as unstyled native controls. Add the `.input` rule: `background: var(--surface); border: 1px solid var(--border); border-radius: 12px;`, font Quicksand, focus ring `--pink` at low alpha.
 
 ## Component-by-component changes (`src/style.css`)
 
@@ -78,6 +78,7 @@ Rarity border colors switch from `--blue` / `#8B5CF6` / `#FFD700` to `--blue` / 
 | `.badge` | warm gold pill (above) |
 | `.card-grid` | no change (layout only) |
 | `@keyframes card-in` | no change |
+| `.input` (new rule) | `background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.5rem 0.85rem; color: var(--text); font-family: 'Quicksand', sans-serif; font-size: 0.9rem;` focus: `border-color: rgba(242, 115, 158, 0.5)` |
 
 ## `src/collection.ts:69` overlay
 
