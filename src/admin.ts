@@ -35,26 +35,41 @@ function showPanelView(): void {
 }
 
 function renderHistory(history: HistoryRow[]): void {
-  document.getElementById("history-body")!.innerHTML = history
-    .map((h) => `<tr><td style="padding: 0.4rem;">${h.username}</td><td style="padding: 0.4rem;">${h.createdAt}</td></tr>`)
-    .join("");
+  const container = document.getElementById("history-body")!;
+  const rows = history.map((h) => {
+    const tr = document.createElement("tr");
+    const tdUsername = document.createElement("td");
+    tdUsername.style.padding = "0.4rem";
+    tdUsername.textContent = h.username;
+    const tdCreatedAt = document.createElement("td");
+    tdCreatedAt.style.padding = "0.4rem";
+    tdCreatedAt.textContent = h.createdAt;
+    tr.appendChild(tdUsername);
+    tr.appendChild(tdCreatedAt);
+    return tr;
+  });
+  container.replaceChildren(...rows);
 }
 
 function renderSearchResults(users: AdminUser[]): void {
   const container = document.getElementById("search-results")!;
   if (users.length === 0) {
-    container.innerHTML = "";
+    container.replaceChildren();
     return;
   }
-  container.innerHTML = users
-    .map((u) => `<span class="badge" data-twitch-id="${u.twitchId}" style="cursor: pointer; margin: 0.2rem;">${u.username}</span>`)
-    .join("");
-  container.querySelectorAll<HTMLElement>("[data-twitch-id]").forEach((el) => {
-    el.addEventListener("click", () => {
-      const user = users.find((u) => u.twitchId === el.dataset.twitchId)!;
+  const spans = users.map((u) => {
+    const span = document.createElement("span");
+    span.className = "badge";
+    span.dataset.twitchId = u.twitchId;
+    span.style.cssText = "cursor: pointer; margin: 0.2rem;";
+    span.textContent = u.username;
+    span.addEventListener("click", () => {
+      const user = users.find((u) => u.twitchId === span.dataset.twitchId)!;
       selectUser(user);
     });
+    return span;
   });
+  container.replaceChildren(...spans);
 }
 
 function selectUser(user: AdminUser): void {
@@ -85,7 +100,7 @@ async function runSearch(query: string): Promise<void> {
   renderSearchResults(result.data.users);
 }
 
-function showConfirmModal(message: string): Promise<boolean> {
+function showConfirmModal(quantity: number, username: string): Promise<boolean> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.style.cssText =
@@ -93,7 +108,10 @@ function showConfirmModal(message: string): Promise<boolean> {
     const box = document.createElement("div");
     box.className = "card";
     box.style.cssText = "max-width: 320px; text-align: center;";
-    box.innerHTML = `<p style="margin-bottom: 1rem;">${message}</p>`;
+    const p = document.createElement("p");
+    p.style.marginBottom = "1rem";
+    p.textContent = `¿Dar ${quantity} blíster(s) a ${username}?`;
+    box.appendChild(p);
 
     const confirmBtn = document.createElement("button");
     confirmBtn.className = "btn";
@@ -133,7 +151,7 @@ async function grantPacks(): Promise<void> {
   const quantity = Number((document.getElementById("quantity-input") as HTMLInputElement).value);
   const messageEl = document.getElementById("grant-message")!;
 
-  const confirmed = await showConfirmModal(`¿Dar ${quantity} blíster(s) a ${selectedUser.username}?`);
+  const confirmed = await showConfirmModal(quantity, selectedUser.username);
   if (!confirmed) return;
 
   const result = await request<{ ok: true }>("/grant-packs", {
