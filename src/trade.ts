@@ -10,11 +10,11 @@ import {
   type TradeOfferItem,
   type TradeOfferSummary,
 } from "./api";
-import { renderCardHtml } from "./card";
+import { renderCardHtml, collectFemaleVariantBaseNames } from "./card";
 
 let currentTargetUsername = "";
 
-function renderSelectableCard(card: CardView, inputClass: string): string {
+function renderSelectableCard(card: CardView, inputClass: string, femaleVariantBaseNames: Set<string>): string {
   if (card.quantity === 0) return "";
   const input = `
     <input
@@ -27,7 +27,7 @@ function renderSelectableCard(card: CardView, inputClass: string): string {
       style="margin-top: 0.5rem; width: 100%;"
     />
   `;
-  return renderCardHtml(card, input);
+  return renderCardHtml(card, input, femaleVariantBaseNames);
 }
 
 function collectQuantities(containerId: string, inputClass: string): { cardId: string; quantity: number }[] {
@@ -51,11 +51,14 @@ async function searchUser(): Promise<void> {
     getUserCollection(currentTargetUsername),
   ]);
 
+  const myFemaleVariants = collectFemaleVariantBaseNames(myCollection.cards);
+  const targetFemaleVariants = collectFemaleVariantBaseNames(targetCollection.cards);
+
   document.getElementById("my-cards")!.innerHTML = myCollection.cards
-    .map((card) => renderSelectableCard(card, "offer-qty"))
+    .map((card) => renderSelectableCard(card, "offer-qty", myFemaleVariants))
     .join("");
   document.getElementById("target-collection")!.innerHTML = targetCollection.cards
-    .map((card) => renderSelectableCard(card, "request-qty"))
+    .map((card) => renderSelectableCard(card, "request-qty", targetFemaleVariants))
     .join("");
   document.getElementById("offer-builder")!.style.display = "block";
 }

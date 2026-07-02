@@ -63,16 +63,22 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   overflow-wrap: break-word;
 }
 
-.badge-rarity {
+.gender-icon {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.55);
 }
-.badge-variant {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
-}
+.gender-icon.gender-male { color: var(--blue); }
+.gender-icon.gender-female { color: var(--pink); }
 .shiny-icon {
   position: absolute;
   top: 0.5rem;
@@ -135,10 +141,6 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   color: var(--pink);
   border: 1px solid rgba(255, 86, 180, 0.30);
 }
-.badge.rarity-rare { background: rgba(0, 204, 255, 0.15); color: var(--blue); border-color: rgba(0, 204, 255, 0.30); }
-.badge.rarity-epic { background: rgba(139, 92, 246, 0.15); color: #8B5CF6; border-color: rgba(139, 92, 246, 0.30); }
-.badge.rarity-legendary { background: rgba(255, 215, 0, 0.15); color: #FFD700; border-color: rgba(255, 215, 0, 0.40); }
-
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

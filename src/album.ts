@@ -1,13 +1,16 @@
 import { getCollection, type CardView } from "./api";
-import { renderCardHtml } from "./card";
+import { renderCardHtml, collectFemaleVariantBaseNames } from "./card";
 
 async function load(): Promise<void> {
   const data = await getCollection();
+  const femaleVariantBaseNames = collectFemaleVariantBaseNames(data.cards);
   const owned = data.cards.filter((c: CardView) => c.quantity > 0).length;
 
   document.getElementById("album-heading")!.innerHTML =
     `Pokédex <span class="count">(${owned}/${data.cards.length})</span>`;
-  document.getElementById("album-grid")!.innerHTML = data.cards.map((c) => renderCardHtml(c)).join("");
+  document.getElementById("album-grid")!.innerHTML = data.cards
+    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames))
+    .join("");
 }
 
 load();
