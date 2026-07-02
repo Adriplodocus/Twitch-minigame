@@ -69,12 +69,36 @@ export function computeFormLabels(cards: CardView[]): Map<string, string> {
   return labels;
 }
 
+const RARITY_LABELS: Record<CardView["rarity"], string> = {
+  common: "Común",
+  rare: "Rara",
+  epic: "Épica",
+  legendary: "Legendaria",
+};
+
+let infoTooltipHandlerAttached = false;
+
+function ensureInfoTooltipHandler(): void {
+  if (infoTooltipHandlerAttached) return;
+  infoTooltipHandlerAttached = true;
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest<HTMLElement>(".info-btn");
+    document.querySelectorAll<HTMLElement>(".info-tooltip.open").forEach((el) => {
+      if (el.closest(".card")?.querySelector(".info-btn") !== btn) el.classList.remove("open");
+    });
+    if (btn) btn.closest(".card")?.querySelector(".info-tooltip")?.classList.toggle("open");
+  });
+}
+
 export function renderCardHtml(
   card: CardView,
   innerExtra = "",
   femaleVariantBaseNames?: Set<string>,
   formLabels?: Map<string, string>
 ): string {
+  ensureInfoTooltipHandler();
+
   const ownedClass = card.quantity > 0 ? "" : "unowned";
   const { baseName: fullBaseName, isShiny, isFemale } = splitCardName(card.name);
   const formLabel = formLabels?.get(card.id);
@@ -86,8 +110,18 @@ export function renderCardHtml(
       ? `<span class="gender-icon gender-male">♂</span>`
       : "";
   const shinyIcon = isShiny ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
-  const variantBadge = formLabel ? `<span class="badge badge-variant">${formLabel}</span>` : "";
   const qtyBadge = card.quantity > 0 ? `<span class="card-qty">x${card.quantity}</span>` : "";
+
+  const genderLine = isFemale ? "Hembra" : hasFemaleVariant ? "Macho" : null;
+  const infoTooltip = `
+    <div class="info-tooltip">
+      <p><strong>${baseName}</strong></p>
+      ${formLabel ? `<p>Variante: ${formLabel}</p>` : ""}
+      <p>Rareza: ${RARITY_LABELS[card.rarity]}</p>
+      ${isShiny ? `<p>Shiny: Sí</p>` : ""}
+      ${genderLine ? `<p>Género: ${genderLine}</p>` : ""}
+    </div>
+  `;
 
   return `
     <div class="card card-rarity-${card.rarity} ${ownedClass} card-in">
@@ -97,8 +131,11 @@ export function renderCardHtml(
       <p class="card-name">${baseName}</p>
       <div class="card-footer">
         <span class="card-footer-slot">${qtyBadge}</span>
-        <span class="card-footer-slot">${variantBadge}</span>
+        <span class="card-footer-slot">
+          <button type="button" class="info-btn" aria-label="Info">i</button>
+        </span>
       </div>
+      ${infoTooltip}
       ${innerExtra}
     </div>
   `;
