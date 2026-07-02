@@ -14,28 +14,40 @@
   </head>
   <body>
     <div class="container" style="padding: 2rem 1rem;">
-      <h1>Trading</h1>
+      <h1 id="trade-heading">Trading</h1>
       <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
         <a class="btn" href="/collection.html">Volver a Colección</a>
         <button class="btn" id="logout-btn">Cerrar sesión</button>
       </div>
 
-      <div style="margin-top: 2rem;">
-        <input class="input" id="search-username" placeholder="Buscar username de Twitch" />
-        <button class="btn" id="search-btn">Buscar</button>
-      </div>
+      <div id="trade-error" style="display: none; margin-top: 1.5rem; color: #C24747; font-weight: 700;"></div>
 
       <div id="offer-builder" style="display: none; margin-top: 1.5rem;">
-        <h2>Tú ofreces</h2>
-        <div id="my-cards" class="card-grid"></div>
-        <h2 style="margin-top: 1.5rem;">Tú pides</h2>
+        <h2 id="target-heading">Cartas</h2>
+        <input
+          class="input"
+          id="target-filter"
+          placeholder="Buscar por nombre"
+          style="margin-top: 0.75rem; width: 100%; max-width: 320px;"
+        />
         <div id="target-collection" class="card-grid"></div>
-        <button class="btn" id="send-offer-btn" style="margin-top: 1.5rem;">Enviar oferta</button>
-      </div>
 
-      <div style="margin-top: 2rem;">
-        <h2>Ofertas</h2>
-        <div id="offers-list"></div>
+        <h2 style="margin-top: 1.5rem;">Tus cartas</h2>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
+          <select id="sort-field" class="input">
+            <option value="pokedex">Pokédex</option>
+            <option value="recent">Recientes</option>
+            <option value="quantity">Cantidad</option>
+          </select>
+          <select id="sort-direction" class="input">
+            <option value="asc">Ascendente</option>
+            <option value="desc">Descendente</option>
+          </select>
+          <input class="input" id="my-filter" placeholder="Buscar por nombre" style="flex: 1; min-width: 160px;" />
+        </div>
+        <div id="my-cards" class="card-grid"></div>
+
+        <button class="btn" id="send-offer-btn" style="margin-top: 1.5rem;">Enviar oferta</button>
       </div>
     </div>
     <script type="module" src="/src/trade.ts"></script>
