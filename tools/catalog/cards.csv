@@ -44,27 +44,27 @@ p10035,Charizard Mega Y,epic,p10035.png,6100350
 p10036,Blastoise Mega,epic,p10036.png,9100360
 p10037,Alakazam Mega,epic,p10037.png,65100370
 p10038,Gengar Mega,epic,p10038.png,94100380
-p10039,Kangaskhan Mega,common,p10039.png,115100390
+p10039,Kangaskhan Mega,rare,p10039.png,115100390
 p1004,Chi Yu,legendary,p1004.png,1004010040
-p10040,Pinsir Mega,common,p10040.png,127100400
+p10040,Pinsir Mega,rare,p10040.png,127100400
 p10041,Gyarados Mega,rare,p10041.png,130100410
-p10042,Aerodactyl Mega,common,p10042.png,142100420
+p10042,Aerodactyl Mega,rare,p10042.png,142100420
 p10043,Mewtwo Mega X,legendary,p10043.png,150100430
 p10044,Mewtwo Mega Y,legendary,p10044.png,150100440
 p10045,Ampharos Mega,epic,p10045.png,181100450
 p10046,Scizor Mega,rare,p10046.png,212100460
-p10047,Heracross Mega,common,p10047.png,214100470
+p10047,Heracross Mega,rare,p10047.png,214100470
 p10048,Houndoom Mega,rare,p10048.png,229100480
 p10049,Tyranitar Mega,epic,p10049.png,248100490
 p1005,Roaring Moon,common,p1005.png,1005010050
 p10050,Blaziken Mega,epic,p10050.png,257100500
 p10051,Gardevoir Mega,epic,p10051.png,282100510
-p10052,Mawile Mega,common,p10052.png,303100520
+p10052,Mawile Mega,rare,p10052.png,303100520
 p10053,Aggron Mega,epic,p10053.png,306100530
 p10054,Medicham Mega,rare,p10054.png,308100540
 p10055,Manectric Mega,rare,p10055.png,310100550
 p10056,Banette Mega,rare,p10056.png,354100560
-p10057,Absol Mega,common,p10057.png,359100570
+p10057,Absol Mega,rare,p10057.png,359100570
 p10058,Garchomp Mega,epic,p10058.png,445100580
 p10059,Lucario Mega,rare,p10059.png,448100590
 p1006,Iron Valiant,common,p1006.png,1006010060
@@ -74,10 +74,10 @@ p10062,Latias Mega,legendary,p10062.png,380100620
 p10063,Latios Mega,legendary,p10063.png,381100630
 p10064,Swampert Mega,epic,p10064.png,260100640
 p10065,Sceptile Mega,epic,p10065.png,254100650
-p10066,Sableye Mega,common,p10066.png,302100660
+p10066,Sableye Mega,rare,p10066.png,302100660
 p10067,Altaria Mega,rare,p10067.png,334100670
 p10068,Gallade Mega,epic,p10068.png,475100680
-p10069,Audino Mega,common,p10069.png,531100690
+p10069,Audino Mega,rare,p10069.png,531100690
 p1007,Koraidon,legendary,p1007.png,1007010070
 p10070,Sharpedo Mega,rare,p10070.png,319100700
 p10071,Slowbro Mega,rare,p10071.png,80100710
@@ -218,12 +218,12 @@ p10198,Butterfree Gmax,epic,p10198.png,12101980
 p10199,Pikachu Gmax,rare,p10199.png,25101990
 p102,Exeggcute,common,p102.png,102001020
 p1020,Gouging Fire,common,p1020.png,1020010200
-p10200,Meowth Gmax,common,p10200.png,52102000
+p10200,Meowth Gmax,rare,p10200.png,52102000
 p10201,Machamp Gmax,epic,p10201.png,68102010
 p10202,Gengar Gmax,epic,p10202.png,94102020
 p10203,Kingler Gmax,rare,p10203.png,99102030
-p10204,Lapras Gmax,common,p10204.png,131102040
-p10205,Eevee Gmax,common,p10205.png,133102050
+p10204,Lapras Gmax,rare,p10204.png,131102040
+p10205,Eevee Gmax,rare,p10205.png,133102050
 p10206,Snorlax Gmax,rare,p10206.png,143102060
 p10207,Garbodor Gmax,rare,p10207.png,569102070
 p10208,Melmetal Gmax,legendary,p10208.png,809102080
@@ -245,7 +245,7 @@ p10221,Hatterene Gmax,epic,p10221.png,858102210
 p10222,Grimmsnarl Gmax,epic,p10222.png,861102220
 p10223,Alcremie Gmax,rare,p10223.png,869102230
 p10224,Copperajah Gmax,rare,p10224.png,879102240
-p10225,Duraludon Gmax,common,p10225.png,884102250
+p10225,Duraludon Gmax,rare,p10225.png,884102250
 p10226,Urshifu Single Strike Gmax,legendary,p10226.png,892102260
 p10227,Urshifu Rapid Strike Gmax,legendary,p10227.png,892102270
 p10228,Toxtricity Low Key Gmax,rare,p10228.png,849102280
@@ -1625,27 +1625,27 @@ p10035-shiny,Charizard Mega Y Shiny,epic,p10035-shiny.png,6100352
 p10036-shiny,Blastoise Mega Shiny,epic,p10036-shiny.png,9100362
 p10037-shiny,Alakazam Mega Shiny,epic,p10037-shiny.png,65100372
 p10038-shiny,Gengar Mega Shiny,epic,p10038-shiny.png,94100382
-p10039-shiny,Kangaskhan Mega Shiny,common,p10039-shiny.png,115100392
+p10039-shiny,Kangaskhan Mega Shiny,rare,p10039-shiny.png,115100392
 p1004-shiny,Chi Yu Shiny,legendary,p1004-shiny.png,1004010042
-p10040-shiny,Pinsir Mega Shiny,common,p10040-shiny.png,127100402
+p10040-shiny,Pinsir Mega Shiny,rare,p10040-shiny.png,127100402
 p10041-shiny,Gyarados Mega Shiny,rare,p10041-shiny.png,130100412
-p10042-shiny,Aerodactyl Mega Shiny,common,p10042-shiny.png,142100422
+p10042-shiny,Aerodactyl Mega Shiny,rare,p10042-shiny.png,142100422
 p10043-shiny,Mewtwo Mega X Shiny,legendary,p10043-shiny.png,150100432
 p10044-shiny,Mewtwo Mega Y Shiny,legendary,p10044-shiny.png,150100442
 p10045-shiny,Ampharos Mega Shiny,epic,p10045-shiny.png,181100452
 p10046-shiny,Scizor Mega Shiny,rare,p10046-shiny.png,212100462
-p10047-shiny,Heracross Mega Shiny,common,p10047-shiny.png,214100472
+p10047-shiny,Heracross Mega Shiny,rare,p10047-shiny.png,214100472
 p10048-shiny,Houndoom Mega Shiny,rare,p10048-shiny.png,229100482
 p10049-shiny,Tyranitar Mega Shiny,epic,p10049-shiny.png,248100492
 p1005-shiny,Roaring Moon Shiny,common,p1005-shiny.png,1005010052
 p10050-shiny,Blaziken Mega Shiny,epic,p10050-shiny.png,257100502
 p10051-shiny,Gardevoir Mega Shiny,epic,p10051-shiny.png,282100512
-p10052-shiny,Mawile Mega Shiny,common,p10052-shiny.png,303100522
+p10052-shiny,Mawile Mega Shiny,rare,p10052-shiny.png,303100522
 p10053-shiny,Aggron Mega Shiny,epic,p10053-shiny.png,306100532
 p10054-shiny,Medicham Mega Shiny,rare,p10054-shiny.png,308100542
 p10055-shiny,Manectric Mega Shiny,rare,p10055-shiny.png,310100552
 p10056-shiny,Banette Mega Shiny,rare,p10056-shiny.png,354100562
-p10057-shiny,Absol Mega Shiny,common,p10057-shiny.png,359100572
+p10057-shiny,Absol Mega Shiny,rare,p10057-shiny.png,359100572
 p10058-shiny,Garchomp Mega Shiny,epic,p10058-shiny.png,445100582
 p10059-shiny,Lucario Mega Shiny,rare,p10059-shiny.png,448100592
 p1006-shiny,Iron Valiant Shiny,common,p1006-shiny.png,1006010062
@@ -1655,10 +1655,10 @@ p10062-shiny,Latias Mega Shiny,legendary,p10062-shiny.png,380100622
 p10063-shiny,Latios Mega Shiny,legendary,p10063-shiny.png,381100632
 p10064-shiny,Swampert Mega Shiny,epic,p10064-shiny.png,260100642
 p10065-shiny,Sceptile Mega Shiny,epic,p10065-shiny.png,254100652
-p10066-shiny,Sableye Mega Shiny,common,p10066-shiny.png,302100662
+p10066-shiny,Sableye Mega Shiny,rare,p10066-shiny.png,302100662
 p10067-shiny,Altaria Mega Shiny,rare,p10067-shiny.png,334100672
 p10068-shiny,Gallade Mega Shiny,epic,p10068-shiny.png,475100682
-p10069-shiny,Audino Mega Shiny,common,p10069-shiny.png,531100692
+p10069-shiny,Audino Mega Shiny,rare,p10069-shiny.png,531100692
 p1007-shiny,Koraidon Shiny,legendary,p1007-shiny.png,1007010072
 p10070-shiny,Sharpedo Mega Shiny,rare,p10070-shiny.png,319100702
 p10071-shiny,Slowbro Mega Shiny,rare,p10071-shiny.png,80100712
@@ -1793,12 +1793,12 @@ p10198-shiny,Butterfree Gmax Shiny,epic,p10198-shiny.png,12101982
 p10199-shiny,Pikachu Gmax Shiny,rare,p10199-shiny.png,25101992
 p102-shiny,Exeggcute Shiny,common,p102-shiny.png,102001022
 p1020-shiny,Gouging Fire Shiny,common,p1020-shiny.png,1020010202
-p10200-shiny,Meowth Gmax Shiny,common,p10200-shiny.png,52102002
+p10200-shiny,Meowth Gmax Shiny,rare,p10200-shiny.png,52102002
 p10201-shiny,Machamp Gmax Shiny,epic,p10201-shiny.png,68102012
 p10202-shiny,Gengar Gmax Shiny,epic,p10202-shiny.png,94102022
 p10203-shiny,Kingler Gmax Shiny,rare,p10203-shiny.png,99102032
-p10204-shiny,Lapras Gmax Shiny,common,p10204-shiny.png,131102042
-p10205-shiny,Eevee Gmax Shiny,common,p10205-shiny.png,133102052
+p10204-shiny,Lapras Gmax Shiny,rare,p10204-shiny.png,131102042
+p10205-shiny,Eevee Gmax Shiny,rare,p10205-shiny.png,133102052
 p10206-shiny,Snorlax Gmax Shiny,rare,p10206-shiny.png,143102062
 p10207-shiny,Garbodor Gmax Shiny,rare,p10207-shiny.png,569102072
 p10208-shiny,Melmetal Gmax Shiny,legendary,p10208-shiny.png,809102082
@@ -1820,7 +1820,7 @@ p10221-shiny,Hatterene Gmax Shiny,epic,p10221-shiny.png,858102212
 p10222-shiny,Grimmsnarl Gmax Shiny,epic,p10222-shiny.png,861102222
 p10223-shiny,Alcremie Gmax Shiny,rare,p10223-shiny.png,869102232
 p10224-shiny,Copperajah Gmax Shiny,rare,p10224-shiny.png,879102242
-p10225-shiny,Duraludon Gmax Shiny,common,p10225-shiny.png,884102252
+p10225-shiny,Duraludon Gmax Shiny,rare,p10225-shiny.png,884102252
 p10226-shiny,Urshifu Single Strike Gmax Shiny,legendary,p10226-shiny.png,892102262
 p10227-shiny,Urshifu Rapid Strike Gmax Shiny,legendary,p10227-shiny.png,892102272
 p10228-shiny,Toxtricity Low Key Gmax Shiny,rare,p10228-shiny.png,849102282
