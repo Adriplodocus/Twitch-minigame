@@ -104,16 +104,10 @@ async function load(): Promise<void> {
   femaleVariantBaseNames = collectFemaleVariantBaseNames(data.cards);
   formLabels = computeFormLabels(data.cards);
   ownedCards = data.cards.filter((c) => c.quantity > 0);
-  const unowned = data.cards.filter((c) => c.quantity === 0);
 
   document.getElementById("owned-heading")!.innerHTML =
     `Obtenidas <span class="count">(${ownedCards.length}/${data.cards.length})</span>`;
   renderOwnedGrid();
-
-  document.getElementById("unowned-heading")!.innerHTML = `Por conseguir <span class="count">(${unowned.length})</span>`;
-  document.getElementById("unowned-grid")!.innerHTML = unowned
-    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels))
-    .join("");
 
   renderPendingPacks(data.pendingPacks, async (packId) => {
     const result = await openPack(packId);
