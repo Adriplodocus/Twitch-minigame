@@ -1,4 +1,4 @@
-import { getCollection, type CardView } from "./api";
+import { getCollection, logout, type CardView } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels } from "./card";
 
 async function load(): Promise<void> {
@@ -13,5 +13,10 @@ async function load(): Promise<void> {
     .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels))
     .join("");
 }
+
+document.getElementById("logout-btn")!.addEventListener("click", async () => {
+  await logout();
+  window.location.href = "/";
+});
 
 load();

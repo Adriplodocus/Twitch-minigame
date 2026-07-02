@@ -36,6 +36,10 @@ export function getCollection(): Promise<CollectionResponse> {
   return request("/collection");
 }
 
+export function logout(): Promise<{ ok: boolean }> {
+  return request("/auth/logout", { method: "POST" });
+}
+
 export function openPack(packId: number): Promise<{ cards: CardView[] }> {
   return request(`/collection/packs/${packId}/open`, { method: "POST" });
 }

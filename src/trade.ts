@@ -6,6 +6,7 @@ import {
   acceptOffer,
   declineOffer,
   cancelOffer,
+  logout,
   type CardView,
   type TradeOfferItem,
   type TradeOfferSummary,
@@ -139,4 +140,8 @@ async function loadOffers(): Promise<void> {
 
 document.getElementById("search-btn")!.addEventListener("click", searchUser);
 document.getElementById("send-offer-btn")!.addEventListener("click", sendOffer);
+document.getElementById("logout-btn")!.addEventListener("click", async () => {
+  await logout();
+  window.location.href = "/";
+});
 loadOffers();

@@ -1,4 +1,4 @@
-import { getCollection, openPack, type CardView, type PendingPack } from "./api";
+import { getCollection, openPack, logout, type CardView, type PendingPack } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName } from "./card";
 
 let femaleVariantBaseNames = new Set<string>();
@@ -118,5 +118,9 @@ async function load(): Promise<void> {
 
 document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
+document.getElementById("logout-btn")!.addEventListener("click", async () => {
+  await logout();
+  window.location.href = "/";
+});
 
 load();
