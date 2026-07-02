@@ -13,6 +13,8 @@ export interface Env {
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 
+export type Category = "normal" | "inicial" | "mega" | "gmax";
+
 export interface SessionUser {
   twitchId: string;
   username: string;

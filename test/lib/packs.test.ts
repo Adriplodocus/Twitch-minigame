@@ -2,10 +2,10 @@ import { it, expect } from "vitest";
 import { pickRandomCards, RARITY_WEIGHTS } from "../../worker/lib/packs";
 
 const catalog = [
-  { id: "c1", rarity: "common" as const },
-  { id: "r1", rarity: "rare" as const },
-  { id: "e1", rarity: "epic" as const },
-  { id: "l1", rarity: "legendary" as const },
+  { id: "c1", rarity: "common" as const, category: "normal" as const },
+  { id: "r1", rarity: "rare" as const, category: "normal" as const },
+  { id: "e1", rarity: "epic" as const, category: "normal" as const },
+  { id: "l1", rarity: "legendary" as const, category: "normal" as const },
 ];
 
 it("returns the requested number of cards", () => {
