@@ -35,21 +35,22 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => Promis
     return;
   }
   container.innerHTML = `<h2>Sobres pendientes (${packs.length})</h2>`;
-  packs.forEach((pack, index) => {
-    const btn = document.createElement("button");
-    btn.className = "btn";
-    btn.style.marginTop = "0.75rem";
-    const label = packs.length > 1 ? `Abrir sobre ${index + 1}` : "Abrir sobre";
-    btn.textContent = label;
-    btn.addEventListener("click", () => {
-      btn.disabled = true;
-      btn.textContent = "Abriendo...";
+  const row = document.createElement("div");
+  row.style.cssText = "display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem;";
+  container.appendChild(row);
+
+  packs.forEach((pack) => {
+    const img = document.createElement("img");
+    img.className = "pack-open-img";
+    img.src = "/pack.png";
+    img.alt = "Abrir sobre";
+    img.addEventListener("click", () => {
+      img.classList.add("opening");
       onOpen(pack.id).finally(() => {
-        btn.disabled = false;
-        btn.textContent = label;
+        img.classList.remove("opening");
       });
     });
-    container.appendChild(btn);
+    row.appendChild(img);
   });
 }
 
