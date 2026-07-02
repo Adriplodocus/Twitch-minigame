@@ -1,16 +1,5 @@
 import { getCollection, openPack, type CardView, type PendingPack } from "./api";
-
-function renderCard(card: CardView): string {
-  const ownedClass = card.quantity > 0 ? "" : "unowned";
-  return `
-    <div class="card ${ownedClass} card-in">
-      <img src="${card.imagePath}" alt="${card.name}" loading="lazy" />
-      <p style="margin-top: 0.5rem; color: var(--text-em);">${card.name}</p>
-      <span class="badge rarity-${card.rarity}">${card.rarity}</span>
-      ${card.quantity > 0 ? `<p style="margin-top: 0.25rem;">x${card.quantity}</p>` : ""}
-    </div>
-  `;
-}
+import { renderCardHtml } from "./card";
 
 function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => void): void {
   const container = document.getElementById("pending-packs")!;
@@ -37,10 +26,9 @@ async function revealPack(cards: CardView[]): Promise<void> {
   document.body.appendChild(overlay);
 
   for (const card of cards) {
-    const el = document.createElement("div");
-    el.className = "card card-in";
-    el.innerHTML = `<img src="${card.imagePath}" alt="${card.name}" /><p style="color: var(--text-em);">${card.name}</p><span class="badge rarity-${card.rarity}">${card.rarity}</span>`;
-    overlay.appendChild(el);
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = renderCardHtml(card);
+    overlay.appendChild(wrapper.firstElementChild!);
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
 
@@ -55,10 +43,10 @@ async function load(): Promise<void> {
 
   document.getElementById("owned-heading")!.innerHTML =
     `Obtenidas <span class="count">(${owned.length}/${data.cards.length})</span>`;
-  document.getElementById("owned-grid")!.innerHTML = owned.map(renderCard).join("");
+  document.getElementById("owned-grid")!.innerHTML = owned.map((c) => renderCardHtml(c)).join("");
 
   document.getElementById("unowned-heading")!.innerHTML = `Por conseguir <span class="count">(${unowned.length})</span>`;
-  document.getElementById("unowned-grid")!.innerHTML = unowned.map(renderCard).join("");
+  document.getElementById("unowned-grid")!.innerHTML = unowned.map((c) => renderCardHtml(c)).join("");
 
   renderPendingPacks(data.pendingPacks, async (packId) => {
     const result = await openPack(packId);

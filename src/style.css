@@ -36,6 +36,7 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
 }
 
 .card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -48,6 +49,49 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
 }
 .card.unowned { opacity: 0.7; }
 .card.unowned img { filter: grayscale(1) brightness(0.65); }
+
+.card.card-rarity-rare { border-color: var(--blue); }
+.card.card-rarity-epic { border-color: #8B5CF6; }
+.card.card-rarity-legendary { border-color: #FFD700; }
+
+.card-name {
+  margin-top: 0.5rem;
+  color: var(--text-em);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+.badge-rarity {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+.badge-variant {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+}
+.shiny-icon {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
+}
+.card-qty {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-em);
+  background: rgba(0, 0, 0, 0.6);
+}
 
 .section-heading {
   margin-top: 2rem;
@@ -92,7 +136,7 @@ h1, h2, h3 { font-family: 'Russo One', sans-serif; color: var(--text-em); }
   border: 1px solid rgba(255, 86, 180, 0.30);
 }
 .badge.rarity-rare { background: rgba(0, 204, 255, 0.15); color: var(--blue); border-color: rgba(0, 204, 255, 0.30); }
-.badge.rarity-epic { background: rgba(255, 86, 180, 0.15); color: var(--pink); border-color: rgba(255, 86, 180, 0.30); }
+.badge.rarity-epic { background: rgba(139, 92, 246, 0.15); color: #8B5CF6; border-color: rgba(139, 92, 246, 0.30); }
 .badge.rarity-legendary { background: rgba(255, 215, 0, 0.15); color: #FFD700; border-color: rgba(255, 215, 0, 0.40); }
 
 .card-grid {

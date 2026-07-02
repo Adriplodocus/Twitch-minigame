@@ -96,19 +96,60 @@ trade.post("/offers", requireAuth, async (c) => {
   return c.json({ id: offerId, status: "pending" }, 201);
 });
 
+interface OfferItemRow {
+  offer_id: number;
+  side: "from" | "to";
+  cardId: string;
+  name: string;
+  rarity: string;
+  imagePath: string;
+  quantity: number;
+}
+
+async function itemsByOfferId(env: Env, offerIds: number[]): Promise<Map<number, OfferItemRow[]>> {
+  const byOfferId = new Map<number, OfferItemRow[]>();
+  if (offerIds.length === 0) return byOfferId;
+
+  const placeholders = offerIds.map(() => "?").join(", ");
+  const rows = await env.DB.prepare(
+    `SELECT ti.offer_id, ti.side, c.id AS cardId, c.name, c.rarity, c.image_path AS imagePath, ti.quantity
+     FROM trade_items ti
+     JOIN cards c ON c.id = ti.card_id
+     WHERE ti.offer_id IN (${placeholders})`
+  )
+    .bind(...offerIds)
+    .all<OfferItemRow>();
+
+  for (const row of rows.results) {
+    const list = byOfferId.get(row.offer_id) ?? [];
+    list.push(row);
+    byOfferId.set(row.offer_id, list);
+  }
+  return byOfferId;
+}
+
 trade.get("/offers", requireAuth, async (c) => {
   const user = c.get("user");
   const sent = await c.env.DB.prepare(
-    "SELECT id, to_user AS toUser, status FROM trade_offers WHERE from_user = ? ORDER BY created_at DESC"
+    `SELECT o.id, u.username AS toUser, o.status
+     FROM trade_offers o JOIN users u ON u.twitch_id = o.to_user
+     WHERE o.from_user = ? ORDER BY o.created_at DESC`
   )
     .bind(user.twitchId)
-    .all();
+    .all<{ id: number; toUser: string; status: string }>();
   const received = await c.env.DB.prepare(
-    "SELECT id, from_user AS fromUser, status FROM trade_offers WHERE to_user = ? ORDER BY created_at DESC"
+    `SELECT o.id, u.username AS fromUser, o.status
+     FROM trade_offers o JOIN users u ON u.twitch_id = o.from_user
+     WHERE o.to_user = ? ORDER BY o.created_at DESC`
   )
     .bind(user.twitchId)
-    .all();
-  return c.json({ sent: sent.results, received: received.results });
+    .all<{ id: number; fromUser: string; status: string }>();
+
+  const allIds = [...sent.results, ...received.results].map((o) => o.id);
+  const items = await itemsByOfferId(c.env, allIds);
+  const withItems = <T extends { id: number }>(offer: T) => ({ ...offer, items: items.get(offer.id) ?? [] });
+
+  return c.json({ sent: sent.results.map(withItems), received: received.results.map(withItems) });
 });
 
 interface TradeItemRow {

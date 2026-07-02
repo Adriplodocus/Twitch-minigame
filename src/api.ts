@@ -42,11 +42,21 @@ export function getUserCollection(username: string): Promise<{ username: string;
   return request(`/trade/users/${encodeURIComponent(username)}`);
 }
 
+export interface TradeOfferItem {
+  side: "from" | "to";
+  cardId: string;
+  name: string;
+  rarity: Rarity;
+  imagePath: string;
+  quantity: number;
+}
+
 export interface TradeOfferSummary {
   id: number;
   status: string;
   toUser?: string;
   fromUser?: string;
+  items: TradeOfferItem[];
 }
 
 export function listOffers(): Promise<{ sent: TradeOfferSummary[]; received: TradeOfferSummary[] }> {
