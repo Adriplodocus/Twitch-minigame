@@ -23,6 +23,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<RequestResu
 
 let selectedUser: AdminUser | null = null;
 let searchDebounce: ReturnType<typeof setTimeout> | undefined;
+let currentUsersPage = 1;
 
 function showLoginView(): void {
   document.getElementById("login-view")!.style.display = "block";
@@ -146,18 +147,16 @@ async function loadHistory(): Promise<void> {
   renderHistory(result.data.history);
 }
 
-async function grantPacks(): Promise<void> {
-  if (!selectedUser) return;
-  const quantity = Number((document.getElementById("quantity-input") as HTMLInputElement).value);
+async function performGrant(twitchId: string, quantity: number, username: string): Promise<void> {
   const messageEl = document.getElementById("grant-message")!;
 
-  const confirmed = await showConfirmModal(quantity, selectedUser.username);
+  const confirmed = await showConfirmModal(quantity, username);
   if (!confirmed) return;
 
   const result = await request<{ ok: true }>("/grant-packs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ twitchId: selectedUser.twitchId, quantity }),
+    body: JSON.stringify({ twitchId, quantity }),
   });
 
   if (!result.ok) {
@@ -169,9 +168,51 @@ async function grantPacks(): Promise<void> {
     return;
   }
 
-  messageEl.textContent = `Blíster(s) entregado(s) a ${selectedUser.username}.`;
-  clearSelection();
+  messageEl.textContent = `Blíster(s) entregado(s) a ${username}.`;
   await loadHistory();
+}
+
+async function grantPacks(): Promise<void> {
+  if (!selectedUser) return;
+  const quantity = Number((document.getElementById("quantity-input") as HTMLInputElement).value);
+  await performGrant(selectedUser.twitchId, quantity, selectedUser.username);
+  clearSelection();
+}
+
+function renderAllUsers(users: AdminUser[]): void {
+  const container = document.getElementById("all-users-body")!;
+  const rows = users.map((u) => {
+    const tr = document.createElement("tr");
+
+    const tdUsername = document.createElement("td");
+    tdUsername.style.padding = "0.4rem";
+    tdUsername.textContent = u.username;
+
+    const tdAction = document.createElement("td");
+    tdAction.style.padding = "0.4rem";
+    const grantBtn = document.createElement("button");
+    grantBtn.className = "btn";
+    grantBtn.textContent = "+1 blíster";
+    grantBtn.addEventListener("click", () => performGrant(u.twitchId, 1, u.username));
+    tdAction.appendChild(grantBtn);
+
+    tr.appendChild(tdUsername);
+    tr.appendChild(tdAction);
+    return tr;
+  });
+  container.replaceChildren(...rows);
+}
+
+async function loadAllUsers(page: number): Promise<void> {
+  const result = await request<{ users: AdminUser[]; page: number; hasMore: boolean }>(`/users/all?page=${page}`);
+  if (!result.ok) {
+    if (result.status === 401) showLoginView();
+    return;
+  }
+  currentUsersPage = result.data.page;
+  renderAllUsers(result.data.users);
+  (document.getElementById("users-prev-btn") as HTMLButtonElement).disabled = currentUsersPage <= 1;
+  (document.getElementById("users-next-btn") as HTMLButtonElement).disabled = !result.data.hasMore;
 }
 
 async function login(): Promise<void> {
@@ -193,6 +234,7 @@ async function login(): Promise<void> {
   errorEl.style.display = "none";
   showPanelView();
   await loadHistory();
+  await loadAllUsers(1);
 }
 
 async function logout(): Promise<void> {
@@ -209,12 +251,19 @@ document.getElementById("search-input")!.addEventListener("input", (e) => {
   const query = (e.target as HTMLInputElement).value;
   searchDebounce = setTimeout(() => runSearch(query), 250);
 });
+document.getElementById("users-prev-btn")!.addEventListener("click", () => {
+  if (currentUsersPage > 1) loadAllUsers(currentUsersPage - 1);
+});
+document.getElementById("users-next-btn")!.addEventListener("click", () => {
+  loadAllUsers(currentUsersPage + 1);
+});
 
 async function init(): Promise<void> {
   const result = await request<{ history: HistoryRow[] }>("/history");
   if (result.ok) {
     showPanelView();
     renderHistory(result.data.history);
+    await loadAllUsers(1);
   } else {
     showLoginView();
   }
