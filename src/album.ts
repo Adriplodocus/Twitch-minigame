@@ -1,5 +1,6 @@
 import { getCollection, logout, type CardView } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels } from "./card";
+import { attachTradeLinkButton } from "./trade-link";
 
 async function load(): Promise<void> {
   const data = await getCollection();
@@ -18,5 +19,6 @@ document.getElementById("logout-btn")!.addEventListener("click", async () => {
   await logout();
   window.location.href = "/";
 });
+attachTradeLinkButton("trade-link-btn");
 
 load();
