@@ -16,6 +16,7 @@ let handlerAttached = false;
 // track containment against the cached flat rect directly.
 let activeCard: HTMLElement | null = null;
 let activeRect: DOMRect | null = null;
+let activeFooterRect: DOMRect | null = null;
 
 function applyTilt(card: HTMLElement, rect: DOMRect, clientX: number, clientY: number): void {
   const x = (clientX - rect.left) / rect.width;
@@ -37,6 +38,19 @@ function resetTilt(card: HTMLElement): void {
   if (glare) glare.style.background = "transparent";
 }
 
+// Same as resetTilt, but skips the card's eased transform transition. Used
+// when the pointer crosses into the footer dead zone: an eased snap-back
+// would leave the info-btn's hit box mid-flight for the ~0.35s transition,
+// so a click right after entering the footer could still land on the
+// pre-reset (tilted) geometry. The footer needs to be flat immediately.
+function resetTiltInstant(card: HTMLElement): void {
+  const prevTransition = card.style.transition;
+  card.style.transition = "none";
+  resetTilt(card);
+  card.getBoundingClientRect(); // force layout so the transition-less reset paints
+  card.style.transition = prevTransition;
+}
+
 export function ensureCardTiltHandler(): void {
   if (typeof window === "undefined") return;
   if (handlerAttached) return;
@@ -47,26 +61,47 @@ export function ensureCardTiltHandler(): void {
     !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!canTilt) return;
 
+  // The footer (info button, qty badge) is a dead zone for tilt: keeping it
+  // flat means its hit box stays where the user's cursor actually is, so a
+  // click on the tiny info-btn doesn't miss because the 3D transform shifted
+  // that corner away underneath the pointer. Whether the pointer is "over
+  // the footer" is checked against this cached FLAT rect, not via
+  // e.target.closest(".card-footer") — once the card is tilted, hit-testing
+  // is resolved against its rendered (transformed) geometry, which is
+  // exactly the corner the tilt has shifted away, so closest() misses the
+  // footer at the same coordinate a flat check would still catch.
+  const inRect = (x: number, y: number, rect: DOMRect): boolean =>
+    x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
   document.addEventListener("pointermove", (e) => {
     if (activeCard && activeRect) {
-      const inBounds =
-        e.clientX >= activeRect.left &&
-        e.clientX <= activeRect.right &&
-        e.clientY >= activeRect.top &&
-        e.clientY <= activeRect.bottom;
-      if (inBounds) {
+      const inBounds = inRect(e.clientX, e.clientY, activeRect);
+      const overFooter = activeFooterRect && inRect(e.clientX, e.clientY, activeFooterRect);
+      if (inBounds && !overFooter) {
         applyTilt(activeCard, activeRect, e.clientX, e.clientY);
+        return;
+      }
+      if (inBounds && overFooter) {
+        resetTiltInstant(activeCard);
+        activeCard = null;
+        activeRect = null;
+        activeFooterRect = null;
         return;
       }
       resetTilt(activeCard);
       activeCard = null;
       activeRect = null;
+      activeFooterRect = null;
     }
 
     const card = (e.target as HTMLElement).closest<HTMLElement>(".card.tiltable");
     if (!card) return;
+    const footer = card.querySelector<HTMLElement>(".card-footer");
+    const footerRect = footer?.getBoundingClientRect() ?? null;
+    if (footerRect && inRect(e.clientX, e.clientY, footerRect)) return;
     activeCard = card;
     activeRect = card.getBoundingClientRect();
+    activeFooterRect = footerRect;
     applyTilt(card, activeRect, e.clientX, e.clientY);
   });
 
@@ -77,5 +112,6 @@ export function ensureCardTiltHandler(): void {
     resetTilt(activeCard);
     activeCard = null;
     activeRect = null;
+    activeFooterRect = null;
   });
 }

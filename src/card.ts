@@ -26,23 +26,43 @@ const VARIANT_SUFFIXES: { suffix: string; label: string; shiny: boolean }[] = [
   { suffix: " (Hembra)", label: "Hembra", shiny: false },
 ];
 
+// Maushold's forms differ by a middle phrase ("Family Of Three/Four"), not a
+// single trailing word — computeFormLabels' generic word-diffing (built for
+// cases like "Mega Charizard X/Y") instead isolates just "Three"/"Four" and
+// leaves "Maushold Family Of" as the displayed name. Stripped explicitly here.
+const FORM_SUFFIXES: { suffix: string; label: string }[] = [
+  { suffix: " Family Of Four", label: "Family of four" },
+  { suffix: " Family Of Three", label: "Family of three" },
+];
+
 export function splitCardName(name: string): {
   baseName: string;
   variantLabel: string | null;
   isShiny: boolean;
   isFemale: boolean;
+  formSuffixLabel: string | null;
 } {
   for (const v of VARIANT_SUFFIXES) {
     if (name.endsWith(v.suffix)) {
+      const stripped = name.slice(0, -v.suffix.length);
+      const form = FORM_SUFFIXES.find((f) => stripped.endsWith(f.suffix));
       return {
-        baseName: name.slice(0, -v.suffix.length),
+        baseName: form ? stripped.slice(0, -form.suffix.length) : stripped,
         variantLabel: v.label,
         isShiny: v.shiny,
         isFemale: v.label.includes("Hembra"),
+        formSuffixLabel: form?.label ?? null,
       };
     }
   }
-  return { baseName: name, variantLabel: null, isShiny: false, isFemale: false };
+  const form = FORM_SUFFIXES.find((f) => name.endsWith(f.suffix));
+  return {
+    baseName: form ? name.slice(0, -form.suffix.length) : name,
+    variantLabel: null,
+    isShiny: false,
+    isFemale: false,
+    formSuffixLabel: form?.label ?? null,
+  };
 }
 
 export function collectFemaleVariantBaseNames(cards: CardView[]): Set<string> {
@@ -123,9 +143,17 @@ export function renderCardHtml(
 
   const isOwned = card.quantity > 0;
   const ownedClass = isOwned ? "" : "unowned";
-  const { baseName: fullBaseName, isShiny, isFemale } = splitCardName(card.name);
-  const formLabel = formLabels?.get(card.id);
-  const baseName = formLabel ? fullBaseName.slice(0, -(formLabel.length + 1)) : fullBaseName;
+  const { baseName: fullBaseName, isShiny, isFemale, formSuffixLabel } = splitCardName(card.name);
+  const genericFormLabel = formLabels?.get(card.id);
+  const formLabel = formSuffixLabel ?? genericFormLabel;
+  // formSuffixLabel is already stripped out of fullBaseName by splitCardName;
+  // genericFormLabel (from computeFormLabels) is still embedded as trailing
+  // words and needs slicing off here.
+  const baseName = formSuffixLabel
+    ? fullBaseName
+    : genericFormLabel
+      ? fullBaseName.slice(0, -(genericFormLabel.length + 1))
+      : fullBaseName;
   const hasFemaleVariant = isFemale || (femaleVariantBaseNames?.has(fullBaseName) ?? false);
   const genderIcon = isFemale
     ? `<span class="gender-icon gender-female">♀</span>`
