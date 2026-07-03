@@ -15,16 +15,32 @@
   <body>
     <div class="container" style="padding: 2rem 1rem;">
       <h1>Álbum</h1>
-      <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+      <div style="display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap;">
         <a class="btn" href="/collection.html">Volver a Colección</a>
         <button class="btn" id="trade-link-btn" type="button">Copiar enlace de trade</button>
         <a class="btn" href="/offers.html">Ofertas</a>
         <button class="btn" id="logout-btn">Cerrar sesión</button>
       </div>
 
-      <h2 id="album-heading" class="section-heading"></h2>
-      <div id="album-grid" class="card-grid"></div>
+      <div id="album-picker">
+        <h2 id="picker-heading" class="section-heading"></h2>
+        <div id="album-picker-grid" class="album-picker-grid"></div>
+      </div>
+
+      <div id="album-book" style="display: none;">
+        <div class="book-header">
+          <a href="/album.html" class="btn book-back-btn">← Álbumes</a>
+          <h2 id="book-heading" class="section-heading"></h2>
+        </div>
+        <div class="book">
+          <button type="button" class="book-nav book-nav-prev" id="book-prev" aria-label="Página anterior">‹</button>
+          <div class="book-spread" id="book-spread"></div>
+          <button type="button" class="book-nav book-nav-next" id="book-next" aria-label="Página siguiente">›</button>
+        </div>
+        <p class="book-indicator" id="book-indicator"></p>
+      </div>
     </div>
+    <audio id="page-flip-sound" src="/page-flip.mp3" preload="auto"></audio>
     <script type="module" src="/src/album.ts"></script>
   </body>
 </html>
