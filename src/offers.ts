@@ -3,6 +3,7 @@ import {
   acceptOffer,
   declineOffer,
   cancelOffer,
+  deleteOffer,
   type TradeOfferItem,
   type TradeOfferSummary,
 } from "./api";
@@ -15,6 +16,11 @@ const STATUS_LABELS: Record<string, string> = {
   declined: "Rechazada",
   cancelled: "Cancelada",
 };
+
+function statusLabel(offer: TradeOfferSummary): string {
+  if (offer.autoExpired) return "Expirada";
+  return STATUS_LABELS[offer.status] ?? offer.status;
+}
 
 function renderOfferItems(items: TradeOfferItem[], side: "from" | "to"): string {
   const filtered = items.filter((item) => item.side === side);
@@ -36,13 +42,12 @@ function renderOffer(offer: TradeOfferSummary, kind: "sent" | "received"): strin
          <button class="btn decline-btn" data-id="${offer.id}">Rechazar</button>`
       : kind === "sent" && offer.status === "pending"
         ? `<button class="btn cancel-btn" data-id="${offer.id}">Cancelar</button>`
-        : "";
-  const statusLabel = STATUS_LABELS[offer.status] ?? offer.status;
+        : `<button class="btn delete-offer-btn" data-id="${offer.id}">Eliminar</button>`;
 
   return `<div class="offer-card">
     <div class="offer-card-header">
       <span class="offer-card-user">${username}</span>
-      <span class="badge offer-status offer-status-${offer.status}">${statusLabel}</span>
+      <span class="badge offer-status offer-status-${offer.status}">${statusLabel(offer)}</span>
     </div>
     <div class="offer-card-body">
       <div class="offer-card-side">
@@ -54,7 +59,7 @@ function renderOffer(offer: TradeOfferSummary, kind: "sent" | "received"): strin
         ${renderOfferItems(offer.items, rightSide)}
       </div>
     </div>
-    ${actions ? `<div class="offer-card-actions">${actions}</div>` : ""}
+    <div class="offer-card-actions">${actions}</div>
   </div>`;
 }
 
@@ -66,6 +71,7 @@ async function loadOffers(): Promise<void> {
       <h2 class="section-heading">Recibidas</h2>
       ${received.length ? received.map((o) => renderOffer(o, "received")).join("") : `<p class="offers-column-empty">— sin ofertas recibidas —</p>`}
     </div>
+    <div class="offers-separator"></div>
     <div class="offers-column">
       <h2 class="section-heading">Enviadas</h2>
       ${sent.length ? sent.map((o) => renderOffer(o, "sent")).join("") : `<p class="offers-column-empty">— sin ofertas enviadas —</p>`}
@@ -87,6 +93,12 @@ async function loadOffers(): Promise<void> {
   container.querySelectorAll<HTMLButtonElement>(".cancel-btn").forEach((btn) =>
     btn.addEventListener("click", async () => {
       await cancelOffer(Number(btn.dataset.id));
+      await loadOffers();
+    })
+  );
+  container.querySelectorAll<HTMLButtonElement>(".delete-offer-btn").forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      await deleteOffer(Number(btn.dataset.id));
       await loadOffers();
     })
   );
