@@ -69,6 +69,7 @@ export interface TradeOfferItem {
 export interface TradeOfferSummary {
   id: number;
   status: string;
+  autoExpired: boolean;
   toUser?: string;
   fromUser?: string;
   items: TradeOfferItem[];
@@ -100,4 +101,12 @@ export function declineOffer(id: number): Promise<{ status: string }> {
 
 export function cancelOffer(id: number): Promise<{ status: string }> {
   return request(`/trade/offers/${id}/cancel`, { method: "POST" });
+}
+
+export function deleteOffer(id: number): Promise<{ ok: boolean }> {
+  return request(`/trade/offers/${id}`, { method: "DELETE" });
+}
+
+export function getPendingOfferCount(): Promise<{ count: number }> {
+  return request("/trade/offers/pending-count");
 }
