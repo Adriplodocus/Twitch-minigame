@@ -30,6 +30,41 @@ export function computeCategory(name: string): Category {
   return "normal";
 }
 
+const REGIONAL_GENERATION_OVERRIDES: { pattern: RegExp; generation: number }[] = [
+  { pattern: /\bAlola\b/, generation: 7 },
+  { pattern: /\bGalar\b/, generation: 8 },
+  { pattern: /\bHisui\b/, generation: 8 },
+  { pattern: /\bPaldea\b/, generation: 9 },
+];
+
+const DEX_GENERATION_RANGES: { max: number; generation: number }[] = [
+  { max: 151, generation: 1 },
+  { max: 251, generation: 2 },
+  { max: 386, generation: 3 },
+  { max: 493, generation: 4 },
+  { max: 649, generation: 5 },
+  { max: 721, generation: 6 },
+  { max: 809, generation: 7 },
+  { max: 905, generation: 8 },
+  { max: 1025, generation: 9 },
+];
+
+function generationFromDex(dexNumber: number): number {
+  for (const range of DEX_GENERATION_RANGES) {
+    if (dexNumber <= range.max) return range.generation;
+  }
+  return 9;
+}
+
+export function computeGeneration(name: string, category: Category, sortOrder: number): number {
+  if (category === "mega") return 6;
+  if (category === "gmax") return 8;
+  for (const override of REGIONAL_GENERATION_OVERRIDES) {
+    if (override.pattern.test(name)) return override.generation;
+  }
+  return generationFromDex(Math.floor(sortOrder / 1_000_000));
+}
+
 export interface CardRow {
   id: string;
   name: string;

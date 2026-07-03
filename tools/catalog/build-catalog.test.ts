@@ -1,5 +1,5 @@
 import { it, expect } from "vitest";
-import { parseCsv, buildCatalog, computeCategory } from "./build-catalog";
+import { parseCsv, buildCatalog, computeCategory, computeGeneration } from "./build-catalog";
 
 it("parses CSV rows", () => {
   const csv = "id,name,rarity,image_filename\nc1,Common Card,common,c1.png\nr1,Rare Card,rare,r1.png\n";
@@ -85,4 +85,37 @@ it("categorizes everything else as normal", () => {
   expect(computeCategory("Pidgey")).toBe("normal");
   expect(computeCategory("Mewtwo")).toBe("normal");
   expect(computeCategory("Mewtwo Mega X")).toBe("mega");
+});
+
+it("computes generation from dex ranges via sortOrder", () => {
+  expect(computeGeneration("Bulbasaur", "normal", 1 * 1_000_000)).toBe(1);
+  expect(computeGeneration("Ho-Oh", "normal", 250 * 1_000_000)).toBe(2);
+  expect(computeGeneration("Absol", "normal", 359 * 1_000_000)).toBe(3);
+  expect(computeGeneration("Arceus", "normal", 493 * 1_000_000)).toBe(4);
+  expect(computeGeneration("Reshiram", "normal", 643 * 1_000_000)).toBe(5);
+  expect(computeGeneration("Xerneas", "normal", 716 * 1_000_000)).toBe(6);
+  expect(computeGeneration("Solgaleo", "normal", 791 * 1_000_000)).toBe(7);
+  expect(computeGeneration("Zacian", "normal", 888 * 1_000_000)).toBe(8);
+  expect(computeGeneration("Koraidon", "normal", 1007 * 1_000_000)).toBe(9);
+});
+
+it("handles dex range boundaries", () => {
+  expect(computeGeneration("X", "normal", 151 * 1_000_000)).toBe(1);
+  expect(computeGeneration("X", "normal", 152 * 1_000_000)).toBe(2);
+  expect(computeGeneration("X", "normal", 386 * 1_000_000)).toBe(3);
+  expect(computeGeneration("X", "normal", 387 * 1_000_000)).toBe(4);
+  expect(computeGeneration("X", "normal", 905 * 1_000_000)).toBe(8);
+  expect(computeGeneration("X", "normal", 906 * 1_000_000)).toBe(9);
+});
+
+it("overrides generation for mega and gmax categories regardless of base dex", () => {
+  expect(computeGeneration("Charizard Mega X", "mega", 6 * 1_000_000)).toBe(6);
+  expect(computeGeneration("Pikachu Gmax", "gmax", 25 * 1_000_000)).toBe(8);
+});
+
+it("overrides generation for regional-form names regardless of base dex", () => {
+  expect(computeGeneration("Vulpix Alola", "normal", 37 * 1_000_000)).toBe(7);
+  expect(computeGeneration("Meowth Galar", "normal", 52 * 1_000_000)).toBe(8);
+  expect(computeGeneration("Typhlosion Hisui", "normal", 157 * 1_000_000)).toBe(8);
+  expect(computeGeneration("Wooper Paldea", "normal", 194 * 1_000_000)).toBe(9);
 });
