@@ -47,12 +47,16 @@ it("lists all catalog cards with owned quantities and pending packs", async () =
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/collection", { headers: { Cookie: cookie } }, env);
   expect(res.status).toBe(200);
-  const json = await res.json<{ cards: { id: string; quantity: number }[]; pendingPacks: { id: number }[] }>();
+  const json = await res.json<{
+    cards: { id: string; quantity: number; generation: number }[];
+    pendingPacks: { id: number }[];
+  }>();
 
   const c1 = json.cards.find((c) => c.id === "c1");
   const r1 = json.cards.find((c) => c.id === "r1");
   expect(c1?.quantity).toBe(2);
   expect(r1?.quantity).toBe(0);
+  expect(c1?.generation).toBe(1);
   expect(json.pendingPacks).toHaveLength(1);
 });
 

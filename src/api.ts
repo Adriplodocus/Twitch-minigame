@@ -8,6 +8,7 @@ export interface CardView {
   rarity: Rarity;
   imagePath: string;
   quantity: number;
+  generation: number;
   sortOrder?: number;
   acquiredAt?: string | null;
 }
