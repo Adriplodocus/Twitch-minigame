@@ -50,7 +50,7 @@ Example classifications under the new thresholds:
 | Fearow | 90 | common |
 | Kadabra | 100 | common |
 | Raichu | 75 | rare |
-| Alakazam | 50 | epic |
+| Alakazam | 50 | rare |
 | Dragonite | 45 | epic |
 | Gyarados | 45 | epic |
 | Tyranitar | 45 | epic |

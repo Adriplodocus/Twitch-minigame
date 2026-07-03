@@ -66,7 +66,7 @@ it("matches known species thresholds from the design spec", () => {
   expect(classifyRarity(90, false, false)).toBe("common"); // Fearow
   expect(classifyRarity(100, false, false)).toBe("common"); // Kadabra
   expect(classifyRarity(75, false, false)).toBe("rare"); // Raichu
-  expect(classifyRarity(50, false, false)).toBe("epic"); // Alakazam
+  expect(classifyRarity(50, false, false)).toBe("rare"); // Alakazam (capture_rate 50 falls in the 46-89 rare band)
   expect(classifyRarity(45, false, false)).toBe("epic"); // Dragonite, Gyarados, Tyranitar
   expect(classifyRarity(25, false, false)).toBe("epic"); // Snorlax
   expect(classifyRarity(3, false, false)).toBe("epic"); // Metagross (no legendary flag)
@@ -388,7 +388,7 @@ Expected: `Wrote <count> cards to .../catalog.json and .../seed-cards.sql`
 grep -E "^p[0-9]+(-shiny)?,(Fearow|Kadabra|Raichu|Alakazam|Dragonite|Gyarados|Tyranitar|Snorlax|Nihilego|Great Tusk)," tools/catalog/cards.csv
 ```
 
-Expected rarities in the matched rows: Fearow → `common`, Kadabra → `common`, Raichu → `rare`, Alakazam → `epic`, Dragonite → `epic`, Gyarados → `epic`, Tyranitar → `epic`, Snorlax → `epic`. (Nihilego and Great Tusk will show their *raw* capture-rate-derived rarity here, since the legendary/epic named-species floor from Task 2 is applied later in `catalog.json`/`seed-cards.sql` by `build-catalog.ts`, not in `cards.csv` itself.)
+Expected rarities in the matched rows: Fearow → `common`, Kadabra → `common`, Raichu → `rare`, Alakazam → `rare` (capture_rate 50 falls in the 46-89 rare band, not epic — corrected during Task 1 review), Dragonite → `epic`, Gyarados → `epic`, Tyranitar → `epic`, Snorlax → `epic`. (Nihilego and Great Tusk will show their *raw* capture-rate-derived rarity here, since the legendary/epic named-species floor from Task 2 is applied later in `catalog.json`/`seed-cards.sql` by `build-catalog.ts`, not in `cards.csv` itself.)
 
 ```bash
 node -e "const c = require('./catalog.json'); const names = ['Nihilego','Great Tusk','Fearow']; for (const n of names) console.log(n, c.find(x => x.name === n)?.rarity)"
