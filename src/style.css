@@ -101,6 +101,83 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .card.card-rarity-epic { border-color: var(--purple); }
 .card.card-rarity-legendary { border-color: var(--gold); }
 
+.card.foil.card-rarity-rare {
+  background: linear-gradient(115deg, var(--surface) 20%, #d8f3f7 40%, var(--surface) 60%);
+  background-size: 250% 250%;
+  animation: foil-shift 5s ease-in-out infinite;
+}
+.card.foil.card-rarity-epic {
+  background: linear-gradient(115deg, var(--surface) 15%, #eaddfb 35%, #d8f3f7 50%, #eaddfb 65%, var(--surface) 85%);
+  background-size: 280% 280%;
+  animation: foil-shift 4s ease-in-out infinite;
+}
+.card.foil.card-rarity-legendary {
+  border-color: var(--gold);
+  background: linear-gradient(115deg, var(--surface) 10%, #fbe9b8 30%, #eaddfb 45%, #d8f3f7 60%, #fbe9b8 75%, var(--surface) 90%);
+  background-size: 320% 320%;
+  animation: foil-shift 3.2s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(120, 90, 60, 0.10), 0 0 14px rgba(232, 185, 58, 0.4);
+}
+@keyframes foil-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.card.foil.shiny.card-rarity-common {
+  border-color: #b9bec4;
+  background: linear-gradient(115deg, var(--surface) 20%, #eef1f4 40%, var(--surface) 60%);
+  background-size: 250% 250%;
+  animation: foil-shift 5s ease-in-out infinite;
+}
+
+.glare {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: transparent;
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.card.tilting .glare { opacity: 1; }
+
+.sparkle-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  pointer-events: none;
+}
+.sparkle-layer .dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.95);
+  opacity: 0;
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+.sparkle-layer .dot:nth-child(1) { top: 14%; left: 20%; animation-delay: 0s; }
+.sparkle-layer .dot:nth-child(2) { top: 30%; left: 78%; animation-delay: 0.4s; }
+.sparkle-layer .dot:nth-child(3) { top: 55%; left: 12%; animation-delay: 0.9s; }
+.sparkle-layer .dot:nth-child(4) { top: 68%; left: 60%; animation-delay: 1.3s; }
+.sparkle-layer .dot:nth-child(5) { top: 20%; left: 50%; animation-delay: 1.8s; }
+.sparkle-layer .dot:nth-child(6) { top: 80%; left: 85%; animation-delay: 2.2s; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.foil,
+  .sparkle-layer .dot {
+    animation: none !important;
+    background-position: 0% 50% !important;
+  }
+}
+
 .card-name {
   margin-top: 0.5rem;
   color: var(--text-em);
