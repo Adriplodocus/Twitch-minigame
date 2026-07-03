@@ -1,0 +1,3 @@
+ALTER TABLE trade_offers ADD COLUMN auto_expired INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE trade_offers ADD COLUMN hidden_from_sender INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE trade_offers ADD COLUMN hidden_from_receiver INTEGER NOT NULL DEFAULT 0;
