@@ -1,6 +1,7 @@
-import { getCollection, getMe, openPack, logout, type CardView, type PendingPack } from "./api";
+import { getCollection, openPack, type CardView, type PendingPack } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName, compareCards, type SortField } from "./card";
 import { attachTradeLinkButton } from "./trade-link";
+import { initUserHeader } from "./user-header";
 import { GENERATIONS } from "./generations";
 
 let femaleVariantBaseNames = new Set<string>();
@@ -142,20 +143,7 @@ async function load(): Promise<void> {
 
 document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
-document.getElementById("logout-btn")!.addEventListener("click", async () => {
-  await logout();
-  window.location.href = "/";
-});
 
 attachTradeLinkButton("trade-link-btn");
-
-async function loadUser(): Promise<void> {
-  const me = await getMe();
-  document.getElementById("user-name")!.textContent = me.username;
-  const avatar = document.getElementById("user-avatar") as HTMLImageElement;
-  avatar.alt = me.username;
-  if (me.avatarUrl) avatar.src = me.avatarUrl;
-}
-
-loadUser();
+initUserHeader();
 load();

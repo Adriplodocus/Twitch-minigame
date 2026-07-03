@@ -1,6 +1,7 @@
-import { getCollection, logout, type CardView } from "./api";
+import { getCollection, type CardView } from "./api";
 import { collectFemaleVariantBaseNames, computeFormLabels } from "./card";
 import { attachTradeLinkButton } from "./trade-link";
+import { initUserHeader } from "./user-header";
 import { GENERATIONS } from "./generations";
 import { AlbumBook } from "./album-book";
 
@@ -72,10 +73,7 @@ async function load(): Promise<void> {
   }
 }
 
-document.getElementById("logout-btn")!.addEventListener("click", async () => {
-  await logout();
-  window.location.href = "/";
-});
 attachTradeLinkButton("trade-link-btn");
+initUserHeader();
 
 load();

@@ -1,4 +1,5 @@
-import { getCollection, getUserCollection, createOffer, getMe, logout, type CardView } from "./api";
+import { getCollection, getUserCollection, createOffer, getMe, type CardView } from "./api";
+import { initUserHeader } from "./user-header";
 import {
   renderCardHtml,
   collectFemaleVariantBaseNames,
@@ -136,9 +137,6 @@ document.getElementById("my-filter")!.addEventListener("input", renderMyGrid);
 document.getElementById("target-collection")!.addEventListener("input", (e) => trackQuantity(e, "request-qty", requestQuantities));
 document.getElementById("my-cards")!.addEventListener("input", (e) => trackQuantity(e, "offer-qty", offerQuantities));
 document.getElementById("send-offer-btn")!.addEventListener("click", sendOffer);
-document.getElementById("logout-btn")!.addEventListener("click", async () => {
-  await logout();
-  window.location.href = "/";
-});
+initUserHeader();
 
 init();

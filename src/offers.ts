@@ -3,11 +3,11 @@ import {
   acceptOffer,
   declineOffer,
   cancelOffer,
-  logout,
   type TradeOfferItem,
   type TradeOfferSummary,
 } from "./api";
 import { renderCardHtml } from "./card";
+import { initUserHeader } from "./user-header";
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pendiente",
@@ -92,9 +92,5 @@ async function loadOffers(): Promise<void> {
   );
 }
 
-document.getElementById("logout-btn")!.addEventListener("click", async () => {
-  await logout();
-  window.location.href = "/";
-});
-
+initUserHeader();
 loadOffers();
