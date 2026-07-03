@@ -55,7 +55,8 @@ export function computeRarityFloor(name: string, category: Category, rarity: Rar
   let floored = rarity;
   // Keyed off `category`, not the Mega/Gmax name regex, so a starter-line Mega/Gmax
   // (category collapses to "inicial", see computeCategory) skips this floor. Currently
-  // safe: every starter final evolution has capture_rate 45, already >= rare on its own.
+  // safe: every starter final evolution has capture_rate 45 and base_stat_total >= 490,
+  // so classifyRarity already puts it at epic (>= rare) on its own.
   if (category === "mega" || category === "gmax") floored = floorRarity(floored, "rare");
   if (LEGENDARY_FLOOR_RE.test(name)) floored = floorRarity(floored, "legendary");
   else if (EPIC_FLOOR_RE.test(name)) floored = floorRarity(floored, "epic");
