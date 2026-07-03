@@ -104,17 +104,17 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .card.foil.card-rarity-rare {
   background: linear-gradient(115deg, var(--surface) 20%, #d8f3f7 40%, var(--surface) 60%);
   background-size: 250% 250%;
-  animation: card-in 0.3s ease both, foil-shift 5s ease-in-out infinite;
+  animation: card-in-fade 0.3s ease both, foil-shift 5s ease-in-out infinite;
 }
 .card.foil.card-rarity-epic {
   background: linear-gradient(115deg, var(--surface) 15%, #eaddfb 35%, #d8f3f7 50%, #eaddfb 65%, var(--surface) 85%);
   background-size: 280% 280%;
-  animation: card-in 0.3s ease both, foil-shift 4s ease-in-out infinite;
+  animation: card-in-fade 0.3s ease both, foil-shift 4s ease-in-out infinite;
 }
 .card.foil.card-rarity-legendary {
   background: linear-gradient(115deg, var(--surface) 10%, #fbe9b8 30%, #eaddfb 45%, #d8f3f7 60%, #fbe9b8 75%, var(--surface) 90%);
   background-size: 320% 320%;
-  animation: card-in 0.3s ease both, foil-shift 3.2s ease-in-out infinite;
+  animation: card-in-fade 0.3s ease both, foil-shift 3.2s ease-in-out infinite;
   box-shadow: 0 4px 16px rgba(120, 90, 60, 0.10), 0 0 14px rgba(232, 185, 58, 0.4);
 }
 .card.foil.card-rarity-legendary:hover {
@@ -129,7 +129,7 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   border-color: #b9bec4;
   background: linear-gradient(115deg, var(--surface) 20%, #eef1f4 40%, var(--surface) 60%);
   background-size: 250% 250%;
-  animation: card-in 0.3s ease both, foil-shift 5s ease-in-out infinite;
+  animation: card-in-fade 0.3s ease both, foil-shift 5s ease-in-out infinite;
 }
 
 .glare {
@@ -440,6 +440,15 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .card-in { animation: card-in 0.3s ease both; }
+
+/* Foil cards drive `transform` from JS (card-tilt.ts) on hover; an
+   animation's `transform` output outranks an inline style, so foil cards
+   get an opacity-only entrance instead of `card-in` to avoid permanently
+   overriding the tilt with a held `translateY(0)`. */
+@keyframes card-in-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
 .album-picker-grid {
   display: grid;
