@@ -66,7 +66,8 @@ async function getPokemon(cache: Cache, id: number): Promise<{ name: string; spe
 }
 
 async function getSpecies(cache: Cache, speciesName: string): Promise<SpeciesInfo> {
-  if (cache.species[speciesName]) return cache.species[speciesName];
+  const cached = cache.species[speciesName];
+  if (cached && typeof cached.baseStatTotal === "number") return cached;
   const [speciesData, pokemonData] = await Promise.all([
     fetchJson(`https://pokeapi.co/api/v2/pokemon-species/${speciesName}`),
     fetchJson(`https://pokeapi.co/api/v2/pokemon/${speciesName}`),
