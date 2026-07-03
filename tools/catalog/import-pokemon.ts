@@ -26,6 +26,7 @@ interface SpeciesInfo {
   isLegendary: boolean;
   isMythical: boolean;
   captureRate: number;
+  baseStatTotal: number;
 }
 
 interface Cache {
@@ -66,28 +67,41 @@ async function getPokemon(cache: Cache, id: number): Promise<{ name: string; spe
 
 async function getSpecies(cache: Cache, speciesName: string): Promise<SpeciesInfo> {
   if (cache.species[speciesName]) return cache.species[speciesName];
-  const data = await fetchJson(`https://pokeapi.co/api/v2/pokemon-species/${speciesName}`);
+  const [speciesData, pokemonData] = await Promise.all([
+    fetchJson(`https://pokeapi.co/api/v2/pokemon-species/${speciesName}`),
+    fetchJson(`https://pokeapi.co/api/v2/pokemon/${speciesName}`),
+  ]);
+  const baseStatTotal: number = Array.isArray(pokemonData?.stats)
+    ? pokemonData.stats.reduce((sum: number, s: { base_stat: number }) => sum + (s.base_stat ?? 0), 0)
+    : 0;
   const info: SpeciesInfo = {
     name: speciesName,
-    dexNumber: data?.id ?? 0,
-    isLegendary: !!data?.is_legendary,
-    isMythical: !!data?.is_mythical,
-    captureRate: data?.capture_rate ?? 255,
+    dexNumber: speciesData?.id ?? 0,
+    isLegendary: !!speciesData?.is_legendary,
+    isMythical: !!speciesData?.is_mythical,
+    captureRate: speciesData?.capture_rate ?? 255,
+    baseStatTotal,
   };
   cache.species[speciesName] = info;
   return info;
 }
 
-export function classifyRarity(captureRate: number, isLegendary: boolean, isMythical: boolean): Rarity {
+export function classifyRarity(
+  captureRate: number,
+  isLegendary: boolean,
+  isMythical: boolean,
+  baseStatTotal: number
+): Rarity {
   if (isLegendary || isMythical) return "legendary";
-  if (captureRate <= 45) return "epic";
+  if (captureRate < 45) return "epic";
+  if (captureRate === 45) return baseStatTotal >= 490 ? "epic" : "rare";
   if (captureRate <= 89) return "rare";
   return "common";
 }
 
 async function getRarity(cache: Cache, speciesName: string): Promise<Rarity> {
   const species = await getSpecies(cache, speciesName);
-  return classifyRarity(species.captureRate, species.isLegendary, species.isMythical);
+  return classifyRarity(species.captureRate, species.isLegendary, species.isMythical, species.baseStatTotal);
 }
 
 function titleCase(name: string): string {
