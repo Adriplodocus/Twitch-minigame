@@ -129,6 +129,20 @@ it("overrides generation for mega and gmax categories regardless of base dex", (
   expect(computeGeneration("Pikachu Gmax", "gmax", 25 * 1_000_000)).toBe(8);
 });
 
+it("overrides generation for a starter species' Mega/Gmax forms even though computeCategory reports them as 'inicial'", () => {
+  // Regression test: computeCategory gives "inicial" precedence over "mega"/"gmax" for
+  // starter-line species (see the "gives inicial precedence..." tests above), so
+  // computeGeneration must not rely on that collapsed category to detect Mega/Gmax cards.
+  expect(computeCategory("Venusaur Mega")).toBe("inicial");
+  expect(computeGeneration("Venusaur Mega", computeCategory("Venusaur Mega"), 3 * 1_000_000)).toBe(6);
+
+  expect(computeCategory("Charizard Mega X")).toBe("inicial");
+  expect(computeGeneration("Charizard Mega X", computeCategory("Charizard Mega X"), 6 * 1_000_000)).toBe(6);
+
+  expect(computeCategory("Venusaur Gmax")).toBe("inicial");
+  expect(computeGeneration("Venusaur Gmax", computeCategory("Venusaur Gmax"), 3 * 1_000_000)).toBe(8);
+});
+
 it("overrides generation for regional-form names regardless of base dex", () => {
   expect(computeGeneration("Vulpix Alola", "normal", 37 * 1_000_000)).toBe(7);
   expect(computeGeneration("Meowth Galar", "normal", 52 * 1_000_000)).toBe(8);

@@ -57,8 +57,13 @@ function generationFromDex(dexNumber: number): number {
 }
 
 export function computeGeneration(name: string, category: Category, sortOrder: number): number {
-  if (category === "mega") return 6;
-  if (category === "gmax") return 8;
+  // Note: deliberately test the name patterns directly rather than branching on `category`.
+  // `category` collapses to "inicial" for a starter species' Mega/Gmax forms (e.g. "Charizard
+  // Mega X", "Venusaur Gmax") — that precedence is intentional for pack drop-rate weighting
+  // (see computeCategory), but generation classification still needs to recognize these as
+  // Mega/Gmax regardless of which category bucket they landed in.
+  if (MEGA_RE.test(name)) return 6;
+  if (GMAX_RE.test(name)) return 8;
   for (const override of REGIONAL_GENERATION_OVERRIDES) {
     if (override.pattern.test(name)) return override.generation;
   }
