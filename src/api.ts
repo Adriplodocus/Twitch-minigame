@@ -41,7 +41,7 @@ export function logout(): Promise<{ ok: boolean }> {
   return request("/auth/logout", { method: "POST" });
 }
 
-export function getMe(): Promise<{ ok: boolean; username: string }> {
+export function getMe(): Promise<{ ok: boolean; username: string; avatarUrl: string | null }> {
   return request("/auth/me");
 }
 

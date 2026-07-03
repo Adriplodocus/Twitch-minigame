@@ -1,4 +1,4 @@
-import { getCollection, openPack, logout, type CardView, type PendingPack } from "./api";
+import { getCollection, getMe, openPack, logout, type CardView, type PendingPack } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName, compareCards, type SortField } from "./card";
 import { attachTradeLinkButton } from "./trade-link";
 import { GENERATIONS } from "./generations";
@@ -130,7 +130,7 @@ async function load(): Promise<void> {
   ownedCards = data.cards.filter((c) => c.quantity > 0);
 
   document.getElementById("owned-heading")!.innerHTML =
-    `Obtenidas <span class="count">(${ownedCards.length}/${data.cards.length})</span>`;
+    `Cromos obtenidos <span class="count">(${ownedCards.length}/${data.cards.length})</span>`;
   renderOwnedGrid();
 
   renderPendingPacks(data.pendingPacks, async (packId, generation) => {
@@ -149,4 +149,13 @@ document.getElementById("logout-btn")!.addEventListener("click", async () => {
 
 attachTradeLinkButton("trade-link-btn");
 
+async function loadUser(): Promise<void> {
+  const me = await getMe();
+  document.getElementById("user-name")!.textContent = me.username;
+  const avatar = document.getElementById("user-avatar") as HTMLImageElement;
+  avatar.alt = me.username;
+  if (me.avatarUrl) avatar.src = me.avatarUrl;
+}
+
+loadUser();
 load();

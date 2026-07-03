@@ -7,7 +7,13 @@ import { requireAuth } from "../middleware/auth";
 
 const auth = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
 
-auth.get("/me", requireAuth, (c) => c.json({ ok: true, username: c.get("user").username }));
+auth.get("/me", requireAuth, async (c) => {
+  const user = c.get("user");
+  const row = await c.env.DB.prepare("SELECT avatar_url AS avatarUrl FROM users WHERE twitch_id = ?")
+    .bind(user.twitchId)
+    .first<{ avatarUrl: string | null }>();
+  return c.json({ ok: true, username: user.username, avatarUrl: row?.avatarUrl ?? null });
+});
 
 auth.get("/login", (c) => {
   const state = crypto.randomUUID();
