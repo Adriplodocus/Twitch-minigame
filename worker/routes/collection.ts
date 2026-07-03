@@ -37,13 +37,13 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   if (!pack || pack.user_id !== user.twitchId) return c.json({ error: "Not found" }, 404);
   if (pack.opened_at) return c.json({ error: "Pack already opened" }, 409);
 
-  let body: { generation?: unknown };
+  let body: unknown;
   try {
     body = await c.req.json();
   } catch {
     return c.json({ error: "Invalid request body" }, 400);
   }
-  const generation = Number(body.generation);
+  const generation = Number((body as { generation?: unknown } | null)?.generation);
   if (!Number.isInteger(generation) || generation < 1 || generation > 9) {
     return c.json({ error: "Invalid generation" }, 400);
   }

@@ -125,6 +125,24 @@ it("rejects opening a pack with an invalid generation", async () => {
   expect(res.status).toBe(400);
 });
 
+it("rejects opening a pack with a null request body", async () => {
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify(null),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
 it("rejects opening a pack that belongs to another user", async () => {
   await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind("2", "viewer2").run();
   const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
