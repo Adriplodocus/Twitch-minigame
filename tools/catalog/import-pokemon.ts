@@ -12,7 +12,7 @@ const CACHE_PATH = path.join(__dirname, ".pokeapi-cache.json");
 
 const NON_POKEMON_FILES = new Set(["egg.png", "egg-manaphy.png", "substitute.png"]);
 
-type Rarity = "common" | "rare" | "epic" | "legendary";
+export type Rarity = "common" | "rare" | "epic" | "legendary";
 
 interface SpriteEntry {
   id: number;
@@ -25,7 +25,7 @@ interface SpeciesInfo {
   dexNumber: number;
   isLegendary: boolean;
   isMythical: boolean;
-  evolvesFrom: string | null;
+  captureRate: number;
 }
 
 interface Cache {
@@ -72,21 +72,22 @@ async function getSpecies(cache: Cache, speciesName: string): Promise<SpeciesInf
     dexNumber: data?.id ?? 0,
     isLegendary: !!data?.is_legendary,
     isMythical: !!data?.is_mythical,
-    evolvesFrom: data?.evolves_from_species?.name ?? null,
+    captureRate: data?.capture_rate ?? 255,
   };
   cache.species[speciesName] = info;
   return info;
 }
 
+export function classifyRarity(captureRate: number, isLegendary: boolean, isMythical: boolean): Rarity {
+  if (isLegendary || isMythical) return "legendary";
+  if (captureRate <= 45) return "epic";
+  if (captureRate <= 89) return "rare";
+  return "common";
+}
+
 async function getRarity(cache: Cache, speciesName: string): Promise<Rarity> {
   const species = await getSpecies(cache, speciesName);
-  if (species.isLegendary || species.isMythical) return "legendary";
-  if (species.evolvesFrom) {
-    const parent = await getSpecies(cache, species.evolvesFrom);
-    if (parent.evolvesFrom) return "epic";
-    return "rare";
-  }
-  return "common";
+  return classifyRarity(species.captureRate, species.isLegendary, species.isMythical);
 }
 
 function titleCase(name: string): string {
