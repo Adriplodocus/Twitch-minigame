@@ -1,0 +1,89 @@
+import type { CardView } from "./api";
+import { renderCardHtml, compareCards } from "./card";
+
+export const PAGE_SIZE = 16;
+const PAGES_PER_SPREAD = 2;
+
+export function pageCount(cardCount: number): number {
+  const contentPages = Math.max(1, Math.ceil(cardCount / PAGE_SIZE));
+  return contentPages % 2 === 0 ? contentPages : contentPages + 1;
+}
+
+export function cardsForPage<T>(cards: T[], pageIndex: number): (T | null)[] {
+  const start = pageIndex * PAGE_SIZE;
+  const slice: (T | null)[] = cards.slice(start, start + PAGE_SIZE);
+  while (slice.length < PAGE_SIZE) slice.push(null);
+  return slice;
+}
+
+export interface BookDeps {
+  spreadEl: HTMLElement;
+  prevBtn: HTMLButtonElement;
+  nextBtn: HTMLButtonElement;
+  indicatorEl: HTMLElement;
+  flipSound: HTMLAudioElement;
+  femaleVariantBaseNames: Set<string>;
+  formLabels: Map<string, string>;
+}
+
+const FLIP_OUT_MS = 240;
+const FLIP_IN_MS = 260;
+
+export class AlbumBook {
+  private readonly cards: CardView[];
+  private spreadIndex = 0;
+  private readonly totalPages: number;
+  private readonly totalSpreads: number;
+
+  constructor(
+    cards: CardView[],
+    private readonly deps: BookDeps
+  ) {
+    this.cards = [...cards].sort((a, b) => compareCards(a, b, "pokedex"));
+    this.totalPages = pageCount(this.cards.length);
+    this.totalSpreads = this.totalPages / PAGES_PER_SPREAD;
+    deps.prevBtn.addEventListener("click", () => this.go(-1));
+    deps.nextBtn.addEventListener("click", () => this.go(1));
+    this.render();
+  }
+
+  private renderPageHtml(pageIndex: number): string {
+    const slots = cardsForPage(this.cards, pageIndex);
+    return `<div class="book-page">${slots
+      .map((c) =>
+        c
+          ? renderCardHtml(c, "", this.deps.femaleVariantBaseNames, this.deps.formLabels)
+          : `<div class="book-page-slot-empty"></div>`
+      )
+      .join("")}</div>`;
+  }
+
+  private render(): void {
+    const left = this.spreadIndex * PAGES_PER_SPREAD;
+    const right = left + 1;
+    this.deps.spreadEl.innerHTML = this.renderPageHtml(left) + this.renderPageHtml(right);
+    this.deps.prevBtn.disabled = this.spreadIndex === 0;
+    this.deps.nextBtn.disabled = this.spreadIndex === this.totalSpreads - 1;
+    this.deps.indicatorEl.textContent = `Páginas ${left + 1}–${right + 1} de ${this.totalPages}`;
+  }
+
+  private go(direction: -1 | 1): void {
+    const nextIndex = this.spreadIndex + direction;
+    if (nextIndex < 0 || nextIndex >= this.totalSpreads) return;
+    this.spreadIndex = nextIndex;
+    this.flipTo();
+  }
+
+  private flipTo(): void {
+    const spread = this.deps.spreadEl;
+    this.deps.flipSound.currentTime = 0;
+    this.deps.flipSound.play().catch(() => {});
+    spread.classList.add("book-spread-flip-out");
+    window.setTimeout(() => {
+      this.render();
+      spread.classList.remove("book-spread-flip-out");
+      spread.classList.add("book-spread-flip-in");
+      window.setTimeout(() => spread.classList.remove("book-spread-flip-in"), FLIP_IN_MS);
+    }, FLIP_OUT_MS);
+  }
+}
