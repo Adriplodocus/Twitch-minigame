@@ -634,13 +634,30 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .book-nav:hover:not(:disabled) { transform: translateY(-2px); }
 .book-nav:disabled { opacity: 0.3; cursor: default; }
-.book-indicator {
-  text-align: center;
+.book-indicator-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   margin-top: 0.75rem;
+}
+.book-indicator {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
   color: var(--muted);
 }
+.book-jump {
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+}
+.book-jump:hover:not(:disabled) { color: var(--text-em); }
+.book-jump:disabled { opacity: 0.3; cursor: default; }
 
 .offers-columns {
   display: grid;

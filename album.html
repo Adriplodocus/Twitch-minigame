@@ -61,7 +61,11 @@
           <div class="book-spread" id="book-spread"></div>
           <button type="button" class="book-nav book-nav-next" id="book-next" aria-label="Página siguiente">›</button>
         </div>
-        <p class="book-indicator" id="book-indicator"></p>
+        <div class="book-indicator-row">
+          <button type="button" class="book-jump" id="book-first" aria-label="Primera página">« Primera</button>
+          <p class="book-indicator" id="book-indicator"></p>
+          <button type="button" class="book-jump" id="book-last" aria-label="Última página">Última »</button>
+        </div>
       </div>
     </div>
     <audio id="page-flip-sound" src="/page-flip.mp3" preload="auto"></audio>
