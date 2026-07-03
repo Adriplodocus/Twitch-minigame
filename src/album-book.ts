@@ -31,10 +31,8 @@ export function cardsForPage<T>(cards: T[], pageIndex: number): (T | null)[] {
 
 export interface BookDeps {
   spreadEl: HTMLElement;
-  firstBtn: HTMLButtonElement;
   prevBtn: HTMLButtonElement;
   nextBtn: HTMLButtonElement;
-  lastBtn: HTMLButtonElement;
   indicatorEl: HTMLElement;
   flipSound: HTMLAudioElement;
   femaleVariantBaseNames: Set<string>;
@@ -57,10 +55,8 @@ export class AlbumBook {
     this.cards = [...cards].sort((a, b) => albumSortKey(a) - albumSortKey(b));
     this.totalPages = pageCount(this.cards.length);
     this.totalSpreads = this.totalPages / PAGES_PER_SPREAD;
-    deps.firstBtn.addEventListener("click", () => this.jump(0));
     deps.prevBtn.addEventListener("click", () => this.go(-1));
     deps.nextBtn.addEventListener("click", () => this.go(1));
-    deps.lastBtn.addEventListener("click", () => this.jump(this.totalSpreads - 1));
     this.render();
   }
 
@@ -79,10 +75,8 @@ export class AlbumBook {
     const left = this.spreadIndex * PAGES_PER_SPREAD;
     const right = left + 1;
     this.deps.spreadEl.innerHTML = this.renderPageHtml(left) + this.renderPageHtml(right);
-    this.deps.firstBtn.disabled = this.spreadIndex === 0;
     this.deps.prevBtn.disabled = this.spreadIndex === 0;
     this.deps.nextBtn.disabled = this.spreadIndex === this.totalSpreads - 1;
-    this.deps.lastBtn.disabled = this.spreadIndex === this.totalSpreads - 1;
     this.deps.indicatorEl.textContent = `Páginas ${left + 1}–${right + 1} de ${this.totalPages}`;
   }
 
@@ -90,13 +84,6 @@ export class AlbumBook {
     const nextIndex = this.spreadIndex + direction;
     if (nextIndex < 0 || nextIndex >= this.totalSpreads) return;
     this.spreadIndex = nextIndex;
-    this.flipTo(direction);
-  }
-
-  private jump(index: number): void {
-    if (index < 0 || index >= this.totalSpreads || index === this.spreadIndex) return;
-    const direction: -1 | 1 = index > this.spreadIndex ? 1 : -1;
-    this.spreadIndex = index;
     this.flipTo(direction);
   }
 

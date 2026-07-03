@@ -45,10 +45,8 @@ function renderBook(
 
   new AlbumBook(genCards, {
     spreadEl: document.getElementById("book-spread")!,
-    firstBtn: document.getElementById("book-first") as HTMLButtonElement,
     prevBtn: document.getElementById("book-prev") as HTMLButtonElement,
     nextBtn: document.getElementById("book-next") as HTMLButtonElement,
-    lastBtn: document.getElementById("book-last") as HTMLButtonElement,
     indicatorEl: document.getElementById("book-indicator")!,
     flipSound: document.getElementById("page-flip-sound") as HTMLAudioElement,
     femaleVariantBaseNames,
