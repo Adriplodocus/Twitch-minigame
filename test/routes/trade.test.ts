@@ -355,3 +355,32 @@ it("rejects deleting an offer the user isn't a participant of", async () => {
   const res = await app.request(`/api/trade/offers/${offerId}`, { method: "DELETE", headers: { Cookie: cookieOther } }, env);
   expect(res.status).toBe(404);
 });
+
+it("counts only received pending offers not hidden by the receiver", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+
+  const zeroRes = await app.request("/api/trade/offers/pending-count", { headers: { Cookie: cookieTo } }, env);
+  expect((await zeroRes.json<{ count: number }>()).count).toBe(0);
+
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  const oneRes = await app.request("/api/trade/offers/pending-count", { headers: { Cookie: cookieTo } }, env);
+  expect((await oneRes.json<{ count: number }>()).count).toBe(1);
+
+  const senderRes = await app.request("/api/trade/offers/pending-count", { headers: { Cookie: cookieFrom } }, env);
+  expect((await senderRes.json<{ count: number }>()).count).toBe(0);
+
+  await app.request(`/api/trade/offers/${offerId}/decline`, { method: "POST", headers: { Cookie: cookieTo } }, env);
+  const afterDeclineRes = await app.request("/api/trade/offers/pending-count", { headers: { Cookie: cookieTo } }, env);
+  expect((await afterDeclineRes.json<{ count: number }>()).count).toBe(0);
+});

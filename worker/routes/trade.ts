@@ -256,4 +256,15 @@ trade.delete("/offers/:id", requireAuth, async (c) => {
   return c.json({ ok: true });
 });
 
+trade.get("/offers/pending-count", requireAuth, async (c) => {
+  const user = c.get("user");
+  const row = await c.env.DB.prepare(
+    `SELECT COUNT(*) AS count FROM trade_offers
+     WHERE to_user = ? AND status = 'pending' AND NOT hidden_from_receiver`
+  )
+    .bind(user.twitchId)
+    .first<{ count: number }>();
+  return c.json({ count: row?.count ?? 0 });
+});
+
 export default trade;
