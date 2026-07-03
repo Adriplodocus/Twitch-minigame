@@ -41,7 +41,7 @@ function renderBook(
   const genCards = cards.filter((c) => c.generation === gen);
   const owned = genCards.filter((c) => c.quantity > 0).length;
   document.getElementById("book-heading")!.innerHTML =
-    `Generación ${genInfo.id} · ${genInfo.region} <span class="count">(${owned}/${genCards.length})</span>`;
+    `Álbum - Generación ${genInfo.id} · ${genInfo.region} <span class="count">(${owned}/${genCards.length})</span>`;
 
   new AlbumBook(genCards, {
     spreadEl: document.getElementById("book-spread")!,
