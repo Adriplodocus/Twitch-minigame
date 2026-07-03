@@ -1,5 +1,18 @@
 import type { CardView } from "./api";
-import { renderCardHtml, compareCards } from "./card";
+import { renderCardHtml } from "./card";
+
+// Regional/Mega/Gmax forms keep the sortOrder of their base species' national
+// dex number (e.g. Tauros Paldea forms sort near #128) even though their
+// generation is overridden to when that form was introduced (see
+// computeGeneration in tools/catalog/build-catalog.ts). Inside a generation's
+// album this would place them before that generation's own dex entries, so
+// push them to the end while preserving their relative order.
+const FORM_OVERRIDE_RE = /\b(Alola|Galar|Hisui|Paldea|Mega|Gmax)\b/;
+
+function albumSortKey(card: CardView): number {
+  const base = card.sortOrder ?? 0;
+  return FORM_OVERRIDE_RE.test(card.name) ? base + 1_000_000_000_000 : base;
+}
 
 export const PAGE_SIZE = 16;
 const PAGES_PER_SPREAD = 2;
@@ -39,7 +52,7 @@ export class AlbumBook {
     cards: CardView[],
     private readonly deps: BookDeps
   ) {
-    this.cards = [...cards].sort((a, b) => compareCards(a, b, "pokedex"));
+    this.cards = [...cards].sort((a, b) => albumSortKey(a) - albumSortKey(b));
     this.totalPages = pageCount(this.cards.length);
     this.totalSpreads = this.totalPages / PAGES_PER_SPREAD;
     deps.prevBtn.addEventListener("click", () => this.go(-1));
