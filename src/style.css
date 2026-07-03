@@ -447,6 +447,12 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .card-in { animation: card-in 0.3s ease both; }
 
+/* Every tiltable (owned) card drives `transform` from JS on hover, not
+   just foil ones — same conflict as below, same fix. Higher specificity
+   than `.card-in` above; still loses to the more specific `.card.foil.*`
+   rules below for foil cards, which already combine both animations. */
+.card.tiltable { animation: card-in-fade 0.3s ease both; }
+
 /* Foil cards drive `transform` from JS (card-tilt.ts) on hover; an
    animation's `transform` output outranks an inline style, so foil cards
    get an opacity-only entrance instead of `card-in` to avoid permanently
