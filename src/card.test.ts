@@ -50,7 +50,7 @@ it("unowned rare card gets no foil even though rarity qualifies", () => {
 
 it("unowned shiny card gets no foil/shiny/sparkle either", () => {
   const html = renderCardHtml(card({ name: "Bulbasaur Shiny", quantity: 0 }));
-  expect(html).not.toMatch(/\bfoil\b/);
-  expect(html).not.toMatch(/\bshiny\b/);
+  expect(html).not.toMatch(/class="card [^"]*\bfoil\b/);
+  expect(html).not.toMatch(/class="card [^"]*\bshiny\b/);
   expect(html).not.toContain('class="sparkle-layer"');
 });

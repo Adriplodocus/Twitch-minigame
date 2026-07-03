@@ -130,7 +130,7 @@ export function renderCardHtml(
     : hasFemaleVariant
       ? `<span class="gender-icon gender-male">♂</span>`
       : "";
-  const shinyIcon = isShiny && isOwned ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
+  const shinyIcon = isShiny ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
   const qtyBadge = card.quantity > 0 ? `<span class="card-qty">x${card.quantity}</span>` : "";
 
   const hasFoil = isOwned && (card.rarity !== "common" || isShiny);
