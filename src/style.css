@@ -261,6 +261,12 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   padding: 0.55rem 1.1rem;
   font-size: 0.8rem;
 }
+.header-sep {
+  width: 1px;
+  height: 1.4rem;
+  background: var(--border);
+  flex-shrink: 0;
+}
 .btn-icon svg { flex-shrink: 0; }
 
 @media (max-width: 480px) {
