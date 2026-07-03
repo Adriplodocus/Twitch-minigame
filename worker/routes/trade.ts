@@ -239,4 +239,21 @@ trade.post("/offers/:id/cancel", requireAuth, async (c) => {
   return c.json({ status: "cancelled" });
 });
 
+trade.delete("/offers/:id", requireAuth, async (c) => {
+  const user = c.get("user");
+  const offerId = Number(c.req.param("id"));
+  const offer = await c.env.DB.prepare("SELECT from_user, to_user, status FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ from_user: string; to_user: string; status: string }>();
+  if (!offer || (offer.from_user !== user.twitchId && offer.to_user !== user.twitchId)) {
+    return c.json({ error: "Not found" }, 404);
+  }
+  if (offer.status === "pending") return c.json({ error: "Offer is still pending" }, 409);
+
+  const column = offer.from_user === user.twitchId ? "hidden_from_sender" : "hidden_from_receiver";
+  await c.env.DB.prepare(`UPDATE trade_offers SET ${column} = 1 WHERE id = ?`).bind(offerId).run();
+
+  return c.json({ ok: true });
+});
+
 export default trade;

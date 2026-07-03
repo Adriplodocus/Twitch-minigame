@@ -285,3 +285,73 @@ it("cancels an offer", async () => {
     .first<{ status: string }>();
   expect(offer?.status).toBe("cancelled");
 });
+
+it("rejects deleting a pending offer", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  const res = await app.request(`/api/trade/offers/${offerId}`, { method: "DELETE", headers: { Cookie: cookieFrom } }, env);
+  expect(res.status).toBe(409);
+});
+
+it("deletes a finished offer only from the deleting side's view", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+  await app.request(`/api/trade/offers/${offerId}/decline`, { method: "POST", headers: { Cookie: cookieTo } }, env);
+
+  const deleteRes = await app.request(
+    `/api/trade/offers/${offerId}`,
+    { method: "DELETE", headers: { Cookie: cookieFrom } },
+    env
+  );
+  expect(deleteRes.status).toBe(200);
+
+  const fromView = await app.request("/api/trade/offers", { headers: { Cookie: cookieFrom } }, env);
+  const fromJson = await fromView.json<{ sent: { id: number }[] }>();
+  expect(fromJson.sent.find((o) => o.id === offerId)).toBeUndefined();
+
+  const toView = await app.request("/api/trade/offers", { headers: { Cookie: cookieTo } }, env);
+  const toJson = await toView.json<{ received: { id: number }[] }>();
+  expect(toJson.received.find((o) => o.id === offerId)).toBeDefined();
+});
+
+it("rejects deleting an offer the user isn't a participant of", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+  await app.request(`/api/trade/offers/${offerId}/decline`, { method: "POST", headers: { Cookie: cookieTo } }, env);
+
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind("3", "viewer3").run();
+  const cookieOther = await sessionCookie("3", "viewer3");
+
+  const res = await app.request(`/api/trade/offers/${offerId}`, { method: "DELETE", headers: { Cookie: cookieOther } }, env);
+  expect(res.status).toBe(404);
+});
