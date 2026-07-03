@@ -78,6 +78,7 @@ export interface CatalogEntry {
   name: string;
   rarity: Rarity;
   category: Category;
+  generation: number;
   imagePath: string;
   sortOrder: number;
 }
@@ -115,13 +116,16 @@ export function buildCatalog(
       throw new Error(`Image file not found in public/cards/: ${row.imageFilename}`);
     }
 
+    const category = computeCategory(row.name);
+    const sortOrder = row.sortOrder ?? 0;
     catalog.push({
       id: row.id,
       name: row.name,
       rarity: row.rarity,
-      category: computeCategory(row.name),
+      category,
+      generation: computeGeneration(row.name, category, sortOrder),
       imagePath: `/cards/${row.imageFilename}`,
-      sortOrder: row.sortOrder ?? 0,
+      sortOrder,
     });
   }
 
@@ -132,11 +136,11 @@ export function buildCatalog(
     const values = chunk
       .map(
         (card) =>
-          `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.category}', '${card.imagePath}', ${card.sortOrder})`
+          `('${card.id}', '${card.name.replace(/'/g, "''")}', '${card.rarity}', '${card.category}', ${card.generation}, '${card.imagePath}', ${card.sortOrder})`
       )
       .join(",\n  ");
     statements.push(
-      `INSERT OR REPLACE INTO cards (id, name, rarity, category, image_path, sort_order) VALUES\n  ${values};`
+      `INSERT OR REPLACE INTO cards (id, name, rarity, category, generation, image_path, sort_order) VALUES\n  ${values};`
     );
   }
   const seedSql = statements.join("\n") + "\n";

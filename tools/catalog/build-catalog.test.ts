@@ -23,8 +23,24 @@ it("builds a catalog and seed SQL from valid rows", () => {
   const { catalog, seedSql } = buildCatalog(rows, new Set(["c1.png", "r1.png"]));
 
   expect(catalog).toEqual([
-    { id: "c1", name: "Common Card", rarity: "common", category: "normal", imagePath: "/cards/c1.png", sortOrder: 1 },
-    { id: "r1", name: "Rare Card", rarity: "rare", category: "normal", imagePath: "/cards/r1.png", sortOrder: 2 },
+    {
+      id: "c1",
+      name: "Common Card",
+      rarity: "common",
+      category: "normal",
+      generation: 1,
+      imagePath: "/cards/c1.png",
+      sortOrder: 1,
+    },
+    {
+      id: "r1",
+      name: "Rare Card",
+      rarity: "rare",
+      category: "normal",
+      generation: 1,
+      imagePath: "/cards/r1.png",
+      sortOrder: 2,
+    },
   ]);
   expect(seedSql).toContain("INSERT OR REPLACE INTO cards");
   expect(seedSql).toContain("'c1'");
