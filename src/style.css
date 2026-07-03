@@ -643,12 +643,18 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 
 .offers-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto 1fr;
   gap: 1.5rem;
   align-items: start;
 }
+.offers-separator {
+  align-self: stretch;
+  width: 1px;
+  background: var(--border);
+}
 @media (max-width: 700px) {
   .offers-columns { grid-template-columns: 1fr; }
+  .offers-separator { width: 100%; height: 1px; }
 }
 .offers-column-empty {
   margin-top: 0.75rem;
@@ -702,6 +708,14 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   gap: 0.75rem;
   margin-top: 1.25rem;
 }
+.delete-offer-btn {
+  background: transparent;
+  color: var(--muted);
+}
+.delete-offer-btn:hover {
+  color: #E5173A;
+  border-color: rgba(229, 23, 58, 0.3);
+}
 
 .modal-overlay {
   position: fixed;
@@ -741,4 +755,21 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   background: transparent;
   color: var(--muted);
   box-shadow: none;
+}
+.page-header-actions a.btn {
+  position: relative;
+}
+.notif-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--pink);
+  animation: notif-pulse 2.2s infinite;
+}
+@keyframes notif-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
