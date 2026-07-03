@@ -514,22 +514,22 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .album-cover-gen-label {
   font-family: 'Russo One', sans-serif;
   font-size: 0.75rem;
-  color: var(--muted);
+  color: #E0E0E0;
   letter-spacing: 0.03em;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 .album-cover-gen-number {
   font-family: 'Russo One', sans-serif;
   font-size: 1.5rem;
-  color: var(--text-em);
+  color: #FFFFFF;
   margin-top: 0.15rem;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 16px rgba(0, 0, 0, 0.6);
 }
 .album-cover-region {
   margin-top: 0.25rem;
   font-size: 0.85rem;
-  color: var(--muted);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  color: #E0E0E0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 .album-cover-count {
   margin-top: 0.75rem;
