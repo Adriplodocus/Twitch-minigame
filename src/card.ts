@@ -137,8 +137,8 @@ export function renderCardHtml(
 
   const hasFoil = isOwned && (card.rarity !== "common" || isShiny);
   const hasSparkle = isOwned && isShiny;
-  const vfxClasses = `${hasFoil ? " foil" : ""}${hasSparkle ? " shiny" : ""}`;
-  const glareHtml = hasFoil ? `<div class="glare"></div>` : "";
+  const vfxClasses = `${hasFoil ? " foil" : ""}${hasSparkle ? " shiny" : ""}${isOwned ? " tiltable" : ""}`;
+  const glareHtml = isOwned ? `<div class="glare"></div>` : "";
   const sparkleHtml = hasSparkle
     ? `<div class="sparkle-layer">${"<span class=\"dot\"></span>".repeat(6)}</div>`
     : "";
