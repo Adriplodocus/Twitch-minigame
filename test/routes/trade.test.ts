@@ -126,6 +126,53 @@ it("lists offers sent and received by the current user", async () => {
   expect(json.received).toHaveLength(0);
 });
 
+it("auto-expires a pending offer older than 7 days on list", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  await env.DB.prepare("UPDATE trade_offers SET created_at = datetime('now', '-8 days') WHERE id = ?")
+    .bind(offerId)
+    .run();
+
+  const res = await app.request("/api/trade/offers", { headers: { Cookie: cookieTo } }, env);
+  expect(res.status).toBe(200);
+  const json = await res.json<{ received: { id: number; status: string; autoExpired: boolean }[] }>();
+  expect(json.received).toEqual([expect.objectContaining({ id: offerId, status: "declined", autoExpired: true })]);
+
+  const row = await env.DB.prepare("SELECT status, auto_expired FROM trade_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ status: string; auto_expired: number }>();
+  expect(row).toEqual({ status: "declined", auto_expired: 1 });
+});
+
+it("does not expire a pending offer younger than 7 days", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  const res = await app.request("/api/trade/offers", { headers: { Cookie: cookieFrom } }, env);
+  const json = await res.json<{ sent: { id: number; status: string }[] }>();
+  expect(json.sent.find((o) => o.id === offerId)?.status).toBe("pending");
+});
+
 it("accepts an offer and swaps card ownership atomically", async () => {
   const cookieFrom = await sessionCookie("1", "viewer1");
   const cookieTo = await sessionCookie("2", "viewer2");

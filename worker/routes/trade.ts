@@ -130,24 +130,34 @@ async function itemsByOfferId(env: Env, offerIds: number[]): Promise<Map<number,
 
 trade.get("/offers", requireAuth, async (c) => {
   const user = c.get("user");
+
+  await c.env.DB.prepare(
+    `UPDATE trade_offers SET status = 'declined', auto_expired = 1
+     WHERE status = 'pending' AND created_at <= datetime('now', '-7 days')`
+  ).run();
+
   const sent = await c.env.DB.prepare(
-    `SELECT o.id, u.username AS toUser, o.status
+    `SELECT o.id, u.username AS toUser, o.status, o.auto_expired AS autoExpired
      FROM trade_offers o JOIN users u ON u.twitch_id = o.to_user
-     WHERE o.from_user = ? ORDER BY o.created_at DESC`
+     WHERE o.from_user = ? AND NOT o.hidden_from_sender ORDER BY o.created_at DESC`
   )
     .bind(user.twitchId)
-    .all<{ id: number; toUser: string; status: string }>();
+    .all<{ id: number; toUser: string; status: string; autoExpired: number }>();
   const received = await c.env.DB.prepare(
-    `SELECT o.id, u.username AS fromUser, o.status
+    `SELECT o.id, u.username AS fromUser, o.status, o.auto_expired AS autoExpired
      FROM trade_offers o JOIN users u ON u.twitch_id = o.from_user
-     WHERE o.to_user = ? ORDER BY o.created_at DESC`
+     WHERE o.to_user = ? AND NOT o.hidden_from_receiver ORDER BY o.created_at DESC`
   )
     .bind(user.twitchId)
-    .all<{ id: number; fromUser: string; status: string }>();
+    .all<{ id: number; fromUser: string; status: string; autoExpired: number }>();
 
   const allIds = [...sent.results, ...received.results].map((o) => o.id);
   const items = await itemsByOfferId(c.env, allIds);
-  const withItems = <T extends { id: number }>(offer: T) => ({ ...offer, items: items.get(offer.id) ?? [] });
+  const withItems = <T extends { id: number; autoExpired: number }>(offer: T) => ({
+    ...offer,
+    autoExpired: Boolean(offer.autoExpired),
+    items: items.get(offer.id) ?? [],
+  });
 
   return c.json({ sent: sent.results.map(withItems), received: received.results.map(withItems) });
 });
