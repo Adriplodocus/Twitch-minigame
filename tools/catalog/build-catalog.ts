@@ -30,6 +30,35 @@ export function computeCategory(name: string): Category {
   return "normal";
 }
 
+const RARITY_RANK: Record<Rarity, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
+
+function floorRarity(rarity: Rarity, floor: Rarity): Rarity {
+  return RARITY_RANK[floor] > RARITY_RANK[rarity] ? floor : rarity;
+}
+
+const LEGENDARY_FLOOR_SPECIES = [
+  "Nihilego", "Buzzwole", "Pheromosa", "Xurkitree", "Celesteela", "Kartana", "Guzzlord",
+  "Poipole", "Naganadel", "Stakataka", "Blacephalon",
+  "Walking Wake", "Iron Leaves", "Gouging Fire", "Raging Bolt", "Iron Boulder", "Iron Crown",
+];
+
+const EPIC_FLOOR_SPECIES = [
+  "Great Tusk", "Scream Tail", "Brute Bonnet", "Flutter Mane", "Slither Wing", "Sandy Shocks",
+  "Iron Treads", "Iron Bundle", "Iron Hands", "Iron Jugulis", "Iron Moth", "Iron Thorns",
+  "Roaring Moon", "Iron Valiant",
+];
+
+const LEGENDARY_FLOOR_RE = new RegExp(`^(${LEGENDARY_FLOOR_SPECIES.join("|")})\\b`);
+const EPIC_FLOOR_RE = new RegExp(`^(${EPIC_FLOOR_SPECIES.join("|")})\\b`);
+
+export function computeRarityFloor(name: string, category: Category, rarity: Rarity): Rarity {
+  let floored = rarity;
+  if (category === "mega" || category === "gmax") floored = floorRarity(floored, "rare");
+  if (LEGENDARY_FLOOR_RE.test(name)) floored = floorRarity(floored, "legendary");
+  else if (EPIC_FLOOR_RE.test(name)) floored = floorRarity(floored, "epic");
+  return floored;
+}
+
 const REGIONAL_GENERATION_OVERRIDES: { pattern: RegExp; generation: number }[] = [
   { pattern: /\bAlola\b/, generation: 7 },
   { pattern: /\bGalar\b/, generation: 8 },
@@ -123,10 +152,11 @@ export function buildCatalog(
 
     const category = computeCategory(row.name);
     const sortOrder = row.sortOrder ?? 0;
+    const rarity = computeRarityFloor(row.name, category, row.rarity);
     catalog.push({
       id: row.id,
       name: row.name,
-      rarity: row.rarity,
+      rarity,
       category,
       generation: computeGeneration(row.name, category, sortOrder),
       imagePath: `/cards/${row.imageFilename}`,

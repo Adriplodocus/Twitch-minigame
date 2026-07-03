@@ -1,5 +1,5 @@
 import { it, expect } from "vitest";
-import { parseCsv, buildCatalog, computeCategory, computeGeneration } from "./build-catalog";
+import { parseCsv, buildCatalog, computeCategory, computeGeneration, computeRarityFloor } from "./build-catalog";
 
 it("parses CSV rows", () => {
   const csv = "id,name,rarity,image_filename\nc1,Common Card,common,c1.png\nr1,Rare Card,rare,r1.png\n";
@@ -148,4 +148,40 @@ it("overrides generation for regional-form names regardless of base dex", () => 
   expect(computeGeneration("Meowth Galar", "normal", 52 * 1_000_000)).toBe(8);
   expect(computeGeneration("Typhlosion Hisui", "normal", 157 * 1_000_000)).toBe(8);
   expect(computeGeneration("Wooper Paldea", "normal", 194 * 1_000_000)).toBe(9);
+});
+
+it("floors mega/gmax cards to at least rare", () => {
+  expect(computeRarityFloor("Meowth Gmax", "gmax", "common")).toBe("rare");
+  expect(computeRarityFloor("Gengar Mega", "mega", "common")).toBe("rare");
+});
+
+it("does not lower a mega/gmax card that is already above the rare floor", () => {
+  expect(computeRarityFloor("Gengar Mega", "mega", "epic")).toBe("epic");
+  expect(computeRarityFloor("Gengar Mega", "mega", "legendary")).toBe("legendary");
+});
+
+it("does not floor normal-category cards", () => {
+  expect(computeRarityFloor("Meowth", "normal", "common")).toBe("common");
+});
+
+it("floors named legendary-tier Ultra Beasts and Paradox species to legendary", () => {
+  expect(computeRarityFloor("Nihilego", "normal", "common")).toBe("legendary");
+  expect(computeRarityFloor("Buzzwole", "normal", "rare")).toBe("legendary");
+  expect(computeRarityFloor("Walking Wake", "normal", "epic")).toBe("legendary");
+  expect(computeRarityFloor("Raging Bolt", "normal", "common")).toBe("legendary");
+});
+
+it("floors named epic-tier Paradox species to epic", () => {
+  expect(computeRarityFloor("Great Tusk", "normal", "common")).toBe("epic");
+  expect(computeRarityFloor("Iron Valiant", "normal", "rare")).toBe("epic");
+});
+
+it("matches named-species floors on shiny/female name suffixes via word-boundary prefix", () => {
+  expect(computeRarityFloor("Nihilego Shiny", "normal", "common")).toBe("legendary");
+  expect(computeRarityFloor("Great Tusk Shiny", "normal", "common")).toBe("epic");
+});
+
+it("does not lower a named-species card that is already above its floor", () => {
+  expect(computeRarityFloor("Nihilego", "normal", "legendary")).toBe("legendary");
+  expect(computeRarityFloor("Great Tusk", "normal", "legendary")).toBe("legendary");
 });
