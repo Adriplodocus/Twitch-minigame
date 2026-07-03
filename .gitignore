@@ -1,5 +1,6 @@
 node_modules/
 dist/
+*.tsbuildinfo
 .wrangler/
 .dev.vars
 catalog.json
