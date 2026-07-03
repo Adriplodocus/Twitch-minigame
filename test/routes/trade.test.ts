@@ -299,7 +299,11 @@ it("rejects deleting a pending offer", async () => {
   );
   const { id: offerId } = await createRes.json<{ id: number }>();
 
-  const res = await app.request(`/api/trade/offers/${offerId}`, { method: "DELETE", headers: { Cookie: cookieFrom } }, env);
+  const res = await app.request(
+    `/api/trade/offers/${offerId}?side=sent`,
+    { method: "DELETE", headers: { Cookie: cookieFrom } },
+    env
+  );
   expect(res.status).toBe(409);
 });
 
@@ -319,7 +323,7 @@ it("deletes a finished offer only from the deleting side's view", async () => {
   await app.request(`/api/trade/offers/${offerId}/decline`, { method: "POST", headers: { Cookie: cookieTo } }, env);
 
   const deleteRes = await app.request(
-    `/api/trade/offers/${offerId}`,
+    `/api/trade/offers/${offerId}?side=sent`,
     { method: "DELETE", headers: { Cookie: cookieFrom } },
     env
   );
@@ -350,7 +354,7 @@ it("deletes a finished offer from the receiver's view without hiding it from the
   await app.request(`/api/trade/offers/${offerId}/decline`, { method: "POST", headers: { Cookie: cookieTo } }, env);
 
   const deleteRes = await app.request(
-    `/api/trade/offers/${offerId}`,
+    `/api/trade/offers/${offerId}?side=received`,
     { method: "DELETE", headers: { Cookie: cookieTo } },
     env
   );
@@ -385,7 +389,7 @@ it("deletes an auto-expired offer the same way as a normally-declined one", asyn
   await app.request("/api/trade/offers", { headers: { Cookie: cookieTo } }, env);
 
   const deleteRes = await app.request(
-    `/api/trade/offers/${offerId}`,
+    `/api/trade/offers/${offerId}?side=sent`,
     { method: "DELETE", headers: { Cookie: cookieFrom } },
     env
   );
@@ -410,8 +414,57 @@ it("rejects deleting an offer the user isn't a participant of", async () => {
   await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind("3", "viewer3").run();
   const cookieOther = await sessionCookie("3", "viewer3");
 
-  const res = await app.request(`/api/trade/offers/${offerId}`, { method: "DELETE", headers: { Cookie: cookieOther } }, env);
+  const res = await app.request(
+    `/api/trade/offers/${offerId}?side=received`,
+    { method: "DELETE", headers: { Cookie: cookieOther } },
+    env
+  );
   expect(res.status).toBe(404);
+});
+
+it("deletes a self-trade offer from the receiver's view without also hiding it from the sender's view", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer1", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+  await app.request(`/api/trade/offers/${offerId}/cancel`, { method: "POST", headers: { Cookie: cookie } }, env);
+
+  const deleteRes = await app.request(
+    `/api/trade/offers/${offerId}?side=received`,
+    { method: "DELETE", headers: { Cookie: cookie } },
+    env
+  );
+  expect(deleteRes.status).toBe(200);
+
+  const view = await app.request("/api/trade/offers", { headers: { Cookie: cookie } }, env);
+  const json = await view.json<{ sent: { id: number }[]; received: { id: number }[] }>();
+  expect(json.received.find((o) => o.id === offerId)).toBeUndefined();
+  expect(json.sent.find((o) => o.id === offerId)).toBeDefined();
+});
+
+it("rejects deleting without a valid side query param", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+  await app.request(`/api/trade/offers/${offerId}/cancel`, { method: "POST", headers: { Cookie: cookie } }, env);
+
+  const res = await app.request(`/api/trade/offers/${offerId}`, { method: "DELETE", headers: { Cookie: cookie } }, env);
+  expect(res.status).toBe(400);
 });
 
 it("counts only received pending offers not hidden by the receiver", async () => {

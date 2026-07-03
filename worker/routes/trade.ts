@@ -246,16 +246,24 @@ trade.post("/offers/:id/cancel", requireAuth, async (c) => {
 trade.delete("/offers/:id", requireAuth, async (c) => {
   const user = c.get("user");
   const offerId = Number(c.req.param("id"));
+  const side = c.req.query("side");
+  if (side !== "sent" && side !== "received") {
+    return c.json({ error: "Query param 'side' must be 'sent' or 'received'" }, 400);
+  }
+
   const offer = await c.env.DB.prepare("SELECT from_user, to_user, status FROM trade_offers WHERE id = ?")
     .bind(offerId)
     .first<{ from_user: string; to_user: string; status: string }>();
-  if (!offer || (offer.from_user !== user.twitchId && offer.to_user !== user.twitchId)) {
-    return c.json({ error: "Not found" }, 404);
-  }
+  if (!offer) return c.json({ error: "Not found" }, 404);
   if (offer.status === "pending") return c.json({ error: "Offer is still pending" }, 409);
 
-  const column = offer.from_user === user.twitchId ? "hidden_from_sender" : "hidden_from_receiver";
-  await c.env.DB.prepare(`UPDATE trade_offers SET ${column} = 1 WHERE id = ?`).bind(offerId).run();
+  if (side === "sent") {
+    if (offer.from_user !== user.twitchId) return c.json({ error: "Not found" }, 404);
+    await c.env.DB.prepare("UPDATE trade_offers SET hidden_from_sender = 1 WHERE id = ?").bind(offerId).run();
+  } else {
+    if (offer.to_user !== user.twitchId) return c.json({ error: "Not found" }, 404);
+    await c.env.DB.prepare("UPDATE trade_offers SET hidden_from_receiver = 1 WHERE id = ?").bind(offerId).run();
+  }
 
   return c.json({ ok: true });
 });

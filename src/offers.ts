@@ -42,7 +42,7 @@ function renderOffer(offer: TradeOfferSummary, kind: "sent" | "received"): strin
          <button class="btn decline-btn" data-id="${offer.id}">Rechazar</button>`
       : kind === "sent" && offer.status === "pending"
         ? `<button class="btn cancel-btn" data-id="${offer.id}">Cancelar</button>`
-        : `<button class="btn delete-offer-btn" data-id="${offer.id}">Eliminar</button>`;
+        : `<button class="btn delete-offer-btn" data-id="${offer.id}" data-side="${kind}">Eliminar</button>`;
 
   return `<div class="offer-card">
     <div class="offer-card-header">
@@ -98,7 +98,7 @@ async function loadOffers(): Promise<void> {
   );
   container.querySelectorAll<HTMLButtonElement>(".delete-offer-btn").forEach((btn) =>
     btn.addEventListener("click", async () => {
-      await deleteOffer(Number(btn.dataset.id));
+      await deleteOffer(Number(btn.dataset.id), btn.dataset.side as "sent" | "received");
       await loadOffers();
     })
   );

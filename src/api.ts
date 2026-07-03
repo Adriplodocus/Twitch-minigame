@@ -103,8 +103,8 @@ export function cancelOffer(id: number): Promise<{ status: string }> {
   return request(`/trade/offers/${id}/cancel`, { method: "POST" });
 }
 
-export function deleteOffer(id: number): Promise<{ ok: boolean }> {
-  return request(`/trade/offers/${id}`, { method: "DELETE" });
+export function deleteOffer(id: number, side: "sent" | "received"): Promise<{ ok: boolean }> {
+  return request(`/trade/offers/${id}?side=${side}`, { method: "DELETE" });
 }
 
 export function getPendingOfferCount(): Promise<{ count: number }> {
