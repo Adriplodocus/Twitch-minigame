@@ -489,7 +489,7 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.35s ease;
+  transition: transform 0.7s ease;
 }
 .album-cover:hover .album-cover-bg {
   transform: scale(1.08);
