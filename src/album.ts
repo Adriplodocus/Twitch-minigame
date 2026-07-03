@@ -16,12 +16,16 @@ function renderPicker(cards: CardView[]): void {
     const genOwned = genCards.filter((c) => c.quantity > 0).length;
     return `
       <a class="album-cover" href="/album.html?gen=${gen.id}">
-        <p class="album-cover-gen">
-          <span class="album-cover-gen-label">Generación</span>
-          <span class="album-cover-gen-number">${gen.id}</span>
-        </p>
-        <p class="album-cover-region">${gen.region}</p>
-        <span class="album-cover-count">${genOwned}/${genCards.length}</span>
+        <img class="album-cover-bg" src="/album-covers/${gen.id}.webp" alt="" />
+        <span class="album-cover-overlay"></span>
+        <span class="album-cover-content">
+          <p class="album-cover-gen">
+            <span class="album-cover-gen-label">Generación</span>
+            <span class="album-cover-gen-number">${gen.id}</span>
+          </p>
+          <p class="album-cover-region">${gen.region}</p>
+          <span class="album-cover-count">${genOwned}/${genCards.length}</span>
+        </span>
       </a>
     `;
   }).join("");
