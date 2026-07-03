@@ -1,4 +1,5 @@
 import type { CardView } from "./api";
+import { ensureCardTiltHandler } from "./card-tilt";
 
 export type SortField = "pokedex" | "recent" | "quantity";
 
@@ -118,6 +119,7 @@ export function renderCardHtml(
   formLabels?: Map<string, string>
 ): string {
   ensureInfoTooltipHandler();
+  ensureCardTiltHandler();
 
   const isOwned = card.quantity > 0;
   const ownedClass = isOwned ? "" : "unowned";
