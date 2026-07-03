@@ -1,24 +1,24 @@
 id,name,rarity,image_filename,sort_order
-p1,Bulbasaur,epic,p1.png,1000010
+p1,Bulbasaur,rare,p1.png,1000010
 p10,Caterpie,common,p10.png,10000100
 p100,Voltorb,common,p100.png,100001000
 p1000,Gholdengo,epic,p1000.png,1000010000
 p10001,Deoxys Attack,legendary,p10001.png,386100010
 p10002,Deoxys Defense,legendary,p10002.png,386100020
 p10003,Deoxys Speed,legendary,p10003.png,386100030
-p10004,Wormadam Sandy,epic,p10004.png,413100040
-p10005,Wormadam Trash,epic,p10005.png,413100050
+p10004,Wormadam Sandy,rare,p10004.png,413100040
+p10005,Wormadam Trash,rare,p10005.png,413100050
 p10006,Shaymin Sky,legendary,p10006.png,492100060
 p10007,Giratina Origin,legendary,p10007.png,487100070
-p10008,Rotom Heat,epic,p10008.png,479100080
-p10009,Rotom Wash,epic,p10009.png,479100090
+p10008,Rotom Heat,rare,p10008.png,479100080
+p10009,Rotom Wash,rare,p10009.png,479100090
 p1001,Wo Chien,legendary,p1001.png,1001010010
-p10010,Rotom Frost,epic,p10010.png,479100100
-p10011,Rotom Fan,epic,p10011.png,479100110
-p10012,Rotom Mow,epic,p10012.png,479100120
-p10013,Castform Sunny,epic,p10013.png,351100130
-p10014,Castform Rainy,epic,p10014.png,351100140
-p10015,Castform Snowy,epic,p10015.png,351100150
+p10010,Rotom Frost,rare,p10010.png,479100100
+p10011,Rotom Fan,rare,p10011.png,479100110
+p10012,Rotom Mow,rare,p10012.png,479100120
+p10013,Castform Sunny,rare,p10013.png,351100130
+p10014,Castform Rainy,rare,p10014.png,351100140
+p10015,Castform Snowy,rare,p10015.png,351100150
 p10016,Basculin Blue Striped,epic,p10016.png,550100160
 p10017,Darmanitan Zen,rare,p10017.png,555100170
 p10018,Meloetta Pirouette,legendary,p10018.png,648100180
@@ -30,7 +30,7 @@ p10022,Kyurem Black,legendary,p10022.png,646100220
 p10023,Kyurem White,legendary,p10023.png,646100230
 p10024,Keldeo Resolute,legendary,p10024.png,647100240
 p10025,Meowstic Female,rare,p10025.png,678100250
-p10026,Aegislash Blade,epic,p10026.png,681100260
+p10026,Aegislash Blade,rare,p10026.png,681100260
 p10027,Pumpkaboo Small,common,p10027.png,710100270
 p10028,Pumpkaboo Large,common,p10028.png,710100280
 p10029,Pumpkaboo Super,common,p10029.png,710100290
@@ -59,11 +59,11 @@ p10049,Tyranitar Mega,epic,p10049.png,248100490
 p1005,Roaring Moon,epic,p1005.png,1005010050
 p10050,Blaziken Mega,epic,p10050.png,257100500
 p10051,Gardevoir Mega,epic,p10051.png,282100510
-p10052,Mawile Mega,epic,p10052.png,303100520
+p10052,Mawile Mega,rare,p10052.png,303100520
 p10053,Aggron Mega,epic,p10053.png,306100530
 p10054,Medicham Mega,common,p10054.png,308100540
-p10055,Manectric Mega,epic,p10055.png,310100550
-p10056,Banette Mega,epic,p10056.png,354100560
+p10055,Manectric Mega,rare,p10055.png,310100550
+p10056,Banette Mega,rare,p10056.png,354100560
 p10057,Absol Mega,epic,p10057.png,359100570
 p10058,Garchomp Mega,epic,p10058.png,445100580
 p10059,Lucario Mega,epic,p10059.png,448100590
@@ -74,7 +74,7 @@ p10062,Latias Mega,legendary,p10062.png,380100620
 p10063,Latios Mega,legendary,p10063.png,381100630
 p10064,Swampert Mega,epic,p10064.png,260100640
 p10065,Sceptile Mega,epic,p10065.png,254100650
-p10066,Sableye Mega,epic,p10066.png,302100660
+p10066,Sableye Mega,rare,p10066.png,302100660
 p10067,Altaria Mega,epic,p10067.png,334100670
 p10068,Gallade Mega,epic,p10068.png,475100680
 p10069,Audino Mega,common,p10069.png,531100690
@@ -82,7 +82,7 @@ p1007,Koraidon,legendary,p1007.png,1007010070
 p10070,Sharpedo Mega,rare,p10070.png,319100700
 p10071,Slowbro Mega,rare,p10071.png,80100710
 p10072,Steelix Mega,epic,p10072.png,208100720
-p10073,Pidgeot Mega,epic,p10073.png,18100730
+p10073,Pidgeot Mega,rare,p10073.png,18100730
 p10074,Glalie Mega,rare,p10074.png,362100740
 p10075,Diancie Mega,legendary,p10075.png,719100750
 p10076,Metagross Mega,epic,p10076.png,376100760
@@ -101,7 +101,7 @@ p10087,Camerupt Mega,common,p10087.png,323100870
 p10088,Lopunny Mega,rare,p10088.png,428100880
 p10089,Salamence Mega,epic,p10089.png,373100890
 p1009,Walking Wake,epic,p1009.png,1009010090
-p10090,Beedrill Mega,epic,p10090.png,15100900
+p10090,Beedrill Mega,rare,p10090.png,15100900
 p10091,Rattata Alola,common,p10091.png,19100910
 p10092,Raticate Alola,common,p10092.png,20100920
 p10093,Raticate Totem Alola,common,p10093.png,20100930
@@ -123,7 +123,7 @@ p10106,Dugtrio Alola,rare,p10106.png,51101060
 p10107,Meowth Alola,common,p10107.png,52101070
 p10108,Persian Alola,common,p10108.png,53101080
 p10109,Geodude Alola,common,p10109.png,74101090
-p1011,Dipplin,epic,p1011.png,1011010110
+p1011,Dipplin,rare,p1011.png,1011010110
 p10110,Graveler Alola,common,p10110.png,75101100
 p10111,Golem Alola,epic,p10111.png,76101110
 p10112,Grimer Alola,common,p10112.png,88101120
@@ -138,9 +138,9 @@ p1012,Poltchageist,common,p1012.png,1012010120
 p10120,Zygarde Complete,legendary,p10120.png,718101200
 p10121,Gumshoos Totem,common,p10121.png,735101210
 p10122,Vikavolt Totem,epic,p10122.png,738101220
-p10123,Oricorio Pom Pom,epic,p10123.png,741101230
-p10124,Oricorio Pau,epic,p10124.png,741101240
-p10125,Oricorio Sensu,epic,p10125.png,741101250
+p10123,Oricorio Pom Pom,rare,p10123.png,741101230
+p10124,Oricorio Pau,rare,p10124.png,741101240
+p10125,Oricorio Sensu,rare,p10125.png,741101250
 p10126,Lycanroc Midnight,common,p10126.png,745101260
 p10127,Wishiwashi School,rare,p10127.png,746101270
 p1013,Sinistcha,rare,p1013.png,1013010130
@@ -158,9 +158,9 @@ p1014,Okidogi,legendary,p1014.png,1014010140
 p10140,Minior Blue,epic,p10140.png,774101400
 p10141,Minior Indigo,epic,p10141.png,774101410
 p10142,Minior Violet,epic,p10142.png,774101420
-p10143,Mimikyu Busted,epic,p10143.png,778101430
-p10144,Mimikyu Totem Disguised,epic,p10144.png,778101440
-p10145,Mimikyu Totem Busted,epic,p10145.png,778101450
+p10143,Mimikyu Busted,rare,p10143.png,778101430
+p10144,Mimikyu Totem Disguised,rare,p10144.png,778101440
+p10145,Mimikyu Totem Busted,rare,p10145.png,778101450
 p10146,Kommo O Totem,epic,p10146.png,784101460
 p10147,Magearna Original,legendary,p10147.png,801101470
 p10148,Pikachu Partner Cap,common,p10148.png,25101480
@@ -179,9 +179,9 @@ p10162,Ponyta Galar,common,p10162.png,77101620
 p10163,Rapidash Galar,rare,p10163.png,78101630
 p10164,Slowpoke Galar,common,p10164.png,79101640
 p10165,Slowbro Galar,rare,p10165.png,80101650
-p10166,Farfetchd Galar,epic,p10166.png,83101660
+p10166,Farfetchd Galar,rare,p10166.png,83101660
 p10167,Weezing Galar,rare,p10167.png,110101670
-p10168,Mr Mime Galar,epic,p10168.png,122101680
+p10168,Mr Mime Galar,rare,p10168.png,122101680
 p10169,Articuno Galar,legendary,p10169.png,144101690
 p1017,Ogerpon,legendary,p1017.png,1017010170
 p10170,Zapdos Galar,legendary,p10170.png,145101700
@@ -197,9 +197,9 @@ p10179,Yamask Galar,common,p10179.png,562101790
 p1018,Archaludon,epic,p1018.png,1018010180
 p10180,Stunfisk Galar,rare,p10180.png,618101800
 p10181,Zygarde 10,legendary,p10181.png,718101810
-p10182,Cramorant Gulping,epic,p10182.png,845101820
-p10183,Cramorant Gorging,epic,p10183.png,845101830
-p10184,Toxtricity Low Key,epic,p10184.png,849101840
+p10182,Cramorant Gulping,rare,p10182.png,845101820
+p10183,Cramorant Gorging,rare,p10183.png,845101830
+p10184,Toxtricity Low Key,rare,p10184.png,849101840
 p10185,Eiscue Noice,rare,p10185.png,875101850
 p10186,Indeedee Female,epic,p10186.png,876101860
 p10187,Morpeko Hangry,common,p10187.png,877101870
@@ -214,7 +214,7 @@ p10194,Calyrex Shadow,legendary,p10194.png,898101940
 p10195,Venusaur Gmax,epic,p10195.png,3101950
 p10196,Charizard Gmax,epic,p10196.png,6101960
 p10197,Blastoise Gmax,epic,p10197.png,9101970
-p10198,Butterfree Gmax,epic,p10198.png,12101980
+p10198,Butterfree Gmax,rare,p10198.png,12101980
 p10199,Pikachu Gmax,common,p10199.png,25101990
 p102,Exeggcute,common,p102.png,102001020
 p1020,Gouging Fire,epic,p1020.png,1020010200
@@ -223,7 +223,7 @@ p10201,Machamp Gmax,epic,p10201.png,68102010
 p10202,Gengar Gmax,epic,p10202.png,94102020
 p10203,Kingler Gmax,rare,p10203.png,99102030
 p10204,Lapras Gmax,epic,p10204.png,131102040
-p10205,Eevee Gmax,epic,p10205.png,133102050
+p10205,Eevee Gmax,rare,p10205.png,133102050
 p10206,Snorlax Gmax,epic,p10206.png,143102060
 p10207,Garbodor Gmax,rare,p10207.png,569102070
 p10208,Melmetal Gmax,legendary,p10208.png,809102080
@@ -235,10 +235,10 @@ p10212,Corviknight Gmax,epic,p10212.png,823102120
 p10213,Orbeetle Gmax,epic,p10213.png,826102130
 p10214,Drednaw Gmax,rare,p10214.png,834102140
 p10215,Coalossal Gmax,epic,p10215.png,839102150
-p10216,Flapple Gmax,epic,p10216.png,841102160
-p10217,Appletun Gmax,epic,p10217.png,842102170
+p10216,Flapple Gmax,rare,p10216.png,841102160
+p10217,Appletun Gmax,rare,p10217.png,842102170
 p10218,Sandaconda Gmax,common,p10218.png,844102180
-p10219,Toxtricity Amped Gmax,epic,p10219.png,849102190
+p10219,Toxtricity Amped Gmax,rare,p10219.png,849102190
 p1022,Iron Boulder,epic,p1022.png,1022010220
 p10220,Centiskorch Gmax,rare,p10220.png,851102200
 p10221,Hatterene Gmax,epic,p10221.png,858102210
@@ -248,14 +248,14 @@ p10224,Copperajah Gmax,common,p10224.png,879102240
 p10225,Duraludon Gmax,epic,p10225.png,884102250
 p10226,Urshifu Single Strike Gmax,legendary,p10226.png,892102260
 p10227,Urshifu Rapid Strike Gmax,legendary,p10227.png,892102270
-p10228,Toxtricity Low Key Gmax,epic,p10228.png,849102280
+p10228,Toxtricity Low Key Gmax,rare,p10228.png,849102280
 p10229,Growlithe Hisui,common,p10229.png,58102290
 p1023,Iron Crown,epic,p1023.png,1023010230
 p10230,Arcanine Hisui,rare,p10230.png,59102300
 p10231,Voltorb Hisui,common,p10231.png,100102310
 p10232,Electrode Hisui,rare,p10232.png,101102320
 p10233,Typhlosion Hisui,epic,p10233.png,157102330
-p10234,Qwilfish Hisui,epic,p10234.png,211102340
+p10234,Qwilfish Hisui,rare,p10234.png,211102340
 p10235,Sneasel Hisui,rare,p10235.png,215102350
 p10236,Samurott Hisui,epic,p10236.png,503102360
 p10237,Lilligant Hisui,rare,p10237.png,549102370
@@ -263,7 +263,7 @@ p10238,Zorua Hisui,rare,p10238.png,570102380
 p10239,Zoroark Hisui,epic,p10239.png,571102390
 p1024,Terapagos,legendary,p1024.png,1024010240
 p10240,Braviary Hisui,rare,p10240.png,628102400
-p10241,Sliggoo Hisui,epic,p10241.png,705102410
+p10241,Sliggoo Hisui,rare,p10241.png,705102410
 p10242,Goodra Hisui,epic,p10242.png,706102420
 p10243,Avalugg Hisui,rare,p10243.png,713102430
 p10244,Decidueye Hisui,epic,p10244.png,724102440
@@ -278,15 +278,15 @@ p10251,Tauros Paldea Blaze Breed,epic,p10251.png,128102510
 p10252,Tauros Paldea Aqua Breed,epic,p10252.png,128102520
 p10253,Wooper Paldea,common,p10253.png,194102530
 p10254,Oinkologne Female,common,p10254.png,916102540
-p10255,Dudunsparce Three Segment,epic,p10255.png,982102550
-p10256,Palafin Hero,epic,p10256.png,964102560
+p10255,Dudunsparce Three Segment,rare,p10255.png,982102550
+p10256,Palafin Hero,rare,p10256.png,964102560
 p10257,Maushold Family Of Three,rare,p10257.png,925102570
 p10258,Tatsugiri Droopy,common,p10258.png,978102580
 p10259,Tatsugiri Stretchy,common,p10259.png,978102590
 p10260,Squawkabilly Blue Plumage,common,p10260.png,931102600
 p10261,Squawkabilly Yellow Plumage,common,p10261.png,931102610
 p10262,Squawkabilly White Plumage,common,p10262.png,931102620
-p10263,Gimmighoul Roaming,epic,p10263.png,999102630
+p10263,Gimmighoul Roaming,rare,p10263.png,999102630
 p10272,Ursaluna Bloodmoon,rare,p10272.png,901102720
 p10273,Ogerpon Wellspring Mask,legendary,p10273.png,1017102730
 p10274,Ogerpon Hearthflame Mask,legendary,p10274.png,1017102740
@@ -298,27 +298,27 @@ p10281,Dragonite Mega,epic,p10281.png,149102810
 p103,Exeggutor,epic,p103.png,103001030
 p104,Cubone,common,p104.png,104001040
 p105,Marowak,rare,p105.png,105001050
-p106,Hitmonlee,epic,p106.png,106001060
-p107,Hitmonchan,epic,p107.png,107001070
-p108,Lickitung,epic,p108.png,108001080
+p106,Hitmonlee,rare,p106.png,106001060
+p107,Hitmonchan,rare,p107.png,107001070
+p108,Lickitung,rare,p108.png,108001080
 p109,Koffing,common,p109.png,109001090
 p11,Metapod,common,p11.png,11000110
 p110,Weezing,rare,p110.png,110001100
 p111,Rhyhorn,common,p111.png,111001110
 p112,Rhydon,rare,p112.png,112001120
 p113,Chansey,epic,p113.png,113001130
-p114,Tangela,epic,p114.png,114001140
+p114,Tangela,rare,p114.png,114001140
 p115,Kangaskhan,epic,p115.png,115001150
 p116,Horsea,common,p116.png,116001160
 p117,Seadra,rare,p117.png,117001170
 p118,Goldeen,common,p118.png,118001180
 p119,Seaking,rare,p119.png,119001190
-p12,Butterfree,epic,p12.png,12000120
+p12,Butterfree,rare,p12.png,12000120
 p120,Staryu,common,p120.png,120001200
 p121,Starmie,rare,p121.png,121001210
-p122,Mr Mime,epic,p122.png,122001220
+p122,Mr Mime,rare,p122.png,122001220
 p123,Scyther,epic,p123.png,123001230
-p124,Jynx,epic,p124.png,124001240
+p124,Jynx,rare,p124.png,124001240
 p125,Electabuzz,epic,p125.png,125001250
 p126,Magmar,epic,p126.png,126001260
 p127,Pinsir,epic,p127.png,127001270
@@ -328,35 +328,35 @@ p13,Weedle,common,p13.png,13000130
 p130,Gyarados,epic,p130.png,130001300
 p131,Lapras,epic,p131.png,131001310
 p132,Ditto,epic,p132.png,132001320
-p133,Eevee,epic,p133.png,133001330
+p133,Eevee,rare,p133.png,133001330
 p134,Vaporeon,epic,p134.png,134001340
 p135,Jolteon,epic,p135.png,135001350
 p136,Flareon,epic,p136.png,136001360
-p137,Porygon,epic,p137.png,137001370
-p138,Omanyte,epic,p138.png,138001380
+p137,Porygon,rare,p137.png,137001370
+p138,Omanyte,rare,p138.png,138001380
 p139,Omastar,epic,p139.png,139001390
 p14,Kakuna,common,p14.png,14000140
-p140,Kabuto,epic,p140.png,140001400
+p140,Kabuto,rare,p140.png,140001400
 p141,Kabutops,epic,p141.png,141001410
 p142,Aerodactyl,epic,p142.png,142001420
 p143,Snorlax,epic,p143.png,143001430
 p144,Articuno,legendary,p144.png,144001440
 p145,Zapdos,legendary,p145.png,145001450
 p146,Moltres,legendary,p146.png,146001460
-p147,Dratini,epic,p147.png,147001470
-p148,Dragonair,epic,p148.png,148001480
+p147,Dratini,rare,p147.png,147001470
+p148,Dragonair,rare,p148.png,148001480
 p149,Dragonite,epic,p149.png,149001490
-p15,Beedrill,epic,p15.png,15000150
+p15,Beedrill,rare,p15.png,15000150
 p150,Mewtwo,legendary,p150.png,150001500
 p151,Mew,legendary,p151.png,151001510
-p152,Chikorita,epic,p152.png,152001520
-p153,Bayleef,epic,p153.png,153001530
+p152,Chikorita,rare,p152.png,152001520
+p153,Bayleef,rare,p153.png,153001530
 p154,Meganium,epic,p154.png,154001540
-p155,Cyndaquil,epic,p155.png,155001550
-p156,Quilava,epic,p156.png,156001560
+p155,Cyndaquil,rare,p155.png,155001550
+p156,Quilava,rare,p156.png,156001560
 p157,Typhlosion,epic,p157.png,157001570
-p158,Totodile,epic,p158.png,158001580
-p159,Croconaw,epic,p159.png,159001590
+p158,Totodile,rare,p158.png,158001580
+p159,Croconaw,rare,p159.png,159001590
 p16,Pidgey,common,p16.png,16000160
 p160,Feraligatr,epic,p160.png,160001600
 p161,Sentret,common,p161.png,161001610
@@ -380,7 +380,7 @@ p176,Togetic,rare,p176.png,176001760
 p177,Natu,common,p177.png,177001770
 p178,Xatu,rare,p178.png,178001780
 p179,Mareep,common,p179.png,179001790
-p18,Pidgeot,epic,p18.png,18000180
+p18,Pidgeot,rare,p18.png,18000180
 p180,Flaaffy,common,p180.png,180001800
 p181,Ampharos,epic,p181.png,181001810
 p182,Bellossom,epic,p182.png,182001820
@@ -390,9 +390,9 @@ p185,Sudowoodo,rare,p185.png,185001850
 p186,Politoed,epic,p186.png,186001860
 p187,Hoppip,common,p187.png,187001870
 p188,Skiploom,common,p188.png,188001880
-p189,Jumpluff,epic,p189.png,189001890
+p189,Jumpluff,rare,p189.png,189001890
 p19,Rattata,common,p19.png,19000190
-p190,Aipom,epic,p190.png,190001900
+p190,Aipom,rare,p190.png,190001900
 p191,Sunkern,common,p191.png,191001910
 p192,Sunflora,common,p192.png,192001920
 p193,Yanma,rare,p193.png,193001930
@@ -402,9 +402,9 @@ p196,Espeon,epic,p196.png,196001960
 p197,Umbreon,epic,p197.png,197001970
 p198,Murkrow,epic,p198.png,198001980
 p199,Slowking,rare,p199.png,199001990
-p2,Ivysaur,epic,p2.png,2000020
+p2,Ivysaur,rare,p2.png,2000020
 p20,Raticate,common,p20.png,20000200
-p200,Misdreavus,epic,p200.png,200002000
+p200,Misdreavus,rare,p200.png,200002000
 p201-form-b,Unown B,common,p201-form-b.png,201002010
 p201-form-c,Unown C,common,p201-form-c.png,201002010
 p201-form-d,Unown D,common,p201-form-d.png,201002010
@@ -433,7 +433,7 @@ p201-form-x,Unown X,common,p201-form-x.png,201002010
 p201-form-y,Unown Y,common,p201-form-y.png,201002010
 p201-form-z,Unown Z,common,p201-form-z.png,201002010
 p201,Unown,common,p201.png,201002010
-p202,Wobbuffet,epic,p202.png,202002020
+p202,Wobbuffet,rare,p202.png,202002020
 p203,Girafarig,rare,p203.png,203002030
 p204,Pineco,common,p204.png,204002040
 p205,Forretress,rare,p205.png,205002050
@@ -443,7 +443,7 @@ p208,Steelix,epic,p208.png,208002080
 p209,Snubbull,common,p209.png,209002090
 p21,Spearow,common,p21.png,21000210
 p210,Granbull,rare,p210.png,210002100
-p211,Qwilfish,epic,p211.png,211002110
+p211,Qwilfish,rare,p211.png,211002110
 p212,Scizor,epic,p212.png,212002120
 p213,Shuckle,common,p213.png,213002130
 p214,Heracross,epic,p214.png,214002140
@@ -458,7 +458,7 @@ p221,Piloswine,rare,p221.png,221002210
 p222,Corsola,rare,p222.png,222002220
 p223,Remoraid,common,p223.png,223002230
 p224,Octillery,rare,p224.png,224002240
-p225,Delibird,epic,p225.png,225002250
+p225,Delibird,rare,p225.png,225002250
 p226,Mantine,epic,p226.png,226002260
 p227,Skarmory,epic,p227.png,227002270
 p228,Houndour,common,p228.png,228002280
@@ -468,34 +468,34 @@ p230,Kingdra,epic,p230.png,230002300
 p231,Phanpy,common,p231.png,231002310
 p232,Donphan,rare,p232.png,232002320
 p233,Porygon2,epic,p233.png,233002330
-p234,Stantler,epic,p234.png,234002340
-p235,Smeargle,epic,p235.png,235002350
+p234,Stantler,rare,p234.png,234002340
+p235,Smeargle,rare,p235.png,235002350
 p236,Tyrogue,rare,p236.png,236002360
-p237,Hitmontop,epic,p237.png,237002370
-p238,Smoochum,epic,p238.png,238002380
-p239,Elekid,epic,p239.png,239002390
+p237,Hitmontop,rare,p237.png,237002370
+p238,Smoochum,rare,p238.png,238002380
+p239,Elekid,rare,p239.png,239002390
 p24,Arbok,common,p24.png,24000240
-p240,Magby,epic,p240.png,240002400
+p240,Magby,rare,p240.png,240002400
 p241,Miltank,epic,p241.png,241002410
 p242,Blissey,epic,p242.png,242002420
 p243,Raikou,legendary,p243.png,243002430
 p244,Entei,legendary,p244.png,244002440
 p245,Suicune,legendary,p245.png,245002450
-p246,Larvitar,epic,p246.png,246002460
-p247,Pupitar,epic,p247.png,247002470
+p246,Larvitar,rare,p246.png,246002460
+p247,Pupitar,rare,p247.png,247002470
 p248,Tyranitar,epic,p248.png,248002480
 p249,Lugia,legendary,p249.png,249002490
 p25,Pikachu,common,p25.png,25000250
 p250,Ho Oh,legendary,p250.png,250002500
 p251,Celebi,legendary,p251.png,251002510
-p252,Treecko,epic,p252.png,252002520
-p253,Grovyle,epic,p253.png,253002530
+p252,Treecko,rare,p252.png,252002520
+p253,Grovyle,rare,p253.png,253002530
 p254,Sceptile,epic,p254.png,254002540
-p255,Torchic,epic,p255.png,255002550
-p256,Combusken,epic,p256.png,256002560
+p255,Torchic,rare,p255.png,255002550
+p256,Combusken,rare,p256.png,256002560
 p257,Blaziken,epic,p257.png,257002570
-p258,Mudkip,epic,p258.png,258002580
-p259,Marshtomp,epic,p259.png,259002590
+p258,Mudkip,rare,p258.png,258002580
+p259,Marshtomp,rare,p259.png,259002590
 p26,Raichu,rare,p26.png,26000260
 p260,Swampert,epic,p260.png,260002600
 p261,Poochyena,common,p261.png,261002610
@@ -504,20 +504,20 @@ p263,Zigzagoon,common,p263.png,263002630
 p264,Linoone,common,p264.png,264002640
 p265,Wurmple,common,p265.png,265002650
 p266,Silcoon,common,p266.png,266002660
-p267,Beautifly,epic,p267.png,267002670
+p267,Beautifly,rare,p267.png,267002670
 p268,Cascoon,common,p268.png,268002680
-p269,Dustox,epic,p269.png,269002690
+p269,Dustox,rare,p269.png,269002690
 p27,Sandshrew,common,p27.png,27000270
 p270,Lotad,common,p270.png,270002700
 p271,Lombre,common,p271.png,271002710
-p272,Ludicolo,epic,p272.png,272002720
+p272,Ludicolo,rare,p272.png,272002720
 p273,Seedot,common,p273.png,273002730
 p274,Nuzleaf,common,p274.png,274002740
-p275,Shiftry,epic,p275.png,275002750
+p275,Shiftry,rare,p275.png,275002750
 p276,Taillow,common,p276.png,276002760
-p277,Swellow,epic,p277.png,277002770
+p277,Swellow,rare,p277.png,277002770
 p278,Wingull,common,p278.png,278002780
-p279,Pelipper,epic,p279.png,279002790
+p279,Pelipper,rare,p279.png,279002790
 p28,Sandslash,common,p28.png,28000280
 p280,Ralts,common,p280.png,280002800
 p281,Kirlia,common,p281.png,281002810
@@ -532,7 +532,7 @@ p289,Slaking,epic,p289.png,289002890
 p29,Nidoran F,common,p29.png,29000290
 p290,Nincada,common,p290.png,290002900
 p291,Ninjask,common,p291.png,291002910
-p292,Shedinja,epic,p292.png,292002920
+p292,Shedinja,rare,p292.png,292002920
 p293,Whismur,common,p293.png,293002930
 p294,Loudred,common,p294.png,294002940
 p295,Exploud,epic,p295.png,295002950
@@ -544,8 +544,8 @@ p3,Venusaur,epic,p3.png,3000030
 p30,Nidorina,common,p30.png,30000300
 p300,Skitty,common,p300.png,300003000
 p301,Delcatty,rare,p301.png,301003010
-p302,Sableye,epic,p302.png,302003020
-p303,Mawile,epic,p303.png,303003030
+p302,Sableye,rare,p302.png,302003020
+p303,Mawile,rare,p303.png,303003030
 p304,Aron,common,p304.png,304003040
 p305,Lairon,common,p305.png,305003050
 p306,Aggron,epic,p306.png,306003060
@@ -553,7 +553,7 @@ p307,Meditite,common,p307.png,307003070
 p308,Medicham,common,p308.png,308003080
 p309,Electrike,common,p309.png,309003090
 p31,Nidoqueen,epic,p31.png,31000310
-p310,Manectric,epic,p310.png,310003100
+p310,Manectric,rare,p310.png,310003100
 p311,Plusle,common,p311.png,311003110
 p312,Minun,common,p312.png,312003120
 p313,Volbeat,common,p313.png,313003130
@@ -582,8 +582,8 @@ p333,Swablu,common,p333.png,333003330
 p334,Altaria,epic,p334.png,334003340
 p335,Zangoose,common,p335.png,335003350
 p336,Seviper,common,p336.png,336003360
-p337,Lunatone,epic,p337.png,337003370
-p338,Solrock,epic,p338.png,338003380
+p337,Lunatone,rare,p337.png,337003370
+p338,Solrock,rare,p338.png,338003380
 p339,Barboach,common,p339.png,339003390
 p34,Nidoking,epic,p34.png,34000340
 p340,Whiscash,rare,p340.png,340003400
@@ -591,21 +591,21 @@ p341,Corphish,common,p341.png,341003410
 p342,Crawdaunt,common,p342.png,342003420
 p343,Baltoy,common,p343.png,343003430
 p344,Claydol,common,p344.png,344003440
-p345,Lileep,epic,p345.png,345003450
+p345,Lileep,rare,p345.png,345003450
 p346,Cradily,epic,p346.png,346003460
-p347,Anorith,epic,p347.png,347003470
+p347,Anorith,rare,p347.png,347003470
 p348,Armaldo,epic,p348.png,348003480
 p349,Feebas,common,p349.png,349003490
 p35,Clefairy,common,p35.png,35000350
 p350,Milotic,rare,p350.png,350003500
-p351,Castform,epic,p351.png,351003510
+p351,Castform,rare,p351.png,351003510
 p352,Kecleon,common,p352.png,352003520
 p353,Shuppet,common,p353.png,353003530
-p354,Banette,epic,p354.png,354003540
+p354,Banette,rare,p354.png,354003540
 p355,Duskull,common,p355.png,355003550
 p356,Dusclops,common,p356.png,356003560
 p357,Tropius,common,p357.png,357003570
-p358,Chimecho,epic,p358.png,358003580
+p358,Chimecho,rare,p358.png,358003580
 p359,Absol,epic,p359.png,359003590
 p36,Clefable,epic,p36.png,36000360
 p360,Wynaut,common,p360.png,360003600
@@ -620,8 +620,8 @@ p368,Gorebyss,rare,p368.png,368003680
 p369,Relicanth,epic,p369.png,369003690
 p37,Vulpix,common,p37.png,37000370
 p370,Luvdisc,common,p370.png,370003700
-p371,Bagon,epic,p371.png,371003710
-p372,Shelgon,epic,p372.png,372003720
+p371,Bagon,rare,p371.png,371003710
+p372,Shelgon,rare,p372.png,372003720
 p373,Salamence,epic,p373.png,373003730
 p374,Beldum,epic,p374.png,374003740
 p375,Metang,epic,p375.png,375003750
@@ -637,42 +637,42 @@ p383,Groudon,legendary,p383.png,383003830
 p384,Rayquaza,legendary,p384.png,384003840
 p385,Jirachi,legendary,p385.png,385003850
 p386,Deoxys Normal,legendary,p386.png,386003860
-p387,Turtwig,epic,p387.png,387003870
-p388,Grotle,epic,p388.png,388003880
+p387,Turtwig,rare,p387.png,387003870
+p388,Grotle,rare,p388.png,388003880
 p389,Torterra,epic,p389.png,389003890
 p39,Jigglypuff,common,p39.png,39000390
-p390,Chimchar,epic,p390.png,390003900
-p391,Monferno,epic,p391.png,391003910
+p390,Chimchar,rare,p390.png,390003900
+p391,Monferno,rare,p391.png,391003910
 p392,Infernape,epic,p392.png,392003920
-p393,Piplup,epic,p393.png,393003930
-p394,Prinplup,epic,p394.png,394003940
+p393,Piplup,rare,p393.png,393003930
+p394,Prinplup,rare,p394.png,394003940
 p395,Empoleon,epic,p395.png,395003950
 p396,Starly,common,p396.png,396003960
 p397,Staravia,common,p397.png,397003970
-p398,Staraptor,epic,p398.png,398003980
+p398,Staraptor,rare,p398.png,398003980
 p399,Bidoof,common,p399.png,399003990
-p4,Charmander,epic,p4.png,4000040
+p4,Charmander,rare,p4.png,4000040
 p40,Wigglytuff,rare,p40.png,40000400
 p400,Bibarel,common,p400.png,400004000
 p401,Kricketot,common,p401.png,401004010
-p402,Kricketune,epic,p402.png,402004020
+p402,Kricketune,rare,p402.png,402004020
 p403,Shinx,common,p403.png,403004030
 p404,Luxio,common,p404.png,404004040
 p405,Luxray,epic,p405.png,405004050
 p406,Budew,common,p406.png,406004060
 p407,Roserade,rare,p407.png,407004070
-p408,Cranidos,epic,p408.png,408004080
+p408,Cranidos,rare,p408.png,408004080
 p409,Rampardos,epic,p409.png,409004090
 p41,Zubat,common,p41.png,41000410
-p410,Shieldon,epic,p410.png,410004100
+p410,Shieldon,rare,p410.png,410004100
 p411,Bastiodon,epic,p411.png,411004110
 p412-form-sandy,Burmy Sandy,common,p412-form-sandy.png,412004120
 p412-form-trash,Burmy Trash,common,p412-form-trash.png,412004120
 p412,Burmy,common,p412.png,412004120
-p413,Wormadam Plant,epic,p413.png,413004130
-p414,Mothim,epic,p414.png,414004140
+p413,Wormadam Plant,rare,p413.png,413004130
+p414,Mothim,rare,p414.png,414004140
 p415,Combee,common,p415.png,415004150
-p416,Vespiquen,epic,p416.png,416004160
+p416,Vespiquen,rare,p416.png,416004160
 p417,Pachirisu,common,p417.png,417004170
 p418,Buizel,common,p418.png,418004180
 p419,Floatzel,rare,p419.png,419004190
@@ -684,7 +684,7 @@ p422-form-east,Shellos East,common,p422-form-east.png,422004220
 p422,Shellos,common,p422.png,422004220
 p423-form-east,Gastrodon East,rare,p423-form-east.png,423004230
 p423,Gastrodon,rare,p423.png,423004230
-p424,Ambipom,epic,p424.png,424004240
+p424,Ambipom,rare,p424.png,424004240
 p425,Drifloon,common,p425.png,425004250
 p426,Drifblim,rare,p426.png,426004260
 p427,Buneary,common,p427.png,427004270
@@ -705,8 +705,8 @@ p44,Gloom,common,p44.png,44000440
 p440,Happiny,common,p440.png,440004400
 p441,Chatot,epic,p441.png,441004410
 p442,Spiritomb,common,p442.png,442004420
-p443,Gible,epic,p443.png,443004430
-p444,Gabite,epic,p444.png,444004440
+p443,Gible,rare,p443.png,443004430
+p444,Gabite,rare,p444.png,444004440
 p445,Garchomp,epic,p445.png,445004450
 p446,Munchlax,rare,p446.png,446004460
 p447,Riolu,rare,p447.png,447004470
@@ -744,7 +744,7 @@ p475,Gallade,epic,p475.png,475004750
 p476,Probopass,rare,p476.png,476004760
 p477,Dusknoir,epic,p477.png,477004770
 p478,Froslass,rare,p478.png,478004780
-p479,Rotom,epic,p479.png,479004790
+p479,Rotom,rare,p479.png,479004790
 p48,Venonat,common,p48.png,48000480
 p480,Uxie,legendary,p480.png,480004800
 p481,Mesprit,legendary,p481.png,481004810
@@ -780,16 +780,16 @@ p493-form-unknown,Arceus Unknown,legendary,p493-form-unknown.png,493004930
 p493-form-water,Arceus Water,legendary,p493-form-water.png,493004930
 p493,Arceus,legendary,p493.png,493004930
 p494,Victini,legendary,p494.png,494004940
-p495,Snivy,epic,p495.png,495004950
-p496,Servine,epic,p496.png,496004960
+p495,Snivy,rare,p495.png,495004950
+p496,Servine,rare,p496.png,496004960
 p497,Serperior,epic,p497.png,497004970
-p498,Tepig,epic,p498.png,498004980
-p499,Pignite,epic,p499.png,499004990
-p5,Charmeleon,epic,p5.png,5000050
+p498,Tepig,rare,p498.png,498004980
+p499,Pignite,rare,p499.png,499004990
+p5,Charmeleon,rare,p5.png,5000050
 p50,Diglett,common,p50.png,50000500
 p500,Emboar,epic,p500.png,500005000
-p501,Oshawott,epic,p501.png,501005010
-p502,Dewott,epic,p502.png,502005020
+p501,Oshawott,rare,p501.png,501005010
+p502,Dewott,rare,p502.png,502005020
 p503,Samurott,epic,p503.png,503005030
 p504,Patrat,common,p504.png,504005040
 p505,Watchog,common,p505.png,505005050
@@ -810,14 +810,14 @@ p518,Musharna,rare,p518.png,518005180
 p519,Pidove,common,p519.png,519005190
 p52,Meowth,common,p52.png,52000520
 p520,Tranquill,common,p520.png,520005200
-p521,Unfezant,epic,p521.png,521005210
+p521,Unfezant,rare,p521.png,521005210
 p522,Blitzle,common,p522.png,522005220
 p523,Zebstrika,rare,p523.png,523005230
 p524,Roggenrola,common,p524.png,524005240
 p525,Boldore,common,p525.png,525005250
 p526,Gigalith,epic,p526.png,526005260
 p527,Woobat,common,p527.png,527005270
-p528,Swoobat,epic,p528.png,528005280
+p528,Swoobat,rare,p528.png,528005280
 p529,Drilbur,common,p529.png,529005290
 p53,Persian,common,p53.png,53000530
 p530,Excadrill,rare,p530.png,530005300
@@ -828,15 +828,15 @@ p534,Conkeldurr,epic,p534.png,534005340
 p535,Tympole,common,p535.png,535005350
 p536,Palpitoad,common,p536.png,536005360
 p537,Seismitoad,epic,p537.png,537005370
-p538,Throh,epic,p538.png,538005380
-p539,Sawk,epic,p539.png,539005390
+p538,Throh,rare,p538.png,538005380
+p539,Sawk,rare,p539.png,539005390
 p54,Psyduck,common,p54.png,54000540
 p540,Sewaddle,common,p540.png,540005400
 p541,Swadloon,common,p541.png,541005410
 p542,Leavanny,epic,p542.png,542005420
 p543,Venipede,common,p543.png,543005430
 p544,Whirlipede,common,p544.png,544005440
-p545,Scolipede,epic,p545.png,545005450
+p545,Scolipede,rare,p545.png,545005450
 p546,Cottonee,common,p546.png,546005460
 p547,Whimsicott,rare,p547.png,547005470
 p548,Petilil,common,p548.png,548005480
@@ -857,9 +857,9 @@ p560,Scrafty,common,p560.png,560005600
 p561,Sigilyph,epic,p561.png,561005610
 p562,Yamask,common,p562.png,562005620
 p563,Cofagrigus,common,p563.png,563005630
-p564,Tirtouga,epic,p564.png,564005640
+p564,Tirtouga,rare,p564.png,564005640
 p565,Carracosta,epic,p565.png,565005650
-p566,Archen,epic,p566.png,566005660
+p566,Archen,rare,p566.png,566005660
 p567,Archeops,epic,p567.png,567005670
 p568,Trubbish,common,p568.png,568005680
 p569,Garbodor,rare,p569.png,569005690
@@ -876,7 +876,7 @@ p578,Duosion,common,p578.png,578005780
 p579,Reuniclus,rare,p579.png,579005790
 p58,Growlithe,common,p58.png,58000580
 p580,Ducklett,common,p580.png,580005800
-p581,Swanna,epic,p581.png,581005810
+p581,Swanna,rare,p581.png,581005810
 p582,Vanillite,common,p582.png,582005820
 p583,Vanillish,common,p583.png,583005830
 p584,Vanilluxe,epic,p584.png,584005840
@@ -927,7 +927,7 @@ p618,Stunfisk,rare,p618.png,618006180
 p619,Mienfoo,common,p619.png,619006190
 p62,Poliwrath,epic,p62.png,62000620
 p620,Mienshao,epic,p620.png,620006200
-p621,Druddigon,epic,p621.png,621006210
+p621,Druddigon,rare,p621.png,621006210
 p622,Golett,common,p622.png,622006220
 p623,Golurk,common,p623.png,623006230
 p624,Pawniard,common,p624.png,624006240
@@ -940,10 +940,10 @@ p63,Abra,common,p63.png,63000630
 p630,Mandibuzz,rare,p630.png,630006300
 p631,Heatmor,common,p631.png,631006310
 p632,Durant,common,p632.png,632006320
-p633,Deino,epic,p633.png,633006330
-p634,Zweilous,epic,p634.png,634006340
+p633,Deino,rare,p633.png,633006330
+p634,Zweilous,rare,p634.png,634006340
 p635,Hydreigon,epic,p635.png,635006350
-p636,Larvesta,epic,p636.png,636006360
+p636,Larvesta,rare,p636.png,636006360
 p637,Volcarona,epic,p637.png,637006370
 p638,Cobalion,legendary,p638.png,638006380
 p639,Terrakion,legendary,p639.png,639006390
@@ -963,14 +963,14 @@ p649-form-douse,Genesect Douse,legendary,p649-form-douse.png,649006490
 p649-form-shock,Genesect Shock,legendary,p649-form-shock.png,649006490
 p649,Genesect,legendary,p649.png,649006490
 p65,Alakazam,rare,p65.png,65000650
-p650,Chespin,epic,p650.png,650006500
-p651,Quilladin,epic,p651.png,651006510
+p650,Chespin,rare,p650.png,650006500
+p651,Quilladin,rare,p651.png,651006510
 p652,Chesnaught,epic,p652.png,652006520
-p653,Fennekin,epic,p653.png,653006530
-p654,Braixen,epic,p654.png,654006540
+p653,Fennekin,rare,p653.png,653006530
+p654,Braixen,rare,p654.png,654006540
 p655,Delphox,epic,p655.png,655006550
-p656,Froakie,epic,p656.png,656006560
-p657,Frogadier,epic,p657.png,657006570
+p656,Froakie,rare,p656.png,656006560
+p657,Frogadier,rare,p657.png,657006570
 p658,Greninja,epic,p658.png,658006580
 p659,Bunnelby,common,p659.png,659006590
 p66,Machop,common,p66.png,66000660
@@ -980,27 +980,27 @@ p662,Fletchinder,common,p662.png,662006620
 p663,Talonflame,epic,p663.png,663006630
 p664,Scatterbug,common,p664.png,664006640
 p665,Spewpa,common,p665.png,665006650
-p666-form-archipelago,Vivillon Archipelago,epic,p666-form-archipelago.png,666006660
-p666-form-continental,Vivillon Continental,epic,p666-form-continental.png,666006660
-p666-form-elegant,Vivillon Elegant,epic,p666-form-elegant.png,666006660
-p666-form-fancy,Vivillon Fancy,epic,p666-form-fancy.png,666006660
-p666-form-garden,Vivillon Garden,epic,p666-form-garden.png,666006660
-p666-form-high-plains,Vivillon High Plains,epic,p666-form-high-plains.png,666006660
-p666-form-icy-snow,Vivillon Icy Snow,epic,p666-form-icy-snow.png,666006660
-p666-form-jungle,Vivillon Jungle,epic,p666-form-jungle.png,666006660
-p666-form-marine,Vivillon Marine,epic,p666-form-marine.png,666006660
-p666-form-meadow,Vivillon Meadow,epic,p666-form-meadow.png,666006660
-p666-form-modern,Vivillon Modern,epic,p666-form-modern.png,666006660
-p666-form-monsoon,Vivillon Monsoon,epic,p666-form-monsoon.png,666006660
-p666-form-ocean,Vivillon Ocean,epic,p666-form-ocean.png,666006660
-p666-form-poke-ball,Vivillon Poke Ball,epic,p666-form-poke-ball.png,666006660
-p666-form-polar,Vivillon Polar,epic,p666-form-polar.png,666006660
-p666-form-river,Vivillon River,epic,p666-form-river.png,666006660
-p666-form-sandstorm,Vivillon Sandstorm,epic,p666-form-sandstorm.png,666006660
-p666-form-savanna,Vivillon Savanna,epic,p666-form-savanna.png,666006660
-p666-form-sun,Vivillon Sun,epic,p666-form-sun.png,666006660
-p666-form-tundra,Vivillon Tundra,epic,p666-form-tundra.png,666006660
-p666,Vivillon,epic,p666.png,666006660
+p666-form-archipelago,Vivillon Archipelago,rare,p666-form-archipelago.png,666006660
+p666-form-continental,Vivillon Continental,rare,p666-form-continental.png,666006660
+p666-form-elegant,Vivillon Elegant,rare,p666-form-elegant.png,666006660
+p666-form-fancy,Vivillon Fancy,rare,p666-form-fancy.png,666006660
+p666-form-garden,Vivillon Garden,rare,p666-form-garden.png,666006660
+p666-form-high-plains,Vivillon High Plains,rare,p666-form-high-plains.png,666006660
+p666-form-icy-snow,Vivillon Icy Snow,rare,p666-form-icy-snow.png,666006660
+p666-form-jungle,Vivillon Jungle,rare,p666-form-jungle.png,666006660
+p666-form-marine,Vivillon Marine,rare,p666-form-marine.png,666006660
+p666-form-meadow,Vivillon Meadow,rare,p666-form-meadow.png,666006660
+p666-form-modern,Vivillon Modern,rare,p666-form-modern.png,666006660
+p666-form-monsoon,Vivillon Monsoon,rare,p666-form-monsoon.png,666006660
+p666-form-ocean,Vivillon Ocean,rare,p666-form-ocean.png,666006660
+p666-form-poke-ball,Vivillon Poke Ball,rare,p666-form-poke-ball.png,666006660
+p666-form-polar,Vivillon Polar,rare,p666-form-polar.png,666006660
+p666-form-river,Vivillon River,rare,p666-form-river.png,666006660
+p666-form-sandstorm,Vivillon Sandstorm,rare,p666-form-sandstorm.png,666006660
+p666-form-savanna,Vivillon Savanna,rare,p666-form-savanna.png,666006660
+p666-form-sun,Vivillon Sun,rare,p666-form-sun.png,666006660
+p666-form-tundra,Vivillon Tundra,rare,p666-form-tundra.png,666006660
+p666,Vivillon,rare,p666.png,666006660
 p667,Litleo,common,p667.png,667006670
 p668,Pyroar Male,rare,p668.png,668006680
 p669-form-blue,Flabebe Blue,common,p669-form-blue.png,669006690
@@ -1041,7 +1041,7 @@ p678,Meowstic Male,rare,p678.png,678006780
 p679,Honedge,common,p679.png,679006790
 p68,Machamp,epic,p68.png,68000680
 p680,Doublade,common,p680.png,680006800
-p681,Aegislash Shield,epic,p681.png,681006810
+p681,Aegislash Shield,rare,p681.png,681006810
 p682,Spritzee,common,p682.png,682006820
 p683,Aromatisse,common,p683.png,683006830
 p684,Swirlix,common,p684.png,684006840
@@ -1057,18 +1057,18 @@ p692,Clauncher,common,p692.png,692006920
 p693,Clawitzer,rare,p693.png,693006930
 p694,Helioptile,common,p694.png,694006940
 p695,Heliolisk,rare,p695.png,695006950
-p696,Tyrunt,epic,p696.png,696006960
+p696,Tyrunt,rare,p696.png,696006960
 p697,Tyrantrum,epic,p697.png,697006970
-p698,Amaura,epic,p698.png,698006980
+p698,Amaura,rare,p698.png,698006980
 p699,Aurorus,epic,p699.png,699006990
-p7,Squirtle,epic,p7.png,7000070
+p7,Squirtle,rare,p7.png,7000070
 p70,Weepinbell,common,p70.png,70000700
 p700,Sylveon,epic,p700.png,700007000
 p701,Hawlucha,common,p701.png,701007010
 p702,Dedenne,common,p702.png,702007020
 p703,Carbink,rare,p703.png,703007030
-p704,Goomy,epic,p704.png,704007040
-p705,Sliggoo,epic,p705.png,705007050
+p704,Goomy,rare,p704.png,704007040
+p705,Sliggoo,rare,p705.png,705007050
 p706,Goodra,epic,p706.png,706007060
 p707,Klefki,rare,p707.png,707007070
 p708,Phantump,common,p708.png,708007080
@@ -1088,19 +1088,19 @@ p719,Diancie,legendary,p719.png,719007190
 p72,Tentacool,common,p72.png,72000720
 p720,Hoopa,legendary,p720.png,720007200
 p721,Volcanion,legendary,p721.png,721007210
-p722,Rowlet,epic,p722.png,722007220
-p723,Dartrix,epic,p723.png,723007230
+p722,Rowlet,rare,p722.png,722007220
+p723,Dartrix,rare,p723.png,723007230
 p724,Decidueye,epic,p724.png,724007240
-p725,Litten,epic,p725.png,725007250
-p726,Torracat,epic,p726.png,726007260
+p725,Litten,rare,p725.png,725007250
+p726,Torracat,rare,p726.png,726007260
 p727,Incineroar,epic,p727.png,727007270
-p728,Popplio,epic,p728.png,728007280
-p729,Brionne,epic,p729.png,729007290
+p728,Popplio,rare,p728.png,728007280
+p729,Brionne,rare,p729.png,729007290
 p73,Tentacruel,rare,p73.png,73000730
 p730,Primarina,epic,p730.png,730007300
 p731,Pikipek,common,p731.png,731007310
 p732,Trumbeak,common,p732.png,732007320
-p733,Toucannon,epic,p733.png,733007330
+p733,Toucannon,rare,p733.png,733007330
 p734,Yungoos,common,p734.png,734007340
 p735,Gumshoos,common,p735.png,735007350
 p736,Grubbin,common,p736.png,736007360
@@ -1109,7 +1109,7 @@ p738,Vikavolt,epic,p738.png,738007380
 p739,Crabrawler,common,p739.png,739007390
 p74,Geodude,common,p74.png,74000740
 p740,Crabominable,rare,p740.png,740007400
-p741,Oricorio Baile,epic,p741.png,741007410
+p741,Oricorio Baile,rare,p741.png,741007410
 p742,Cutiefly,common,p742.png,742007420
 p743,Ribombee,rare,p743.png,743007430
 p744,Rockruff,common,p744.png,744007440
@@ -1127,7 +1127,7 @@ p754,Lurantis,rare,p754.png,754007540
 p755,Morelull,common,p755.png,755007550
 p756,Shiinotic,rare,p756.png,756007560
 p757,Salandit,common,p757.png,757007570
-p758,Salazzle,epic,p758.png,758007580
+p758,Salazzle,rare,p758.png,758007580
 p759,Stufful,common,p759.png,759007590
 p76,Golem,epic,p76.png,76000760
 p760,Bewear,rare,p760.png,760007600
@@ -1164,17 +1164,17 @@ p773-form-steel,Silvally Steel,legendary,p773-form-steel.png,773007730
 p773-form-water,Silvally Water,legendary,p773-form-water.png,773007730
 p773,Silvally,legendary,p773.png,773007730
 p774,Minior Red Meteor,epic,p774.png,774007740
-p775-form-form-1,Komala Form 1,epic,p775-form-form-1.png,775007750
-p775,Komala,epic,p775.png,775007750
+p775-form-form-1,Komala Form 1,rare,p775-form-form-1.png,775007750
+p775,Komala,rare,p775.png,775007750
 p776,Turtonator,rare,p776.png,776007760
 p777,Togedemaru,common,p777.png,777007770
-p778,Mimikyu Disguised,epic,p778.png,778007780
+p778,Mimikyu Disguised,rare,p778.png,778007780
 p779,Bruxish,rare,p779.png,779007790
 p78,Rapidash,rare,p78.png,78000780
 p780,Drampa,rare,p780.png,780007800
 p781,Dhelmise,epic,p781.png,781007810
-p782,Jangmo O,epic,p782.png,782007820
-p783,Hakamo O,epic,p783.png,783007830
+p782,Jangmo O,rare,p782.png,782007820
+p783,Hakamo O,rare,p783.png,783007830
 p784,Kommo O,epic,p784.png,784007840
 p785,Tapu Koko,legendary,p785.png,785007850
 p786,Tapu Lele,legendary,p786.png,786007860
@@ -1192,12 +1192,12 @@ p796,Xurkitree,epic,p796.png,796007960
 p797,Celesteela,epic,p797.png,797007970
 p798,Kartana,epic,p798.png,798007980
 p799,Guzzlord,epic,p799.png,799007990
-p8,Wartortle,epic,p8.png,8000080
+p8,Wartortle,rare,p8.png,8000080
 p80,Slowbro,rare,p80.png,80000800
 p800,Necrozma,legendary,p800.png,800008000
 p801,Magearna,legendary,p801.png,801008010
 p802,Marshadow,legendary,p802.png,802008020
-p803,Poipole,epic,p803.png,803008030
+p803,Poipole,rare,p803.png,803008030
 p804,Naganadel,epic,p804.png,804008040
 p805,Stakataka,epic,p805.png,805008050
 p806,Blacephalon,epic,p806.png,806008060
@@ -1205,14 +1205,14 @@ p807,Zeraora,legendary,p807.png,807008070
 p808,Meltan,legendary,p808.png,808008080
 p809,Melmetal,legendary,p809.png,809008090
 p81,Magnemite,common,p81.png,81000810
-p810,Grookey,epic,p810.png,810008100
-p811,Thwackey,epic,p811.png,811008110
+p810,Grookey,rare,p810.png,810008100
+p811,Thwackey,rare,p811.png,811008110
 p812,Rillaboom,epic,p812.png,812008120
-p813,Scorbunny,epic,p813.png,813008130
-p814,Raboot,epic,p814.png,814008140
+p813,Scorbunny,rare,p813.png,813008130
+p814,Raboot,rare,p814.png,814008140
 p815,Cinderace,epic,p815.png,815008150
-p816,Sobble,epic,p816.png,816008160
-p817,Drizzile,epic,p817.png,817008170
+p816,Sobble,rare,p816.png,816008160
+p817,Drizzile,rare,p817.png,817008170
 p818,Inteleon,epic,p818.png,818008180
 p819,Skwovet,common,p819.png,819008190
 p82,Magneton,rare,p82.png,82000820
@@ -1226,7 +1226,7 @@ p826,Orbeetle,epic,p826.png,826008260
 p827,Nickit,common,p827.png,827008270
 p828,Thievul,common,p828.png,828008280
 p829,Gossifleur,common,p829.png,829008290
-p83,Farfetchd,epic,p83.png,83000830
+p83,Farfetchd,rare,p83.png,83000830
 p830,Eldegoss,rare,p830.png,830008300
 p831,Wooloo,common,p831.png,831008310
 p832,Dubwool,common,p832.png,832008320
@@ -1239,20 +1239,20 @@ p838,Carkol,common,p838.png,838008380
 p839,Coalossal,epic,p839.png,839008390
 p84,Doduo,common,p84.png,84000840
 p840,Applin,common,p840.png,840008400
-p841,Flapple,epic,p841.png,841008410
-p842,Appletun,epic,p842.png,842008420
+p841,Flapple,rare,p841.png,841008410
+p842,Appletun,rare,p842.png,842008420
 p843,Silicobra,common,p843.png,843008430
 p844,Sandaconda,common,p844.png,844008440
-p845,Cramorant,epic,p845.png,845008450
+p845,Cramorant,rare,p845.png,845008450
 p846,Arrokuda,common,p846.png,846008460
 p847,Barraskewda,rare,p847.png,847008470
 p848,Toxel,rare,p848.png,848008480
-p849,Toxtricity Amped,epic,p849.png,849008490
-p85,Dodrio,epic,p85.png,85000850
+p849,Toxtricity Amped,rare,p849.png,849008490
+p85,Dodrio,rare,p85.png,85000850
 p850,Sizzlipede,common,p850.png,850008500
 p851,Centiskorch,rare,p851.png,851008510
 p852,Clobbopus,common,p852.png,852008520
-p853,Grapploct,epic,p853.png,853008530
+p853,Grapploct,rare,p853.png,853008530
 p854,Sinistea,common,p854.png,854008540
 p855,Polteageist,rare,p855.png,855008550
 p856,Hatenna,common,p856.png,856008560
@@ -1334,7 +1334,7 @@ p869-form-vanilla-cream-star-sweet,Alcremie Vanilla Cream Star Sweet,common,p869
 p869-form-vanilla-cream-strawberry-sweet,Alcremie Vanilla Cream Strawberry Sweet,common,p869-form-vanilla-cream-strawberry-sweet.png,869008690
 p869,Alcremie,common,p869.png,869008690
 p87,Dewgong,rare,p87.png,87000870
-p870,Falinks,epic,p870.png,870008700
+p870,Falinks,rare,p870.png,870008700
 p871,Pincurchin,rare,p871.png,871008710
 p872,Snom,common,p872.png,872008720
 p873,Frosmoth,rare,p873.png,873008730
@@ -1350,8 +1350,8 @@ p881,Arctozolt,epic,p881.png,881008810
 p882,Dracovish,epic,p882.png,882008820
 p883,Arctovish,epic,p883.png,883008830
 p884,Duraludon,epic,p884.png,884008840
-p885,Dreepy,epic,p885.png,885008850
-p886,Drakloak,epic,p886.png,886008860
+p885,Dreepy,rare,p885.png,885008850
+p886,Drakloak,rare,p886.png,886008860
 p887,Dragapult,epic,p887.png,887008870
 p888,Zacian,legendary,p888.png,888008880
 p889,Zamazenta,legendary,p889.png,889008890
@@ -1374,15 +1374,15 @@ p902,Basculegion Male,common,p902.png,902009020
 p903,Sneasler,common,p903.png,903009030
 p904,Overqwil,common,p904.png,904009040
 p905,Enamorus Incarnate,legendary,p905.png,905009050
-p906,Sprigatito,epic,p906.png,906009060
-p907,Floragato,epic,p907.png,907009070
+p906,Sprigatito,rare,p906.png,906009060
+p907,Floragato,rare,p907.png,907009070
 p908,Meowscarada,epic,p908.png,908009080
-p909,Fuecoco,epic,p909.png,909009090
+p909,Fuecoco,rare,p909.png,909009090
 p91,Cloyster,rare,p91.png,91000910
-p910,Crocalor,epic,p910.png,910009100
+p910,Crocalor,rare,p910.png,910009100
 p911,Skeledirge,epic,p911.png,911009110
-p912,Quaxly,epic,p912.png,912009120
-p913,Quaxwell,epic,p913.png,913009130
+p912,Quaxly,rare,p912.png,912009120
+p913,Quaxwell,rare,p913.png,913009130
 p914,Quaquaval,epic,p914.png,914009140
 p915,Lechonk,common,p915.png,915009150
 p916,Oinkologne Male,common,p916.png,916009160
@@ -1419,15 +1419,15 @@ p943,Mabosstiff,rare,p943.png,943009430
 p944,Shroodle,common,p944.png,944009440
 p945,Grafaiai,common,p945.png,945009450
 p946,Bramblin,common,p946.png,946009460
-p947,Brambleghast,epic,p947.png,947009470
+p947,Brambleghast,rare,p947.png,947009470
 p948,Toedscool,common,p948.png,948009480
 p949,Toedscruel,common,p949.png,949009490
-p95,Onix,epic,p95.png,95000950
+p95,Onix,rare,p95.png,95000950
 p950,Klawf,common,p950.png,950009500
 p951,Capsakid,common,p951.png,951009510
 p952,Scovillain,rare,p952.png,952009520
 p953,Rellor,common,p953.png,953009530
-p954,Rabsca,epic,p954.png,954009540
+p954,Rabsca,rare,p954.png,954009540
 p955,Flittle,common,p955.png,955009550
 p956,Espathra,rare,p956.png,956009560
 p957,Tinkatink,common,p957.png,957009570
@@ -1438,7 +1438,7 @@ p960,Wiglett,common,p960.png,960009600
 p961,Wugtrio,rare,p961.png,961009610
 p962,Bombirdier,epic,p962.png,962009620
 p963,Finizen,common,p963.png,963009630
-p964,Palafin Zero,epic,p964.png,964009640
+p964,Palafin Zero,rare,p964.png,964009640
 p965,Varoom,common,p965.png,965009650
 p966,Revavroom,rare,p966.png,966009660
 p967,Cyclizar,common,p967.png,967009670
@@ -1458,7 +1458,7 @@ p979,Annihilape,epic,p979.png,979009790
 p98,Krabby,common,p98.png,98000980
 p980,Clodsire,common,p980.png,980009800
 p981,Farigiraf,epic,p981.png,981009810
-p982,Dudunsparce Two Segment,epic,p982.png,982009820
+p982,Dudunsparce Two Segment,rare,p982.png,982009820
 p983,Kingambit,epic,p983.png,983009830
 p984,Great Tusk,epic,p984.png,984009840
 p985,Scream Tail,rare,p985.png,985009850
@@ -1473,21 +1473,21 @@ p992,Iron Hands,rare,p992.png,992009920
 p993,Iron Jugulis,epic,p993.png,993009930
 p994,Iron Moth,epic,p994.png,994009940
 p995,Iron Thorns,epic,p995.png,995009950
-p996,Frigibax,epic,p996.png,996009960
+p996,Frigibax,rare,p996.png,996009960
 p997,Arctibax,epic,p997.png,997009970
 p998,Baxcalibur,epic,p998.png,998009980
-p999,Gimmighoul,epic,p999.png,999009990
+p999,Gimmighoul,rare,p999.png,999009990
 p10033-female,Venusaur Mega (Hembra),epic,p10033-female.png,3100331
 p10235-female,Sneasel Hisui (Hembra),rare,p10235-female.png,215102351
 p111-female,Rhyhorn (Hembra),common,p111-female.png,111001111
 p112-female,Rhydon (Hembra),rare,p112-female.png,112001121
 p118-female,Goldeen (Hembra),common,p118-female.png,118001181
 p119-female,Seaking (Hembra),rare,p119-female.png,119001191
-p12-female,Butterfree (Hembra),epic,p12-female.png,12000121
+p12-female,Butterfree (Hembra),rare,p12-female.png,12000121
 p123-female,Scyther (Hembra),epic,p123-female.png,123001231
 p129-female,Magikarp (Hembra),common,p129-female.png,129001291
 p130-female,Gyarados (Hembra),epic,p130-female.png,130001301
-p133-female,Eevee (Hembra),epic,p133-female.png,133001331
+p133-female,Eevee (Hembra),rare,p133-female.png,133001331
 p154-female,Meganium (Hembra),epic,p154-female.png,154001541
 p165-female,Ledyba (Hembra),common,p165-female.png,165001651
 p166-female,Ledian (Hembra),common,p166-female.png,166001661
@@ -1495,12 +1495,12 @@ p178-female,Xatu (Hembra),rare,p178-female.png,178001781
 p185-female,Sudowoodo (Hembra),rare,p185-female.png,185001851
 p186-female,Politoed (Hembra),epic,p186-female.png,186001861
 p19-female,Rattata (Hembra),common,p19-female.png,19000191
-p190-female,Aipom (Hembra),epic,p190-female.png,190001901
+p190-female,Aipom (Hembra),rare,p190-female.png,190001901
 p194-female,Wooper (Hembra),common,p194-female.png,194001941
 p195-female,Quagsire (Hembra),common,p195-female.png,195001951
 p198-female,Murkrow (Hembra),epic,p198-female.png,198001981
 p20-female,Raticate (Hembra),common,p20-female.png,20000201
-p202-female,Wobbuffet (Hembra),epic,p202-female.png,202002021
+p202-female,Wobbuffet (Hembra),rare,p202-female.png,202002021
 p203-female,Girafarig (Hembra),rare,p203-female.png,203002031
 p207-female,Gligar (Hembra),rare,p207-female.png,207002071
 p208-female,Steelix (Hembra),epic,p208-female.png,208002081
@@ -1513,15 +1513,15 @@ p224-female,Octillery (Hembra),rare,p224-female.png,224002241
 p229-female,Houndoom (Hembra),epic,p229-female.png,229002291
 p232-female,Donphan (Hembra),rare,p232-female.png,232002321
 p25-female,Pikachu (Hembra),common,p25-female.png,25000251
-p255-female,Torchic (Hembra),epic,p255-female.png,255002551
-p256-female,Combusken (Hembra),epic,p256-female.png,256002561
+p255-female,Torchic (Hembra),rare,p255-female.png,255002551
+p256-female,Combusken (Hembra),rare,p256-female.png,256002561
 p257-female,Blaziken (Hembra),epic,p257-female.png,257002571
 p26-female,Raichu (Hembra),rare,p26-female.png,26000261
-p267-female,Beautifly (Hembra),epic,p267-female.png,267002671
-p269-female,Dustox (Hembra),epic,p269-female.png,269002691
-p272-female,Ludicolo (Hembra),epic,p272-female.png,272002721
+p267-female,Beautifly (Hembra),rare,p267-female.png,267002671
+p269-female,Dustox (Hembra),rare,p269-female.png,269002691
+p272-female,Ludicolo (Hembra),rare,p272-female.png,272002721
 p274-female,Nuzleaf (Hembra),common,p274-female.png,274002741
-p275-female,Shiftry (Hembra),epic,p275-female.png,275002751
+p275-female,Shiftry (Hembra),rare,p275-female.png,275002751
 p3-female,Venusaur (Hembra),epic,p3-female.png,3000031
 p307-female,Meditite (Hembra),common,p307-female.png,307003071
 p308-female,Medicham (Hembra),common,p308-female.png,308003081
@@ -1535,11 +1535,11 @@ p350-female,Milotic (Hembra),rare,p350-female.png,350003501
 p369-female,Relicanth (Hembra),epic,p369-female.png,369003691
 p396-female,Starly (Hembra),common,p396-female.png,396003961
 p397-female,Staravia (Hembra),common,p397-female.png,397003971
-p398-female,Staraptor (Hembra),epic,p398-female.png,398003981
+p398-female,Staraptor (Hembra),rare,p398-female.png,398003981
 p399-female,Bidoof (Hembra),common,p399-female.png,399003991
 p400-female,Bibarel (Hembra),common,p400-female.png,400004001
 p401-female,Kricketot (Hembra),common,p401-female.png,401004011
-p402-female,Kricketune (Hembra),epic,p402-female.png,402004021
+p402-female,Kricketune (Hembra),rare,p402-female.png,402004021
 p403-female,Shinx (Hembra),common,p403-female.png,403004031
 p404-female,Luxio (Hembra),common,p404-female.png,404004041
 p405-female,Luxray (Hembra),epic,p405-female.png,405004051
@@ -1550,10 +1550,10 @@ p417-female,Pachirisu (Hembra),common,p417-female.png,417004171
 p418-female,Buizel (Hembra),common,p418-female.png,418004181
 p419-female,Floatzel (Hembra),rare,p419-female.png,419004191
 p42-female,Golbat (Hembra),common,p42-female.png,42000421
-p424-female,Ambipom (Hembra),epic,p424-female.png,424004241
+p424-female,Ambipom (Hembra),rare,p424-female.png,424004241
 p44-female,Gloom (Hembra),common,p44-female.png,44000441
-p443-female,Gible (Hembra),epic,p443-female.png,443004431
-p444-female,Gabite (Hembra),epic,p444-female.png,444004441
+p443-female,Gible (Hembra),rare,p443-female.png,443004431
+p444-female,Gabite (Hembra),rare,p444-female.png,444004441
 p445-female,Garchomp (Hembra),epic,p445-female.png,445004451
 p449-female,Hippopotas (Hembra),common,p449-female.png,449004491
 p45-female,Vileplume (Hembra),epic,p45-female.png,45000451
@@ -1568,7 +1568,7 @@ p461-female,Weavile (Hembra),epic,p461-female.png,461004611
 p464-female,Rhyperior (Hembra),epic,p464-female.png,464004641
 p465-female,Tangrowth (Hembra),epic,p465-female.png,465004651
 p473-female,Mamoswine (Hembra),rare,p473-female.png,473004731
-p521-female,Unfezant (Hembra),epic,p521-female.png,521005211
+p521-female,Unfezant (Hembra),rare,p521-female.png,521005211
 p592-female,Frillish Male (Hembra),common,p592-female.png,592005921
 p593-female,Jellicent Male (Hembra),rare,p593-female.png,593005931
 p64-female,Kadabra (Hembra),common,p64-female.png,64000641
@@ -1576,30 +1576,30 @@ p65-female,Alakazam (Hembra),rare,p65-female.png,65000651
 p668-female,Pyroar Male (Hembra),rare,p668-female.png,668006681
 p678-female,Meowstic Male (Hembra),rare,p678-female.png,678006781
 p84-female,Doduo (Hembra),common,p84-female.png,84000841
-p85-female,Dodrio (Hembra),epic,p85-female.png,85000851
+p85-female,Dodrio (Hembra),rare,p85-female.png,85000851
 p876-female,Indeedee Male (Hembra),epic,p876-female.png,876008761
 p916-female,Oinkologne Male (Hembra),common,p916-female.png,916009161
 p97-female,Hypno (Hembra),rare,p97-female.png,97000971
-p1-shiny,Bulbasaur Shiny,epic,p1-shiny.png,1000012
+p1-shiny,Bulbasaur Shiny,rare,p1-shiny.png,1000012
 p10-shiny,Caterpie Shiny,common,p10-shiny.png,10000102
 p100-shiny,Voltorb Shiny,common,p100-shiny.png,100001002
 p1000-shiny,Gholdengo Shiny,epic,p1000-shiny.png,1000010002
 p10001-shiny,Deoxys Attack Shiny,legendary,p10001-shiny.png,386100012
 p10002-shiny,Deoxys Defense Shiny,legendary,p10002-shiny.png,386100022
 p10003-shiny,Deoxys Speed Shiny,legendary,p10003-shiny.png,386100032
-p10004-shiny,Wormadam Sandy Shiny,epic,p10004-shiny.png,413100042
-p10005-shiny,Wormadam Trash Shiny,epic,p10005-shiny.png,413100052
+p10004-shiny,Wormadam Sandy Shiny,rare,p10004-shiny.png,413100042
+p10005-shiny,Wormadam Trash Shiny,rare,p10005-shiny.png,413100052
 p10006-shiny,Shaymin Sky Shiny,legendary,p10006-shiny.png,492100062
 p10007-shiny,Giratina Origin Shiny,legendary,p10007-shiny.png,487100072
-p10008-shiny,Rotom Heat Shiny,epic,p10008-shiny.png,479100082
-p10009-shiny,Rotom Wash Shiny,epic,p10009-shiny.png,479100092
+p10008-shiny,Rotom Heat Shiny,rare,p10008-shiny.png,479100082
+p10009-shiny,Rotom Wash Shiny,rare,p10009-shiny.png,479100092
 p1001-shiny,Wo Chien Shiny,legendary,p1001-shiny.png,1001010012
-p10010-shiny,Rotom Frost Shiny,epic,p10010-shiny.png,479100102
-p10011-shiny,Rotom Fan Shiny,epic,p10011-shiny.png,479100112
-p10012-shiny,Rotom Mow Shiny,epic,p10012-shiny.png,479100122
-p10013-shiny,Castform Sunny Shiny,epic,p10013-shiny.png,351100132
-p10014-shiny,Castform Rainy Shiny,epic,p10014-shiny.png,351100142
-p10015-shiny,Castform Snowy Shiny,epic,p10015-shiny.png,351100152
+p10010-shiny,Rotom Frost Shiny,rare,p10010-shiny.png,479100102
+p10011-shiny,Rotom Fan Shiny,rare,p10011-shiny.png,479100112
+p10012-shiny,Rotom Mow Shiny,rare,p10012-shiny.png,479100122
+p10013-shiny,Castform Sunny Shiny,rare,p10013-shiny.png,351100132
+p10014-shiny,Castform Rainy Shiny,rare,p10014-shiny.png,351100142
+p10015-shiny,Castform Snowy Shiny,rare,p10015-shiny.png,351100152
 p10016-shiny,Basculin Blue Striped Shiny,epic,p10016-shiny.png,550100162
 p10017-shiny,Darmanitan Zen Shiny,rare,p10017-shiny.png,555100172
 p10018-shiny,Meloetta Pirouette Shiny,legendary,p10018-shiny.png,648100182
@@ -1611,7 +1611,7 @@ p10022-shiny,Kyurem Black Shiny,legendary,p10022-shiny.png,646100222
 p10023-shiny,Kyurem White Shiny,legendary,p10023-shiny.png,646100232
 p10024-shiny,Keldeo Resolute Shiny,legendary,p10024-shiny.png,647100242
 p10025-shiny,Meowstic Female Shiny,rare,p10025-shiny.png,678100252
-p10026-shiny,Aegislash Blade Shiny,epic,p10026-shiny.png,681100262
+p10026-shiny,Aegislash Blade Shiny,rare,p10026-shiny.png,681100262
 p10027-shiny,Pumpkaboo Small Shiny,common,p10027-shiny.png,710100272
 p10028-shiny,Pumpkaboo Large Shiny,common,p10028-shiny.png,710100282
 p10029-shiny,Pumpkaboo Super Shiny,common,p10029-shiny.png,710100292
@@ -1640,11 +1640,11 @@ p10049-shiny,Tyranitar Mega Shiny,epic,p10049-shiny.png,248100492
 p1005-shiny,Roaring Moon Shiny,epic,p1005-shiny.png,1005010052
 p10050-shiny,Blaziken Mega Shiny,epic,p10050-shiny.png,257100502
 p10051-shiny,Gardevoir Mega Shiny,epic,p10051-shiny.png,282100512
-p10052-shiny,Mawile Mega Shiny,epic,p10052-shiny.png,303100522
+p10052-shiny,Mawile Mega Shiny,rare,p10052-shiny.png,303100522
 p10053-shiny,Aggron Mega Shiny,epic,p10053-shiny.png,306100532
 p10054-shiny,Medicham Mega Shiny,common,p10054-shiny.png,308100542
-p10055-shiny,Manectric Mega Shiny,epic,p10055-shiny.png,310100552
-p10056-shiny,Banette Mega Shiny,epic,p10056-shiny.png,354100562
+p10055-shiny,Manectric Mega Shiny,rare,p10055-shiny.png,310100552
+p10056-shiny,Banette Mega Shiny,rare,p10056-shiny.png,354100562
 p10057-shiny,Absol Mega Shiny,epic,p10057-shiny.png,359100572
 p10058-shiny,Garchomp Mega Shiny,epic,p10058-shiny.png,445100582
 p10059-shiny,Lucario Mega Shiny,epic,p10059-shiny.png,448100592
@@ -1655,7 +1655,7 @@ p10062-shiny,Latias Mega Shiny,legendary,p10062-shiny.png,380100622
 p10063-shiny,Latios Mega Shiny,legendary,p10063-shiny.png,381100632
 p10064-shiny,Swampert Mega Shiny,epic,p10064-shiny.png,260100642
 p10065-shiny,Sceptile Mega Shiny,epic,p10065-shiny.png,254100652
-p10066-shiny,Sableye Mega Shiny,epic,p10066-shiny.png,302100662
+p10066-shiny,Sableye Mega Shiny,rare,p10066-shiny.png,302100662
 p10067-shiny,Altaria Mega Shiny,epic,p10067-shiny.png,334100672
 p10068-shiny,Gallade Mega Shiny,epic,p10068-shiny.png,475100682
 p10069-shiny,Audino Mega Shiny,common,p10069-shiny.png,531100692
@@ -1663,7 +1663,7 @@ p1007-shiny,Koraidon Shiny,legendary,p1007-shiny.png,1007010072
 p10070-shiny,Sharpedo Mega Shiny,rare,p10070-shiny.png,319100702
 p10071-shiny,Slowbro Mega Shiny,rare,p10071-shiny.png,80100712
 p10072-shiny,Steelix Mega Shiny,epic,p10072-shiny.png,208100722
-p10073-shiny,Pidgeot Mega Shiny,epic,p10073-shiny.png,18100732
+p10073-shiny,Pidgeot Mega Shiny,rare,p10073-shiny.png,18100732
 p10074-shiny,Glalie Mega Shiny,rare,p10074-shiny.png,362100742
 p10075-shiny,Diancie Mega Shiny,legendary,p10075-shiny.png,719100752
 p10076-shiny,Metagross Mega Shiny,epic,p10076-shiny.png,376100762
@@ -1682,7 +1682,7 @@ p10087-shiny,Camerupt Mega Shiny,common,p10087-shiny.png,323100872
 p10088-shiny,Lopunny Mega Shiny,rare,p10088-shiny.png,428100882
 p10089-shiny,Salamence Mega Shiny,epic,p10089-shiny.png,373100892
 p1009-shiny,Walking Wake Shiny,epic,p1009-shiny.png,1009010092
-p10090-shiny,Beedrill Mega Shiny,epic,p10090-shiny.png,15100902
+p10090-shiny,Beedrill Mega Shiny,rare,p10090-shiny.png,15100902
 p10091-shiny,Rattata Alola Shiny,common,p10091-shiny.png,19100912
 p10092-shiny,Raticate Alola Shiny,common,p10092-shiny.png,20100922
 p10093-shiny,Raticate Totem Alola Shiny,common,p10093-shiny.png,20100932
@@ -1704,7 +1704,7 @@ p10106-shiny,Dugtrio Alola Shiny,rare,p10106-shiny.png,51101062
 p10107-shiny,Meowth Alola Shiny,common,p10107-shiny.png,52101072
 p10108-shiny,Persian Alola Shiny,common,p10108-shiny.png,53101082
 p10109-shiny,Geodude Alola Shiny,common,p10109-shiny.png,74101092
-p1011-shiny,Dipplin Shiny,epic,p1011-shiny.png,1011010112
+p1011-shiny,Dipplin Shiny,rare,p1011-shiny.png,1011010112
 p10110-shiny,Graveler Alola Shiny,common,p10110-shiny.png,75101102
 p10111-shiny,Golem Alola Shiny,epic,p10111-shiny.png,76101112
 p10112-shiny,Grimer Alola Shiny,common,p10112-shiny.png,88101122
@@ -1719,9 +1719,9 @@ p1012-shiny,Poltchageist Shiny,common,p1012-shiny.png,1012010122
 p10120-shiny,Zygarde Complete Shiny,legendary,p10120-shiny.png,718101202
 p10121-shiny,Gumshoos Totem Shiny,common,p10121-shiny.png,735101212
 p10122-shiny,Vikavolt Totem Shiny,epic,p10122-shiny.png,738101222
-p10123-shiny,Oricorio Pom Pom Shiny,epic,p10123-shiny.png,741101232
-p10124-shiny,Oricorio Pau Shiny,epic,p10124-shiny.png,741101242
-p10125-shiny,Oricorio Sensu Shiny,epic,p10125-shiny.png,741101252
+p10123-shiny,Oricorio Pom Pom Shiny,rare,p10123-shiny.png,741101232
+p10124-shiny,Oricorio Pau Shiny,rare,p10124-shiny.png,741101242
+p10125-shiny,Oricorio Sensu Shiny,rare,p10125-shiny.png,741101252
 p10126-shiny,Lycanroc Midnight Shiny,common,p10126-shiny.png,745101262
 p10127-shiny,Wishiwashi School Shiny,rare,p10127-shiny.png,746101272
 p1013-shiny,Sinistcha Shiny,rare,p1013-shiny.png,1013010132
@@ -1733,9 +1733,9 @@ p1014-shiny,Okidogi Shiny,legendary,p1014-shiny.png,1014010142
 p10140-shiny,Minior Blue Shiny,epic,p10140-shiny.png,774101402
 p10141-shiny,Minior Indigo Shiny,epic,p10141-shiny.png,774101412
 p10142-shiny,Minior Violet Shiny,epic,p10142-shiny.png,774101422
-p10143-shiny,Mimikyu Busted Shiny,epic,p10143-shiny.png,778101432
-p10144-shiny,Mimikyu Totem Disguised Shiny,epic,p10144-shiny.png,778101442
-p10145-shiny,Mimikyu Totem Busted Shiny,epic,p10145-shiny.png,778101452
+p10143-shiny,Mimikyu Busted Shiny,rare,p10143-shiny.png,778101432
+p10144-shiny,Mimikyu Totem Disguised Shiny,rare,p10144-shiny.png,778101442
+p10145-shiny,Mimikyu Totem Busted Shiny,rare,p10145-shiny.png,778101452
 p10146-shiny,Kommo O Totem Shiny,epic,p10146-shiny.png,784101462
 p10147-shiny,Magearna Original Shiny,legendary,p10147-shiny.png,801101472
 p10148-shiny,Pikachu Partner Cap Shiny,common,p10148-shiny.png,25101482
@@ -1754,9 +1754,9 @@ p10162-shiny,Ponyta Galar Shiny,common,p10162-shiny.png,77101622
 p10163-shiny,Rapidash Galar Shiny,rare,p10163-shiny.png,78101632
 p10164-shiny,Slowpoke Galar Shiny,common,p10164-shiny.png,79101642
 p10165-shiny,Slowbro Galar Shiny,rare,p10165-shiny.png,80101652
-p10166-shiny,Farfetchd Galar Shiny,epic,p10166-shiny.png,83101662
+p10166-shiny,Farfetchd Galar Shiny,rare,p10166-shiny.png,83101662
 p10167-shiny,Weezing Galar Shiny,rare,p10167-shiny.png,110101672
-p10168-shiny,Mr Mime Galar Shiny,epic,p10168-shiny.png,122101682
+p10168-shiny,Mr Mime Galar Shiny,rare,p10168-shiny.png,122101682
 p10169-shiny,Articuno Galar Shiny,legendary,p10169-shiny.png,144101692
 p1017-shiny,Ogerpon Shiny,legendary,p1017-shiny.png,1017010172
 p10170-shiny,Zapdos Galar Shiny,legendary,p10170-shiny.png,145101702
@@ -1772,9 +1772,9 @@ p10179-shiny,Yamask Galar Shiny,common,p10179-shiny.png,562101792
 p1018-shiny,Archaludon Shiny,epic,p1018-shiny.png,1018010182
 p10180-shiny,Stunfisk Galar Shiny,rare,p10180-shiny.png,618101802
 p10181-shiny,Zygarde 10 Shiny,legendary,p10181-shiny.png,718101812
-p10182-shiny,Cramorant Gulping Shiny,epic,p10182-shiny.png,845101822
-p10183-shiny,Cramorant Gorging Shiny,epic,p10183-shiny.png,845101832
-p10184-shiny,Toxtricity Low Key Shiny,epic,p10184-shiny.png,849101842
+p10182-shiny,Cramorant Gulping Shiny,rare,p10182-shiny.png,845101822
+p10183-shiny,Cramorant Gorging Shiny,rare,p10183-shiny.png,845101832
+p10184-shiny,Toxtricity Low Key Shiny,rare,p10184-shiny.png,849101842
 p10185-shiny,Eiscue Noice Shiny,rare,p10185-shiny.png,875101852
 p10186-shiny,Indeedee Female Shiny,epic,p10186-shiny.png,876101862
 p10187-shiny,Morpeko Hangry Shiny,common,p10187-shiny.png,877101872
@@ -1789,7 +1789,7 @@ p10194-shiny,Calyrex Shadow Shiny,legendary,p10194-shiny.png,898101942
 p10195-shiny,Venusaur Gmax Shiny,epic,p10195-shiny.png,3101952
 p10196-shiny,Charizard Gmax Shiny,epic,p10196-shiny.png,6101962
 p10197-shiny,Blastoise Gmax Shiny,epic,p10197-shiny.png,9101972
-p10198-shiny,Butterfree Gmax Shiny,epic,p10198-shiny.png,12101982
+p10198-shiny,Butterfree Gmax Shiny,rare,p10198-shiny.png,12101982
 p10199-shiny,Pikachu Gmax Shiny,common,p10199-shiny.png,25101992
 p102-shiny,Exeggcute Shiny,common,p102-shiny.png,102001022
 p1020-shiny,Gouging Fire Shiny,epic,p1020-shiny.png,1020010202
@@ -1798,7 +1798,7 @@ p10201-shiny,Machamp Gmax Shiny,epic,p10201-shiny.png,68102012
 p10202-shiny,Gengar Gmax Shiny,epic,p10202-shiny.png,94102022
 p10203-shiny,Kingler Gmax Shiny,rare,p10203-shiny.png,99102032
 p10204-shiny,Lapras Gmax Shiny,epic,p10204-shiny.png,131102042
-p10205-shiny,Eevee Gmax Shiny,epic,p10205-shiny.png,133102052
+p10205-shiny,Eevee Gmax Shiny,rare,p10205-shiny.png,133102052
 p10206-shiny,Snorlax Gmax Shiny,epic,p10206-shiny.png,143102062
 p10207-shiny,Garbodor Gmax Shiny,rare,p10207-shiny.png,569102072
 p10208-shiny,Melmetal Gmax Shiny,legendary,p10208-shiny.png,809102082
@@ -1810,10 +1810,10 @@ p10212-shiny,Corviknight Gmax Shiny,epic,p10212-shiny.png,823102122
 p10213-shiny,Orbeetle Gmax Shiny,epic,p10213-shiny.png,826102132
 p10214-shiny,Drednaw Gmax Shiny,rare,p10214-shiny.png,834102142
 p10215-shiny,Coalossal Gmax Shiny,epic,p10215-shiny.png,839102152
-p10216-shiny,Flapple Gmax Shiny,epic,p10216-shiny.png,841102162
-p10217-shiny,Appletun Gmax Shiny,epic,p10217-shiny.png,842102172
+p10216-shiny,Flapple Gmax Shiny,rare,p10216-shiny.png,841102162
+p10217-shiny,Appletun Gmax Shiny,rare,p10217-shiny.png,842102172
 p10218-shiny,Sandaconda Gmax Shiny,common,p10218-shiny.png,844102182
-p10219-shiny,Toxtricity Amped Gmax Shiny,epic,p10219-shiny.png,849102192
+p10219-shiny,Toxtricity Amped Gmax Shiny,rare,p10219-shiny.png,849102192
 p1022-shiny,Iron Boulder Shiny,epic,p1022-shiny.png,1022010222
 p10220-shiny,Centiskorch Gmax Shiny,rare,p10220-shiny.png,851102202
 p10221-shiny,Hatterene Gmax Shiny,epic,p10221-shiny.png,858102212
@@ -1823,14 +1823,14 @@ p10224-shiny,Copperajah Gmax Shiny,common,p10224-shiny.png,879102242
 p10225-shiny,Duraludon Gmax Shiny,epic,p10225-shiny.png,884102252
 p10226-shiny,Urshifu Single Strike Gmax Shiny,legendary,p10226-shiny.png,892102262
 p10227-shiny,Urshifu Rapid Strike Gmax Shiny,legendary,p10227-shiny.png,892102272
-p10228-shiny,Toxtricity Low Key Gmax Shiny,epic,p10228-shiny.png,849102282
+p10228-shiny,Toxtricity Low Key Gmax Shiny,rare,p10228-shiny.png,849102282
 p10229-shiny,Growlithe Hisui Shiny,common,p10229-shiny.png,58102292
 p1023-shiny,Iron Crown Shiny,epic,p1023-shiny.png,1023010232
 p10230-shiny,Arcanine Hisui Shiny,rare,p10230-shiny.png,59102302
 p10231-shiny,Voltorb Hisui Shiny,common,p10231-shiny.png,100102312
 p10232-shiny,Electrode Hisui Shiny,rare,p10232-shiny.png,101102322
 p10233-shiny,Typhlosion Hisui Shiny,epic,p10233-shiny.png,157102332
-p10234-shiny,Qwilfish Hisui Shiny,epic,p10234-shiny.png,211102342
+p10234-shiny,Qwilfish Hisui Shiny,rare,p10234-shiny.png,211102342
 p10235-shiny,Sneasel Hisui Shiny,rare,p10235-shiny.png,215102352
 p10236-shiny,Samurott Hisui Shiny,epic,p10236-shiny.png,503102362
 p10237-shiny,Lilligant Hisui Shiny,rare,p10237-shiny.png,549102372
@@ -1838,7 +1838,7 @@ p10238-shiny,Zorua Hisui Shiny,rare,p10238-shiny.png,570102382
 p10239-shiny,Zoroark Hisui Shiny,epic,p10239-shiny.png,571102392
 p1024-shiny,Terapagos Shiny,legendary,p1024-shiny.png,1024010242
 p10240-shiny,Braviary Hisui Shiny,rare,p10240-shiny.png,628102402
-p10241-shiny,Sliggoo Hisui Shiny,epic,p10241-shiny.png,705102412
+p10241-shiny,Sliggoo Hisui Shiny,rare,p10241-shiny.png,705102412
 p10242-shiny,Goodra Hisui Shiny,epic,p10242-shiny.png,706102422
 p10243-shiny,Avalugg Hisui Shiny,rare,p10243-shiny.png,713102432
 p10244-shiny,Decidueye Hisui Shiny,epic,p10244-shiny.png,724102442
@@ -1853,15 +1853,15 @@ p10251-shiny,Tauros Paldea Blaze Breed Shiny,epic,p10251-shiny.png,128102512
 p10252-shiny,Tauros Paldea Aqua Breed Shiny,epic,p10252-shiny.png,128102522
 p10253-shiny,Wooper Paldea Shiny,common,p10253-shiny.png,194102532
 p10254-shiny,Oinkologne Female Shiny,common,p10254-shiny.png,916102542
-p10255-shiny,Dudunsparce Three Segment Shiny,epic,p10255-shiny.png,982102552
-p10256-shiny,Palafin Hero Shiny,epic,p10256-shiny.png,964102562
+p10255-shiny,Dudunsparce Three Segment Shiny,rare,p10255-shiny.png,982102552
+p10256-shiny,Palafin Hero Shiny,rare,p10256-shiny.png,964102562
 p10257-shiny,Maushold Family Of Three Shiny,rare,p10257-shiny.png,925102572
 p10258-shiny,Tatsugiri Droopy Shiny,common,p10258-shiny.png,978102582
 p10259-shiny,Tatsugiri Stretchy Shiny,common,p10259-shiny.png,978102592
 p10260-shiny,Squawkabilly Blue Plumage Shiny,common,p10260-shiny.png,931102602
 p10261-shiny,Squawkabilly Yellow Plumage Shiny,common,p10261-shiny.png,931102612
 p10262-shiny,Squawkabilly White Plumage Shiny,common,p10262-shiny.png,931102622
-p10263-shiny,Gimmighoul Roaming Shiny,epic,p10263-shiny.png,999102632
+p10263-shiny,Gimmighoul Roaming Shiny,rare,p10263-shiny.png,999102632
 p10272-shiny,Ursaluna Bloodmoon Shiny,rare,p10272-shiny.png,901102722
 p10273-shiny,Ogerpon Wellspring Mask Shiny,legendary,p10273-shiny.png,1017102732
 p10274-shiny,Ogerpon Hearthflame Mask Shiny,legendary,p10274-shiny.png,1017102742
@@ -1873,27 +1873,27 @@ p10281-shiny,Dragonite Mega Shiny,epic,p10281-shiny.png,149102812
 p103-shiny,Exeggutor Shiny,epic,p103-shiny.png,103001032
 p104-shiny,Cubone Shiny,common,p104-shiny.png,104001042
 p105-shiny,Marowak Shiny,rare,p105-shiny.png,105001052
-p106-shiny,Hitmonlee Shiny,epic,p106-shiny.png,106001062
-p107-shiny,Hitmonchan Shiny,epic,p107-shiny.png,107001072
-p108-shiny,Lickitung Shiny,epic,p108-shiny.png,108001082
+p106-shiny,Hitmonlee Shiny,rare,p106-shiny.png,106001062
+p107-shiny,Hitmonchan Shiny,rare,p107-shiny.png,107001072
+p108-shiny,Lickitung Shiny,rare,p108-shiny.png,108001082
 p109-shiny,Koffing Shiny,common,p109-shiny.png,109001092
 p11-shiny,Metapod Shiny,common,p11-shiny.png,11000112
 p110-shiny,Weezing Shiny,rare,p110-shiny.png,110001102
 p111-shiny,Rhyhorn Shiny,common,p111-shiny.png,111001112
 p112-shiny,Rhydon Shiny,rare,p112-shiny.png,112001122
 p113-shiny,Chansey Shiny,epic,p113-shiny.png,113001132
-p114-shiny,Tangela Shiny,epic,p114-shiny.png,114001142
+p114-shiny,Tangela Shiny,rare,p114-shiny.png,114001142
 p115-shiny,Kangaskhan Shiny,epic,p115-shiny.png,115001152
 p116-shiny,Horsea Shiny,common,p116-shiny.png,116001162
 p117-shiny,Seadra Shiny,rare,p117-shiny.png,117001172
 p118-shiny,Goldeen Shiny,common,p118-shiny.png,118001182
 p119-shiny,Seaking Shiny,rare,p119-shiny.png,119001192
-p12-shiny,Butterfree Shiny,epic,p12-shiny.png,12000122
+p12-shiny,Butterfree Shiny,rare,p12-shiny.png,12000122
 p120-shiny,Staryu Shiny,common,p120-shiny.png,120001202
 p121-shiny,Starmie Shiny,rare,p121-shiny.png,121001212
-p122-shiny,Mr Mime Shiny,epic,p122-shiny.png,122001222
+p122-shiny,Mr Mime Shiny,rare,p122-shiny.png,122001222
 p123-shiny,Scyther Shiny,epic,p123-shiny.png,123001232
-p124-shiny,Jynx Shiny,epic,p124-shiny.png,124001242
+p124-shiny,Jynx Shiny,rare,p124-shiny.png,124001242
 p125-shiny,Electabuzz Shiny,epic,p125-shiny.png,125001252
 p126-shiny,Magmar Shiny,epic,p126-shiny.png,126001262
 p127-shiny,Pinsir Shiny,epic,p127-shiny.png,127001272
@@ -1903,35 +1903,35 @@ p13-shiny,Weedle Shiny,common,p13-shiny.png,13000132
 p130-shiny,Gyarados Shiny,epic,p130-shiny.png,130001302
 p131-shiny,Lapras Shiny,epic,p131-shiny.png,131001312
 p132-shiny,Ditto Shiny,epic,p132-shiny.png,132001322
-p133-shiny,Eevee Shiny,epic,p133-shiny.png,133001332
+p133-shiny,Eevee Shiny,rare,p133-shiny.png,133001332
 p134-shiny,Vaporeon Shiny,epic,p134-shiny.png,134001342
 p135-shiny,Jolteon Shiny,epic,p135-shiny.png,135001352
 p136-shiny,Flareon Shiny,epic,p136-shiny.png,136001362
-p137-shiny,Porygon Shiny,epic,p137-shiny.png,137001372
-p138-shiny,Omanyte Shiny,epic,p138-shiny.png,138001382
+p137-shiny,Porygon Shiny,rare,p137-shiny.png,137001372
+p138-shiny,Omanyte Shiny,rare,p138-shiny.png,138001382
 p139-shiny,Omastar Shiny,epic,p139-shiny.png,139001392
 p14-shiny,Kakuna Shiny,common,p14-shiny.png,14000142
-p140-shiny,Kabuto Shiny,epic,p140-shiny.png,140001402
+p140-shiny,Kabuto Shiny,rare,p140-shiny.png,140001402
 p141-shiny,Kabutops Shiny,epic,p141-shiny.png,141001412
 p142-shiny,Aerodactyl Shiny,epic,p142-shiny.png,142001422
 p143-shiny,Snorlax Shiny,epic,p143-shiny.png,143001432
 p144-shiny,Articuno Shiny,legendary,p144-shiny.png,144001442
 p145-shiny,Zapdos Shiny,legendary,p145-shiny.png,145001452
 p146-shiny,Moltres Shiny,legendary,p146-shiny.png,146001462
-p147-shiny,Dratini Shiny,epic,p147-shiny.png,147001472
-p148-shiny,Dragonair Shiny,epic,p148-shiny.png,148001482
+p147-shiny,Dratini Shiny,rare,p147-shiny.png,147001472
+p148-shiny,Dragonair Shiny,rare,p148-shiny.png,148001482
 p149-shiny,Dragonite Shiny,epic,p149-shiny.png,149001492
-p15-shiny,Beedrill Shiny,epic,p15-shiny.png,15000152
+p15-shiny,Beedrill Shiny,rare,p15-shiny.png,15000152
 p150-shiny,Mewtwo Shiny,legendary,p150-shiny.png,150001502
 p151-shiny,Mew Shiny,legendary,p151-shiny.png,151001512
-p152-shiny,Chikorita Shiny,epic,p152-shiny.png,152001522
-p153-shiny,Bayleef Shiny,epic,p153-shiny.png,153001532
+p152-shiny,Chikorita Shiny,rare,p152-shiny.png,152001522
+p153-shiny,Bayleef Shiny,rare,p153-shiny.png,153001532
 p154-shiny,Meganium Shiny,epic,p154-shiny.png,154001542
-p155-shiny,Cyndaquil Shiny,epic,p155-shiny.png,155001552
-p156-shiny,Quilava Shiny,epic,p156-shiny.png,156001562
+p155-shiny,Cyndaquil Shiny,rare,p155-shiny.png,155001552
+p156-shiny,Quilava Shiny,rare,p156-shiny.png,156001562
 p157-shiny,Typhlosion Shiny,epic,p157-shiny.png,157001572
-p158-shiny,Totodile Shiny,epic,p158-shiny.png,158001582
-p159-shiny,Croconaw Shiny,epic,p159-shiny.png,159001592
+p158-shiny,Totodile Shiny,rare,p158-shiny.png,158001582
+p159-shiny,Croconaw Shiny,rare,p159-shiny.png,159001592
 p16-shiny,Pidgey Shiny,common,p16-shiny.png,16000162
 p160-shiny,Feraligatr Shiny,epic,p160-shiny.png,160001602
 p161-shiny,Sentret Shiny,common,p161-shiny.png,161001612
@@ -1954,7 +1954,7 @@ p176-shiny,Togetic Shiny,rare,p176-shiny.png,176001762
 p177-shiny,Natu Shiny,common,p177-shiny.png,177001772
 p178-shiny,Xatu Shiny,rare,p178-shiny.png,178001782
 p179-shiny,Mareep Shiny,common,p179-shiny.png,179001792
-p18-shiny,Pidgeot Shiny,epic,p18-shiny.png,18000182
+p18-shiny,Pidgeot Shiny,rare,p18-shiny.png,18000182
 p180-shiny,Flaaffy Shiny,common,p180-shiny.png,180001802
 p181-shiny,Ampharos Shiny,epic,p181-shiny.png,181001812
 p182-shiny,Bellossom Shiny,epic,p182-shiny.png,182001822
@@ -1964,9 +1964,9 @@ p185-shiny,Sudowoodo Shiny,rare,p185-shiny.png,185001852
 p186-shiny,Politoed Shiny,epic,p186-shiny.png,186001862
 p187-shiny,Hoppip Shiny,common,p187-shiny.png,187001872
 p188-shiny,Skiploom Shiny,common,p188-shiny.png,188001882
-p189-shiny,Jumpluff Shiny,epic,p189-shiny.png,189001892
+p189-shiny,Jumpluff Shiny,rare,p189-shiny.png,189001892
 p19-shiny,Rattata Shiny,common,p19-shiny.png,19000192
-p190-shiny,Aipom Shiny,epic,p190-shiny.png,190001902
+p190-shiny,Aipom Shiny,rare,p190-shiny.png,190001902
 p191-shiny,Sunkern Shiny,common,p191-shiny.png,191001912
 p192-shiny,Sunflora Shiny,common,p192-shiny.png,192001922
 p193-shiny,Yanma Shiny,rare,p193-shiny.png,193001932
@@ -1976,9 +1976,9 @@ p196-shiny,Espeon Shiny,epic,p196-shiny.png,196001962
 p197-shiny,Umbreon Shiny,epic,p197-shiny.png,197001972
 p198-shiny,Murkrow Shiny,epic,p198-shiny.png,198001982
 p199-shiny,Slowking Shiny,rare,p199-shiny.png,199001992
-p2-shiny,Ivysaur Shiny,epic,p2-shiny.png,2000022
+p2-shiny,Ivysaur Shiny,rare,p2-shiny.png,2000022
 p20-shiny,Raticate Shiny,common,p20-shiny.png,20000202
-p200-shiny,Misdreavus Shiny,epic,p200-shiny.png,200002002
+p200-shiny,Misdreavus Shiny,rare,p200-shiny.png,200002002
 p201-form-b-shiny,Unown B Shiny,common,p201-form-b-shiny.png,201002012
 p201-form-c-shiny,Unown C Shiny,common,p201-form-c-shiny.png,201002012
 p201-form-d-shiny,Unown D Shiny,common,p201-form-d-shiny.png,201002012
@@ -2007,7 +2007,7 @@ p201-form-x-shiny,Unown X Shiny,common,p201-form-x-shiny.png,201002012
 p201-form-y-shiny,Unown Y Shiny,common,p201-form-y-shiny.png,201002012
 p201-form-z-shiny,Unown Z Shiny,common,p201-form-z-shiny.png,201002012
 p201-shiny,Unown Shiny,common,p201-shiny.png,201002012
-p202-shiny,Wobbuffet Shiny,epic,p202-shiny.png,202002022
+p202-shiny,Wobbuffet Shiny,rare,p202-shiny.png,202002022
 p203-shiny,Girafarig Shiny,rare,p203-shiny.png,203002032
 p204-shiny,Pineco Shiny,common,p204-shiny.png,204002042
 p205-shiny,Forretress Shiny,rare,p205-shiny.png,205002052
@@ -2017,7 +2017,7 @@ p208-shiny,Steelix Shiny,epic,p208-shiny.png,208002082
 p209-shiny,Snubbull Shiny,common,p209-shiny.png,209002092
 p21-shiny,Spearow Shiny,common,p21-shiny.png,21000212
 p210-shiny,Granbull Shiny,rare,p210-shiny.png,210002102
-p211-shiny,Qwilfish Shiny,epic,p211-shiny.png,211002112
+p211-shiny,Qwilfish Shiny,rare,p211-shiny.png,211002112
 p212-shiny,Scizor Shiny,epic,p212-shiny.png,212002122
 p213-shiny,Shuckle Shiny,common,p213-shiny.png,213002132
 p214-shiny,Heracross Shiny,epic,p214-shiny.png,214002142
@@ -2032,7 +2032,7 @@ p221-shiny,Piloswine Shiny,rare,p221-shiny.png,221002212
 p222-shiny,Corsola Shiny,rare,p222-shiny.png,222002222
 p223-shiny,Remoraid Shiny,common,p223-shiny.png,223002232
 p224-shiny,Octillery Shiny,rare,p224-shiny.png,224002242
-p225-shiny,Delibird Shiny,epic,p225-shiny.png,225002252
+p225-shiny,Delibird Shiny,rare,p225-shiny.png,225002252
 p226-shiny,Mantine Shiny,epic,p226-shiny.png,226002262
 p227-shiny,Skarmory Shiny,epic,p227-shiny.png,227002272
 p228-shiny,Houndour Shiny,common,p228-shiny.png,228002282
@@ -2042,34 +2042,34 @@ p230-shiny,Kingdra Shiny,epic,p230-shiny.png,230002302
 p231-shiny,Phanpy Shiny,common,p231-shiny.png,231002312
 p232-shiny,Donphan Shiny,rare,p232-shiny.png,232002322
 p233-shiny,Porygon2 Shiny,epic,p233-shiny.png,233002332
-p234-shiny,Stantler Shiny,epic,p234-shiny.png,234002342
-p235-shiny,Smeargle Shiny,epic,p235-shiny.png,235002352
+p234-shiny,Stantler Shiny,rare,p234-shiny.png,234002342
+p235-shiny,Smeargle Shiny,rare,p235-shiny.png,235002352
 p236-shiny,Tyrogue Shiny,rare,p236-shiny.png,236002362
-p237-shiny,Hitmontop Shiny,epic,p237-shiny.png,237002372
-p238-shiny,Smoochum Shiny,epic,p238-shiny.png,238002382
-p239-shiny,Elekid Shiny,epic,p239-shiny.png,239002392
+p237-shiny,Hitmontop Shiny,rare,p237-shiny.png,237002372
+p238-shiny,Smoochum Shiny,rare,p238-shiny.png,238002382
+p239-shiny,Elekid Shiny,rare,p239-shiny.png,239002392
 p24-shiny,Arbok Shiny,common,p24-shiny.png,24000242
-p240-shiny,Magby Shiny,epic,p240-shiny.png,240002402
+p240-shiny,Magby Shiny,rare,p240-shiny.png,240002402
 p241-shiny,Miltank Shiny,epic,p241-shiny.png,241002412
 p242-shiny,Blissey Shiny,epic,p242-shiny.png,242002422
 p243-shiny,Raikou Shiny,legendary,p243-shiny.png,243002432
 p244-shiny,Entei Shiny,legendary,p244-shiny.png,244002442
 p245-shiny,Suicune Shiny,legendary,p245-shiny.png,245002452
-p246-shiny,Larvitar Shiny,epic,p246-shiny.png,246002462
-p247-shiny,Pupitar Shiny,epic,p247-shiny.png,247002472
+p246-shiny,Larvitar Shiny,rare,p246-shiny.png,246002462
+p247-shiny,Pupitar Shiny,rare,p247-shiny.png,247002472
 p248-shiny,Tyranitar Shiny,epic,p248-shiny.png,248002482
 p249-shiny,Lugia Shiny,legendary,p249-shiny.png,249002492
 p25-shiny,Pikachu Shiny,common,p25-shiny.png,25000252
 p250-shiny,Ho Oh Shiny,legendary,p250-shiny.png,250002502
 p251-shiny,Celebi Shiny,legendary,p251-shiny.png,251002512
-p252-shiny,Treecko Shiny,epic,p252-shiny.png,252002522
-p253-shiny,Grovyle Shiny,epic,p253-shiny.png,253002532
+p252-shiny,Treecko Shiny,rare,p252-shiny.png,252002522
+p253-shiny,Grovyle Shiny,rare,p253-shiny.png,253002532
 p254-shiny,Sceptile Shiny,epic,p254-shiny.png,254002542
-p255-shiny,Torchic Shiny,epic,p255-shiny.png,255002552
-p256-shiny,Combusken Shiny,epic,p256-shiny.png,256002562
+p255-shiny,Torchic Shiny,rare,p255-shiny.png,255002552
+p256-shiny,Combusken Shiny,rare,p256-shiny.png,256002562
 p257-shiny,Blaziken Shiny,epic,p257-shiny.png,257002572
-p258-shiny,Mudkip Shiny,epic,p258-shiny.png,258002582
-p259-shiny,Marshtomp Shiny,epic,p259-shiny.png,259002592
+p258-shiny,Mudkip Shiny,rare,p258-shiny.png,258002582
+p259-shiny,Marshtomp Shiny,rare,p259-shiny.png,259002592
 p26-shiny,Raichu Shiny,rare,p26-shiny.png,26000262
 p260-shiny,Swampert Shiny,epic,p260-shiny.png,260002602
 p261-shiny,Poochyena Shiny,common,p261-shiny.png,261002612
@@ -2078,20 +2078,20 @@ p263-shiny,Zigzagoon Shiny,common,p263-shiny.png,263002632
 p264-shiny,Linoone Shiny,common,p264-shiny.png,264002642
 p265-shiny,Wurmple Shiny,common,p265-shiny.png,265002652
 p266-shiny,Silcoon Shiny,common,p266-shiny.png,266002662
-p267-shiny,Beautifly Shiny,epic,p267-shiny.png,267002672
+p267-shiny,Beautifly Shiny,rare,p267-shiny.png,267002672
 p268-shiny,Cascoon Shiny,common,p268-shiny.png,268002682
-p269-shiny,Dustox Shiny,epic,p269-shiny.png,269002692
+p269-shiny,Dustox Shiny,rare,p269-shiny.png,269002692
 p27-shiny,Sandshrew Shiny,common,p27-shiny.png,27000272
 p270-shiny,Lotad Shiny,common,p270-shiny.png,270002702
 p271-shiny,Lombre Shiny,common,p271-shiny.png,271002712
-p272-shiny,Ludicolo Shiny,epic,p272-shiny.png,272002722
+p272-shiny,Ludicolo Shiny,rare,p272-shiny.png,272002722
 p273-shiny,Seedot Shiny,common,p273-shiny.png,273002732
 p274-shiny,Nuzleaf Shiny,common,p274-shiny.png,274002742
-p275-shiny,Shiftry Shiny,epic,p275-shiny.png,275002752
+p275-shiny,Shiftry Shiny,rare,p275-shiny.png,275002752
 p276-shiny,Taillow Shiny,common,p276-shiny.png,276002762
-p277-shiny,Swellow Shiny,epic,p277-shiny.png,277002772
+p277-shiny,Swellow Shiny,rare,p277-shiny.png,277002772
 p278-shiny,Wingull Shiny,common,p278-shiny.png,278002782
-p279-shiny,Pelipper Shiny,epic,p279-shiny.png,279002792
+p279-shiny,Pelipper Shiny,rare,p279-shiny.png,279002792
 p28-shiny,Sandslash Shiny,common,p28-shiny.png,28000282
 p280-shiny,Ralts Shiny,common,p280-shiny.png,280002802
 p281-shiny,Kirlia Shiny,common,p281-shiny.png,281002812
@@ -2106,7 +2106,7 @@ p289-shiny,Slaking Shiny,epic,p289-shiny.png,289002892
 p29-shiny,Nidoran F Shiny,common,p29-shiny.png,29000292
 p290-shiny,Nincada Shiny,common,p290-shiny.png,290002902
 p291-shiny,Ninjask Shiny,common,p291-shiny.png,291002912
-p292-shiny,Shedinja Shiny,epic,p292-shiny.png,292002922
+p292-shiny,Shedinja Shiny,rare,p292-shiny.png,292002922
 p293-shiny,Whismur Shiny,common,p293-shiny.png,293002932
 p294-shiny,Loudred Shiny,common,p294-shiny.png,294002942
 p295-shiny,Exploud Shiny,epic,p295-shiny.png,295002952
@@ -2118,8 +2118,8 @@ p3-shiny,Venusaur Shiny,epic,p3-shiny.png,3000032
 p30-shiny,Nidorina Shiny,common,p30-shiny.png,30000302
 p300-shiny,Skitty Shiny,common,p300-shiny.png,300003002
 p301-shiny,Delcatty Shiny,rare,p301-shiny.png,301003012
-p302-shiny,Sableye Shiny,epic,p302-shiny.png,302003022
-p303-shiny,Mawile Shiny,epic,p303-shiny.png,303003032
+p302-shiny,Sableye Shiny,rare,p302-shiny.png,302003022
+p303-shiny,Mawile Shiny,rare,p303-shiny.png,303003032
 p304-shiny,Aron Shiny,common,p304-shiny.png,304003042
 p305-shiny,Lairon Shiny,common,p305-shiny.png,305003052
 p306-shiny,Aggron Shiny,epic,p306-shiny.png,306003062
@@ -2127,7 +2127,7 @@ p307-shiny,Meditite Shiny,common,p307-shiny.png,307003072
 p308-shiny,Medicham Shiny,common,p308-shiny.png,308003082
 p309-shiny,Electrike Shiny,common,p309-shiny.png,309003092
 p31-shiny,Nidoqueen Shiny,epic,p31-shiny.png,31000312
-p310-shiny,Manectric Shiny,epic,p310-shiny.png,310003102
+p310-shiny,Manectric Shiny,rare,p310-shiny.png,310003102
 p311-shiny,Plusle Shiny,common,p311-shiny.png,311003112
 p312-shiny,Minun Shiny,common,p312-shiny.png,312003122
 p313-shiny,Volbeat Shiny,common,p313-shiny.png,313003132
@@ -2156,8 +2156,8 @@ p333-shiny,Swablu Shiny,common,p333-shiny.png,333003332
 p334-shiny,Altaria Shiny,epic,p334-shiny.png,334003342
 p335-shiny,Zangoose Shiny,common,p335-shiny.png,335003352
 p336-shiny,Seviper Shiny,common,p336-shiny.png,336003362
-p337-shiny,Lunatone Shiny,epic,p337-shiny.png,337003372
-p338-shiny,Solrock Shiny,epic,p338-shiny.png,338003382
+p337-shiny,Lunatone Shiny,rare,p337-shiny.png,337003372
+p338-shiny,Solrock Shiny,rare,p338-shiny.png,338003382
 p339-shiny,Barboach Shiny,common,p339-shiny.png,339003392
 p34-shiny,Nidoking Shiny,epic,p34-shiny.png,34000342
 p340-shiny,Whiscash Shiny,rare,p340-shiny.png,340003402
@@ -2165,21 +2165,21 @@ p341-shiny,Corphish Shiny,common,p341-shiny.png,341003412
 p342-shiny,Crawdaunt Shiny,common,p342-shiny.png,342003422
 p343-shiny,Baltoy Shiny,common,p343-shiny.png,343003432
 p344-shiny,Claydol Shiny,common,p344-shiny.png,344003442
-p345-shiny,Lileep Shiny,epic,p345-shiny.png,345003452
+p345-shiny,Lileep Shiny,rare,p345-shiny.png,345003452
 p346-shiny,Cradily Shiny,epic,p346-shiny.png,346003462
-p347-shiny,Anorith Shiny,epic,p347-shiny.png,347003472
+p347-shiny,Anorith Shiny,rare,p347-shiny.png,347003472
 p348-shiny,Armaldo Shiny,epic,p348-shiny.png,348003482
 p349-shiny,Feebas Shiny,common,p349-shiny.png,349003492
 p35-shiny,Clefairy Shiny,common,p35-shiny.png,35000352
 p350-shiny,Milotic Shiny,rare,p350-shiny.png,350003502
-p351-shiny,Castform Shiny,epic,p351-shiny.png,351003512
+p351-shiny,Castform Shiny,rare,p351-shiny.png,351003512
 p352-shiny,Kecleon Shiny,common,p352-shiny.png,352003522
 p353-shiny,Shuppet Shiny,common,p353-shiny.png,353003532
-p354-shiny,Banette Shiny,epic,p354-shiny.png,354003542
+p354-shiny,Banette Shiny,rare,p354-shiny.png,354003542
 p355-shiny,Duskull Shiny,common,p355-shiny.png,355003552
 p356-shiny,Dusclops Shiny,common,p356-shiny.png,356003562
 p357-shiny,Tropius Shiny,common,p357-shiny.png,357003572
-p358-shiny,Chimecho Shiny,epic,p358-shiny.png,358003582
+p358-shiny,Chimecho Shiny,rare,p358-shiny.png,358003582
 p359-shiny,Absol Shiny,epic,p359-shiny.png,359003592
 p36-shiny,Clefable Shiny,epic,p36-shiny.png,36000362
 p360-shiny,Wynaut Shiny,common,p360-shiny.png,360003602
@@ -2194,8 +2194,8 @@ p368-shiny,Gorebyss Shiny,rare,p368-shiny.png,368003682
 p369-shiny,Relicanth Shiny,epic,p369-shiny.png,369003692
 p37-shiny,Vulpix Shiny,common,p37-shiny.png,37000372
 p370-shiny,Luvdisc Shiny,common,p370-shiny.png,370003702
-p371-shiny,Bagon Shiny,epic,p371-shiny.png,371003712
-p372-shiny,Shelgon Shiny,epic,p372-shiny.png,372003722
+p371-shiny,Bagon Shiny,rare,p371-shiny.png,371003712
+p372-shiny,Shelgon Shiny,rare,p372-shiny.png,372003722
 p373-shiny,Salamence Shiny,epic,p373-shiny.png,373003732
 p374-shiny,Beldum Shiny,epic,p374-shiny.png,374003742
 p375-shiny,Metang Shiny,epic,p375-shiny.png,375003752
@@ -2211,42 +2211,42 @@ p383-shiny,Groudon Shiny,legendary,p383-shiny.png,383003832
 p384-shiny,Rayquaza Shiny,legendary,p384-shiny.png,384003842
 p385-shiny,Jirachi Shiny,legendary,p385-shiny.png,385003852
 p386-shiny,Deoxys Normal Shiny,legendary,p386-shiny.png,386003862
-p387-shiny,Turtwig Shiny,epic,p387-shiny.png,387003872
-p388-shiny,Grotle Shiny,epic,p388-shiny.png,388003882
+p387-shiny,Turtwig Shiny,rare,p387-shiny.png,387003872
+p388-shiny,Grotle Shiny,rare,p388-shiny.png,388003882
 p389-shiny,Torterra Shiny,epic,p389-shiny.png,389003892
 p39-shiny,Jigglypuff Shiny,common,p39-shiny.png,39000392
-p390-shiny,Chimchar Shiny,epic,p390-shiny.png,390003902
-p391-shiny,Monferno Shiny,epic,p391-shiny.png,391003912
+p390-shiny,Chimchar Shiny,rare,p390-shiny.png,390003902
+p391-shiny,Monferno Shiny,rare,p391-shiny.png,391003912
 p392-shiny,Infernape Shiny,epic,p392-shiny.png,392003922
-p393-shiny,Piplup Shiny,epic,p393-shiny.png,393003932
-p394-shiny,Prinplup Shiny,epic,p394-shiny.png,394003942
+p393-shiny,Piplup Shiny,rare,p393-shiny.png,393003932
+p394-shiny,Prinplup Shiny,rare,p394-shiny.png,394003942
 p395-shiny,Empoleon Shiny,epic,p395-shiny.png,395003952
 p396-shiny,Starly Shiny,common,p396-shiny.png,396003962
 p397-shiny,Staravia Shiny,common,p397-shiny.png,397003972
-p398-shiny,Staraptor Shiny,epic,p398-shiny.png,398003982
+p398-shiny,Staraptor Shiny,rare,p398-shiny.png,398003982
 p399-shiny,Bidoof Shiny,common,p399-shiny.png,399003992
-p4-shiny,Charmander Shiny,epic,p4-shiny.png,4000042
+p4-shiny,Charmander Shiny,rare,p4-shiny.png,4000042
 p40-shiny,Wigglytuff Shiny,rare,p40-shiny.png,40000402
 p400-shiny,Bibarel Shiny,common,p400-shiny.png,400004002
 p401-shiny,Kricketot Shiny,common,p401-shiny.png,401004012
-p402-shiny,Kricketune Shiny,epic,p402-shiny.png,402004022
+p402-shiny,Kricketune Shiny,rare,p402-shiny.png,402004022
 p403-shiny,Shinx Shiny,common,p403-shiny.png,403004032
 p404-shiny,Luxio Shiny,common,p404-shiny.png,404004042
 p405-shiny,Luxray Shiny,epic,p405-shiny.png,405004052
 p406-shiny,Budew Shiny,common,p406-shiny.png,406004062
 p407-shiny,Roserade Shiny,rare,p407-shiny.png,407004072
-p408-shiny,Cranidos Shiny,epic,p408-shiny.png,408004082
+p408-shiny,Cranidos Shiny,rare,p408-shiny.png,408004082
 p409-shiny,Rampardos Shiny,epic,p409-shiny.png,409004092
 p41-shiny,Zubat Shiny,common,p41-shiny.png,41000412
-p410-shiny,Shieldon Shiny,epic,p410-shiny.png,410004102
+p410-shiny,Shieldon Shiny,rare,p410-shiny.png,410004102
 p411-shiny,Bastiodon Shiny,epic,p411-shiny.png,411004112
 p412-form-sandy-shiny,Burmy Sandy Shiny,common,p412-form-sandy-shiny.png,412004122
 p412-form-trash-shiny,Burmy Trash Shiny,common,p412-form-trash-shiny.png,412004122
 p412-shiny,Burmy Shiny,common,p412-shiny.png,412004122
-p413-shiny,Wormadam Plant Shiny,epic,p413-shiny.png,413004132
-p414-shiny,Mothim Shiny,epic,p414-shiny.png,414004142
+p413-shiny,Wormadam Plant Shiny,rare,p413-shiny.png,413004132
+p414-shiny,Mothim Shiny,rare,p414-shiny.png,414004142
 p415-shiny,Combee Shiny,common,p415-shiny.png,415004152
-p416-shiny,Vespiquen Shiny,epic,p416-shiny.png,416004162
+p416-shiny,Vespiquen Shiny,rare,p416-shiny.png,416004162
 p417-shiny,Pachirisu Shiny,common,p417-shiny.png,417004172
 p418-shiny,Buizel Shiny,common,p418-shiny.png,418004182
 p419-shiny,Floatzel Shiny,rare,p419-shiny.png,419004192
@@ -2258,7 +2258,7 @@ p422-form-east-shiny,Shellos East Shiny,common,p422-form-east-shiny.png,42200422
 p422-shiny,Shellos Shiny,common,p422-shiny.png,422004222
 p423-form-east-shiny,Gastrodon East Shiny,rare,p423-form-east-shiny.png,423004232
 p423-shiny,Gastrodon Shiny,rare,p423-shiny.png,423004232
-p424-shiny,Ambipom Shiny,epic,p424-shiny.png,424004242
+p424-shiny,Ambipom Shiny,rare,p424-shiny.png,424004242
 p425-shiny,Drifloon Shiny,common,p425-shiny.png,425004252
 p426-shiny,Drifblim Shiny,rare,p426-shiny.png,426004262
 p427-shiny,Buneary Shiny,common,p427-shiny.png,427004272
@@ -2279,8 +2279,8 @@ p44-shiny,Gloom Shiny,common,p44-shiny.png,44000442
 p440-shiny,Happiny Shiny,common,p440-shiny.png,440004402
 p441-shiny,Chatot Shiny,epic,p441-shiny.png,441004412
 p442-shiny,Spiritomb Shiny,common,p442-shiny.png,442004422
-p443-shiny,Gible Shiny,epic,p443-shiny.png,443004432
-p444-shiny,Gabite Shiny,epic,p444-shiny.png,444004442
+p443-shiny,Gible Shiny,rare,p443-shiny.png,443004432
+p444-shiny,Gabite Shiny,rare,p444-shiny.png,444004442
 p445-shiny,Garchomp Shiny,epic,p445-shiny.png,445004452
 p446-shiny,Munchlax Shiny,rare,p446-shiny.png,446004462
 p447-shiny,Riolu Shiny,rare,p447-shiny.png,447004472
@@ -2318,7 +2318,7 @@ p475-shiny,Gallade Shiny,epic,p475-shiny.png,475004752
 p476-shiny,Probopass Shiny,rare,p476-shiny.png,476004762
 p477-shiny,Dusknoir Shiny,epic,p477-shiny.png,477004772
 p478-shiny,Froslass Shiny,rare,p478-shiny.png,478004782
-p479-shiny,Rotom Shiny,epic,p479-shiny.png,479004792
+p479-shiny,Rotom Shiny,rare,p479-shiny.png,479004792
 p48-shiny,Venonat Shiny,common,p48-shiny.png,48000482
 p480-shiny,Uxie Shiny,legendary,p480-shiny.png,480004802
 p481-shiny,Mesprit Shiny,legendary,p481-shiny.png,481004812
@@ -2354,16 +2354,16 @@ p493-form-unknown-shiny,Arceus Unknown Shiny,legendary,p493-form-unknown-shiny.p
 p493-form-water-shiny,Arceus Water Shiny,legendary,p493-form-water-shiny.png,493004932
 p493-shiny,Arceus Shiny,legendary,p493-shiny.png,493004932
 p494-shiny,Victini Shiny,legendary,p494-shiny.png,494004942
-p495-shiny,Snivy Shiny,epic,p495-shiny.png,495004952
-p496-shiny,Servine Shiny,epic,p496-shiny.png,496004962
+p495-shiny,Snivy Shiny,rare,p495-shiny.png,495004952
+p496-shiny,Servine Shiny,rare,p496-shiny.png,496004962
 p497-shiny,Serperior Shiny,epic,p497-shiny.png,497004972
-p498-shiny,Tepig Shiny,epic,p498-shiny.png,498004982
-p499-shiny,Pignite Shiny,epic,p499-shiny.png,499004992
-p5-shiny,Charmeleon Shiny,epic,p5-shiny.png,5000052
+p498-shiny,Tepig Shiny,rare,p498-shiny.png,498004982
+p499-shiny,Pignite Shiny,rare,p499-shiny.png,499004992
+p5-shiny,Charmeleon Shiny,rare,p5-shiny.png,5000052
 p50-shiny,Diglett Shiny,common,p50-shiny.png,50000502
 p500-shiny,Emboar Shiny,epic,p500-shiny.png,500005002
-p501-shiny,Oshawott Shiny,epic,p501-shiny.png,501005012
-p502-shiny,Dewott Shiny,epic,p502-shiny.png,502005022
+p501-shiny,Oshawott Shiny,rare,p501-shiny.png,501005012
+p502-shiny,Dewott Shiny,rare,p502-shiny.png,502005022
 p503-shiny,Samurott Shiny,epic,p503-shiny.png,503005032
 p504-shiny,Patrat Shiny,common,p504-shiny.png,504005042
 p505-shiny,Watchog Shiny,common,p505-shiny.png,505005052
@@ -2384,14 +2384,14 @@ p518-shiny,Musharna Shiny,rare,p518-shiny.png,518005182
 p519-shiny,Pidove Shiny,common,p519-shiny.png,519005192
 p52-shiny,Meowth Shiny,common,p52-shiny.png,52000522
 p520-shiny,Tranquill Shiny,common,p520-shiny.png,520005202
-p521-shiny,Unfezant Shiny,epic,p521-shiny.png,521005212
+p521-shiny,Unfezant Shiny,rare,p521-shiny.png,521005212
 p522-shiny,Blitzle Shiny,common,p522-shiny.png,522005222
 p523-shiny,Zebstrika Shiny,rare,p523-shiny.png,523005232
 p524-shiny,Roggenrola Shiny,common,p524-shiny.png,524005242
 p525-shiny,Boldore Shiny,common,p525-shiny.png,525005252
 p526-shiny,Gigalith Shiny,epic,p526-shiny.png,526005262
 p527-shiny,Woobat Shiny,common,p527-shiny.png,527005272
-p528-shiny,Swoobat Shiny,epic,p528-shiny.png,528005282
+p528-shiny,Swoobat Shiny,rare,p528-shiny.png,528005282
 p529-shiny,Drilbur Shiny,common,p529-shiny.png,529005292
 p53-shiny,Persian Shiny,common,p53-shiny.png,53000532
 p530-shiny,Excadrill Shiny,rare,p530-shiny.png,530005302
@@ -2402,15 +2402,15 @@ p534-shiny,Conkeldurr Shiny,epic,p534-shiny.png,534005342
 p535-shiny,Tympole Shiny,common,p535-shiny.png,535005352
 p536-shiny,Palpitoad Shiny,common,p536-shiny.png,536005362
 p537-shiny,Seismitoad Shiny,epic,p537-shiny.png,537005372
-p538-shiny,Throh Shiny,epic,p538-shiny.png,538005382
-p539-shiny,Sawk Shiny,epic,p539-shiny.png,539005392
+p538-shiny,Throh Shiny,rare,p538-shiny.png,538005382
+p539-shiny,Sawk Shiny,rare,p539-shiny.png,539005392
 p54-shiny,Psyduck Shiny,common,p54-shiny.png,54000542
 p540-shiny,Sewaddle Shiny,common,p540-shiny.png,540005402
 p541-shiny,Swadloon Shiny,common,p541-shiny.png,541005412
 p542-shiny,Leavanny Shiny,epic,p542-shiny.png,542005422
 p543-shiny,Venipede Shiny,common,p543-shiny.png,543005432
 p544-shiny,Whirlipede Shiny,common,p544-shiny.png,544005442
-p545-shiny,Scolipede Shiny,epic,p545-shiny.png,545005452
+p545-shiny,Scolipede Shiny,rare,p545-shiny.png,545005452
 p546-shiny,Cottonee Shiny,common,p546-shiny.png,546005462
 p547-shiny,Whimsicott Shiny,rare,p547-shiny.png,547005472
 p548-shiny,Petilil Shiny,common,p548-shiny.png,548005482
@@ -2431,9 +2431,9 @@ p560-shiny,Scrafty Shiny,common,p560-shiny.png,560005602
 p561-shiny,Sigilyph Shiny,epic,p561-shiny.png,561005612
 p562-shiny,Yamask Shiny,common,p562-shiny.png,562005622
 p563-shiny,Cofagrigus Shiny,common,p563-shiny.png,563005632
-p564-shiny,Tirtouga Shiny,epic,p564-shiny.png,564005642
+p564-shiny,Tirtouga Shiny,rare,p564-shiny.png,564005642
 p565-shiny,Carracosta Shiny,epic,p565-shiny.png,565005652
-p566-shiny,Archen Shiny,epic,p566-shiny.png,566005662
+p566-shiny,Archen Shiny,rare,p566-shiny.png,566005662
 p567-shiny,Archeops Shiny,epic,p567-shiny.png,567005672
 p568-shiny,Trubbish Shiny,common,p568-shiny.png,568005682
 p569-shiny,Garbodor Shiny,rare,p569-shiny.png,569005692
@@ -2450,7 +2450,7 @@ p578-shiny,Duosion Shiny,common,p578-shiny.png,578005782
 p579-shiny,Reuniclus Shiny,rare,p579-shiny.png,579005792
 p58-shiny,Growlithe Shiny,common,p58-shiny.png,58000582
 p580-shiny,Ducklett Shiny,common,p580-shiny.png,580005802
-p581-shiny,Swanna Shiny,epic,p581-shiny.png,581005812
+p581-shiny,Swanna Shiny,rare,p581-shiny.png,581005812
 p582-shiny,Vanillite Shiny,common,p582-shiny.png,582005822
 p583-shiny,Vanillish Shiny,common,p583-shiny.png,583005832
 p584-shiny,Vanilluxe Shiny,epic,p584-shiny.png,584005842
@@ -2501,7 +2501,7 @@ p618-shiny,Stunfisk Shiny,rare,p618-shiny.png,618006182
 p619-shiny,Mienfoo Shiny,common,p619-shiny.png,619006192
 p62-shiny,Poliwrath Shiny,epic,p62-shiny.png,62000622
 p620-shiny,Mienshao Shiny,epic,p620-shiny.png,620006202
-p621-shiny,Druddigon Shiny,epic,p621-shiny.png,621006212
+p621-shiny,Druddigon Shiny,rare,p621-shiny.png,621006212
 p622-shiny,Golett Shiny,common,p622-shiny.png,622006222
 p623-shiny,Golurk Shiny,common,p623-shiny.png,623006232
 p624-shiny,Pawniard Shiny,common,p624-shiny.png,624006242
@@ -2514,10 +2514,10 @@ p63-shiny,Abra Shiny,common,p63-shiny.png,63000632
 p630-shiny,Mandibuzz Shiny,rare,p630-shiny.png,630006302
 p631-shiny,Heatmor Shiny,common,p631-shiny.png,631006312
 p632-shiny,Durant Shiny,common,p632-shiny.png,632006322
-p633-shiny,Deino Shiny,epic,p633-shiny.png,633006332
-p634-shiny,Zweilous Shiny,epic,p634-shiny.png,634006342
+p633-shiny,Deino Shiny,rare,p633-shiny.png,633006332
+p634-shiny,Zweilous Shiny,rare,p634-shiny.png,634006342
 p635-shiny,Hydreigon Shiny,epic,p635-shiny.png,635006352
-p636-shiny,Larvesta Shiny,epic,p636-shiny.png,636006362
+p636-shiny,Larvesta Shiny,rare,p636-shiny.png,636006362
 p637-shiny,Volcarona Shiny,epic,p637-shiny.png,637006372
 p638-shiny,Cobalion Shiny,legendary,p638-shiny.png,638006382
 p639-shiny,Terrakion Shiny,legendary,p639-shiny.png,639006392
@@ -2537,14 +2537,14 @@ p649-form-douse-shiny,Genesect Douse Shiny,legendary,p649-form-douse-shiny.png,6
 p649-form-shock-shiny,Genesect Shock Shiny,legendary,p649-form-shock-shiny.png,649006492
 p649-shiny,Genesect Shiny,legendary,p649-shiny.png,649006492
 p65-shiny,Alakazam Shiny,rare,p65-shiny.png,65000652
-p650-shiny,Chespin Shiny,epic,p650-shiny.png,650006502
-p651-shiny,Quilladin Shiny,epic,p651-shiny.png,651006512
+p650-shiny,Chespin Shiny,rare,p650-shiny.png,650006502
+p651-shiny,Quilladin Shiny,rare,p651-shiny.png,651006512
 p652-shiny,Chesnaught Shiny,epic,p652-shiny.png,652006522
-p653-shiny,Fennekin Shiny,epic,p653-shiny.png,653006532
-p654-shiny,Braixen Shiny,epic,p654-shiny.png,654006542
+p653-shiny,Fennekin Shiny,rare,p653-shiny.png,653006532
+p654-shiny,Braixen Shiny,rare,p654-shiny.png,654006542
 p655-shiny,Delphox Shiny,epic,p655-shiny.png,655006552
-p656-shiny,Froakie Shiny,epic,p656-shiny.png,656006562
-p657-shiny,Frogadier Shiny,epic,p657-shiny.png,657006572
+p656-shiny,Froakie Shiny,rare,p656-shiny.png,656006562
+p657-shiny,Frogadier Shiny,rare,p657-shiny.png,657006572
 p658-shiny,Greninja Shiny,epic,p658-shiny.png,658006582
 p659-shiny,Bunnelby Shiny,common,p659-shiny.png,659006592
 p66-shiny,Machop Shiny,common,p66-shiny.png,66000662
@@ -2554,27 +2554,27 @@ p662-shiny,Fletchinder Shiny,common,p662-shiny.png,662006622
 p663-shiny,Talonflame Shiny,epic,p663-shiny.png,663006632
 p664-shiny,Scatterbug Shiny,common,p664-shiny.png,664006642
 p665-shiny,Spewpa Shiny,common,p665-shiny.png,665006652
-p666-form-archipelago-shiny,Vivillon Archipelago Shiny,epic,p666-form-archipelago-shiny.png,666006662
-p666-form-continental-shiny,Vivillon Continental Shiny,epic,p666-form-continental-shiny.png,666006662
-p666-form-elegant-shiny,Vivillon Elegant Shiny,epic,p666-form-elegant-shiny.png,666006662
-p666-form-fancy-shiny,Vivillon Fancy Shiny,epic,p666-form-fancy-shiny.png,666006662
-p666-form-garden-shiny,Vivillon Garden Shiny,epic,p666-form-garden-shiny.png,666006662
-p666-form-high-plains-shiny,Vivillon High Plains Shiny,epic,p666-form-high-plains-shiny.png,666006662
-p666-form-icy-snow-shiny,Vivillon Icy Snow Shiny,epic,p666-form-icy-snow-shiny.png,666006662
-p666-form-jungle-shiny,Vivillon Jungle Shiny,epic,p666-form-jungle-shiny.png,666006662
-p666-form-marine-shiny,Vivillon Marine Shiny,epic,p666-form-marine-shiny.png,666006662
-p666-form-meadow-shiny,Vivillon Meadow Shiny,epic,p666-form-meadow-shiny.png,666006662
-p666-form-modern-shiny,Vivillon Modern Shiny,epic,p666-form-modern-shiny.png,666006662
-p666-form-monsoon-shiny,Vivillon Monsoon Shiny,epic,p666-form-monsoon-shiny.png,666006662
-p666-form-ocean-shiny,Vivillon Ocean Shiny,epic,p666-form-ocean-shiny.png,666006662
-p666-form-poke-ball-shiny,Vivillon Poke Ball Shiny,epic,p666-form-poke-ball-shiny.png,666006662
-p666-form-polar-shiny,Vivillon Polar Shiny,epic,p666-form-polar-shiny.png,666006662
-p666-form-river-shiny,Vivillon River Shiny,epic,p666-form-river-shiny.png,666006662
-p666-form-sandstorm-shiny,Vivillon Sandstorm Shiny,epic,p666-form-sandstorm-shiny.png,666006662
-p666-form-savanna-shiny,Vivillon Savanna Shiny,epic,p666-form-savanna-shiny.png,666006662
-p666-form-sun-shiny,Vivillon Sun Shiny,epic,p666-form-sun-shiny.png,666006662
-p666-form-tundra-shiny,Vivillon Tundra Shiny,epic,p666-form-tundra-shiny.png,666006662
-p666-shiny,Vivillon Shiny,epic,p666-shiny.png,666006662
+p666-form-archipelago-shiny,Vivillon Archipelago Shiny,rare,p666-form-archipelago-shiny.png,666006662
+p666-form-continental-shiny,Vivillon Continental Shiny,rare,p666-form-continental-shiny.png,666006662
+p666-form-elegant-shiny,Vivillon Elegant Shiny,rare,p666-form-elegant-shiny.png,666006662
+p666-form-fancy-shiny,Vivillon Fancy Shiny,rare,p666-form-fancy-shiny.png,666006662
+p666-form-garden-shiny,Vivillon Garden Shiny,rare,p666-form-garden-shiny.png,666006662
+p666-form-high-plains-shiny,Vivillon High Plains Shiny,rare,p666-form-high-plains-shiny.png,666006662
+p666-form-icy-snow-shiny,Vivillon Icy Snow Shiny,rare,p666-form-icy-snow-shiny.png,666006662
+p666-form-jungle-shiny,Vivillon Jungle Shiny,rare,p666-form-jungle-shiny.png,666006662
+p666-form-marine-shiny,Vivillon Marine Shiny,rare,p666-form-marine-shiny.png,666006662
+p666-form-meadow-shiny,Vivillon Meadow Shiny,rare,p666-form-meadow-shiny.png,666006662
+p666-form-modern-shiny,Vivillon Modern Shiny,rare,p666-form-modern-shiny.png,666006662
+p666-form-monsoon-shiny,Vivillon Monsoon Shiny,rare,p666-form-monsoon-shiny.png,666006662
+p666-form-ocean-shiny,Vivillon Ocean Shiny,rare,p666-form-ocean-shiny.png,666006662
+p666-form-poke-ball-shiny,Vivillon Poke Ball Shiny,rare,p666-form-poke-ball-shiny.png,666006662
+p666-form-polar-shiny,Vivillon Polar Shiny,rare,p666-form-polar-shiny.png,666006662
+p666-form-river-shiny,Vivillon River Shiny,rare,p666-form-river-shiny.png,666006662
+p666-form-sandstorm-shiny,Vivillon Sandstorm Shiny,rare,p666-form-sandstorm-shiny.png,666006662
+p666-form-savanna-shiny,Vivillon Savanna Shiny,rare,p666-form-savanna-shiny.png,666006662
+p666-form-sun-shiny,Vivillon Sun Shiny,rare,p666-form-sun-shiny.png,666006662
+p666-form-tundra-shiny,Vivillon Tundra Shiny,rare,p666-form-tundra-shiny.png,666006662
+p666-shiny,Vivillon Shiny,rare,p666-shiny.png,666006662
 p667-shiny,Litleo Shiny,common,p667-shiny.png,667006672
 p668-shiny,Pyroar Male Shiny,rare,p668-shiny.png,668006682
 p669-form-blue-shiny,Flabebe Blue Shiny,common,p669-form-blue-shiny.png,669006692
@@ -2616,7 +2616,7 @@ p678-shiny,Meowstic Male Shiny,rare,p678-shiny.png,678006782
 p679-shiny,Honedge Shiny,common,p679-shiny.png,679006792
 p68-shiny,Machamp Shiny,epic,p68-shiny.png,68000682
 p680-shiny,Doublade Shiny,common,p680-shiny.png,680006802
-p681-shiny,Aegislash Shield Shiny,epic,p681-shiny.png,681006812
+p681-shiny,Aegislash Shield Shiny,rare,p681-shiny.png,681006812
 p682-shiny,Spritzee Shiny,common,p682-shiny.png,682006822
 p683-shiny,Aromatisse Shiny,common,p683-shiny.png,683006832
 p684-shiny,Swirlix Shiny,common,p684-shiny.png,684006842
@@ -2632,18 +2632,18 @@ p692-shiny,Clauncher Shiny,common,p692-shiny.png,692006922
 p693-shiny,Clawitzer Shiny,rare,p693-shiny.png,693006932
 p694-shiny,Helioptile Shiny,common,p694-shiny.png,694006942
 p695-shiny,Heliolisk Shiny,rare,p695-shiny.png,695006952
-p696-shiny,Tyrunt Shiny,epic,p696-shiny.png,696006962
+p696-shiny,Tyrunt Shiny,rare,p696-shiny.png,696006962
 p697-shiny,Tyrantrum Shiny,epic,p697-shiny.png,697006972
-p698-shiny,Amaura Shiny,epic,p698-shiny.png,698006982
+p698-shiny,Amaura Shiny,rare,p698-shiny.png,698006982
 p699-shiny,Aurorus Shiny,epic,p699-shiny.png,699006992
-p7-shiny,Squirtle Shiny,epic,p7-shiny.png,7000072
+p7-shiny,Squirtle Shiny,rare,p7-shiny.png,7000072
 p70-shiny,Weepinbell Shiny,common,p70-shiny.png,70000702
 p700-shiny,Sylveon Shiny,epic,p700-shiny.png,700007002
 p701-shiny,Hawlucha Shiny,common,p701-shiny.png,701007012
 p702-shiny,Dedenne Shiny,common,p702-shiny.png,702007022
 p703-shiny,Carbink Shiny,rare,p703-shiny.png,703007032
-p704-shiny,Goomy Shiny,epic,p704-shiny.png,704007042
-p705-shiny,Sliggoo Shiny,epic,p705-shiny.png,705007052
+p704-shiny,Goomy Shiny,rare,p704-shiny.png,704007042
+p705-shiny,Sliggoo Shiny,rare,p705-shiny.png,705007052
 p706-shiny,Goodra Shiny,epic,p706-shiny.png,706007062
 p707-shiny,Klefki Shiny,rare,p707-shiny.png,707007072
 p708-shiny,Phantump Shiny,common,p708-shiny.png,708007082
@@ -2663,19 +2663,19 @@ p719-shiny,Diancie Shiny,legendary,p719-shiny.png,719007192
 p72-shiny,Tentacool Shiny,common,p72-shiny.png,72000722
 p720-shiny,Hoopa Shiny,legendary,p720-shiny.png,720007202
 p721-shiny,Volcanion Shiny,legendary,p721-shiny.png,721007212
-p722-shiny,Rowlet Shiny,epic,p722-shiny.png,722007222
-p723-shiny,Dartrix Shiny,epic,p723-shiny.png,723007232
+p722-shiny,Rowlet Shiny,rare,p722-shiny.png,722007222
+p723-shiny,Dartrix Shiny,rare,p723-shiny.png,723007232
 p724-shiny,Decidueye Shiny,epic,p724-shiny.png,724007242
-p725-shiny,Litten Shiny,epic,p725-shiny.png,725007252
-p726-shiny,Torracat Shiny,epic,p726-shiny.png,726007262
+p725-shiny,Litten Shiny,rare,p725-shiny.png,725007252
+p726-shiny,Torracat Shiny,rare,p726-shiny.png,726007262
 p727-shiny,Incineroar Shiny,epic,p727-shiny.png,727007272
-p728-shiny,Popplio Shiny,epic,p728-shiny.png,728007282
-p729-shiny,Brionne Shiny,epic,p729-shiny.png,729007292
+p728-shiny,Popplio Shiny,rare,p728-shiny.png,728007282
+p729-shiny,Brionne Shiny,rare,p729-shiny.png,729007292
 p73-shiny,Tentacruel Shiny,rare,p73-shiny.png,73000732
 p730-shiny,Primarina Shiny,epic,p730-shiny.png,730007302
 p731-shiny,Pikipek Shiny,common,p731-shiny.png,731007312
 p732-shiny,Trumbeak Shiny,common,p732-shiny.png,732007322
-p733-shiny,Toucannon Shiny,epic,p733-shiny.png,733007332
+p733-shiny,Toucannon Shiny,rare,p733-shiny.png,733007332
 p734-shiny,Yungoos Shiny,common,p734-shiny.png,734007342
 p735-shiny,Gumshoos Shiny,common,p735-shiny.png,735007352
 p736-shiny,Grubbin Shiny,common,p736-shiny.png,736007362
@@ -2684,7 +2684,7 @@ p738-shiny,Vikavolt Shiny,epic,p738-shiny.png,738007382
 p739-shiny,Crabrawler Shiny,common,p739-shiny.png,739007392
 p74-shiny,Geodude Shiny,common,p74-shiny.png,74000742
 p740-shiny,Crabominable Shiny,rare,p740-shiny.png,740007402
-p741-shiny,Oricorio Baile Shiny,epic,p741-shiny.png,741007412
+p741-shiny,Oricorio Baile Shiny,rare,p741-shiny.png,741007412
 p742-shiny,Cutiefly Shiny,common,p742-shiny.png,742007422
 p743-shiny,Ribombee Shiny,rare,p743-shiny.png,743007432
 p744-shiny,Rockruff Shiny,common,p744-shiny.png,744007442
@@ -2702,7 +2702,7 @@ p754-shiny,Lurantis Shiny,rare,p754-shiny.png,754007542
 p755-shiny,Morelull Shiny,common,p755-shiny.png,755007552
 p756-shiny,Shiinotic Shiny,rare,p756-shiny.png,756007562
 p757-shiny,Salandit Shiny,common,p757-shiny.png,757007572
-p758-shiny,Salazzle Shiny,epic,p758-shiny.png,758007582
+p758-shiny,Salazzle Shiny,rare,p758-shiny.png,758007582
 p759-shiny,Stufful Shiny,common,p759-shiny.png,759007592
 p76-shiny,Golem Shiny,epic,p76-shiny.png,76000762
 p760-shiny,Bewear Shiny,rare,p760-shiny.png,760007602
@@ -2739,17 +2739,17 @@ p773-form-steel-shiny,Silvally Steel Shiny,legendary,p773-form-steel-shiny.png,7
 p773-form-water-shiny,Silvally Water Shiny,legendary,p773-form-water-shiny.png,773007732
 p773-shiny,Silvally Shiny,legendary,p773-shiny.png,773007732
 p774-shiny,Minior Red Meteor Shiny,epic,p774-shiny.png,774007742
-p775-form-form-1-shiny,Komala Form 1 Shiny,epic,p775-form-form-1-shiny.png,775007752
-p775-shiny,Komala Shiny,epic,p775-shiny.png,775007752
+p775-form-form-1-shiny,Komala Form 1 Shiny,rare,p775-form-form-1-shiny.png,775007752
+p775-shiny,Komala Shiny,rare,p775-shiny.png,775007752
 p776-shiny,Turtonator Shiny,rare,p776-shiny.png,776007762
 p777-shiny,Togedemaru Shiny,common,p777-shiny.png,777007772
-p778-shiny,Mimikyu Disguised Shiny,epic,p778-shiny.png,778007782
+p778-shiny,Mimikyu Disguised Shiny,rare,p778-shiny.png,778007782
 p779-shiny,Bruxish Shiny,rare,p779-shiny.png,779007792
 p78-shiny,Rapidash Shiny,rare,p78-shiny.png,78000782
 p780-shiny,Drampa Shiny,rare,p780-shiny.png,780007802
 p781-shiny,Dhelmise Shiny,epic,p781-shiny.png,781007812
-p782-shiny,Jangmo O Shiny,epic,p782-shiny.png,782007822
-p783-shiny,Hakamo O Shiny,epic,p783-shiny.png,783007832
+p782-shiny,Jangmo O Shiny,rare,p782-shiny.png,782007822
+p783-shiny,Hakamo O Shiny,rare,p783-shiny.png,783007832
 p784-shiny,Kommo O Shiny,epic,p784-shiny.png,784007842
 p785-shiny,Tapu Koko Shiny,legendary,p785-shiny.png,785007852
 p786-shiny,Tapu Lele Shiny,legendary,p786-shiny.png,786007862
@@ -2767,12 +2767,12 @@ p796-shiny,Xurkitree Shiny,epic,p796-shiny.png,796007962
 p797-shiny,Celesteela Shiny,epic,p797-shiny.png,797007972
 p798-shiny,Kartana Shiny,epic,p798-shiny.png,798007982
 p799-shiny,Guzzlord Shiny,epic,p799-shiny.png,799007992
-p8-shiny,Wartortle Shiny,epic,p8-shiny.png,8000082
+p8-shiny,Wartortle Shiny,rare,p8-shiny.png,8000082
 p80-shiny,Slowbro Shiny,rare,p80-shiny.png,80000802
 p800-shiny,Necrozma Shiny,legendary,p800-shiny.png,800008002
 p801-shiny,Magearna Shiny,legendary,p801-shiny.png,801008012
 p802-shiny,Marshadow Shiny,legendary,p802-shiny.png,802008022
-p803-shiny,Poipole Shiny,epic,p803-shiny.png,803008032
+p803-shiny,Poipole Shiny,rare,p803-shiny.png,803008032
 p804-shiny,Naganadel Shiny,epic,p804-shiny.png,804008042
 p805-shiny,Stakataka Shiny,epic,p805-shiny.png,805008052
 p806-shiny,Blacephalon Shiny,epic,p806-shiny.png,806008062
@@ -2780,14 +2780,14 @@ p807-shiny,Zeraora Shiny,legendary,p807-shiny.png,807008072
 p808-shiny,Meltan Shiny,legendary,p808-shiny.png,808008082
 p809-shiny,Melmetal Shiny,legendary,p809-shiny.png,809008092
 p81-shiny,Magnemite Shiny,common,p81-shiny.png,81000812
-p810-shiny,Grookey Shiny,epic,p810-shiny.png,810008102
-p811-shiny,Thwackey Shiny,epic,p811-shiny.png,811008112
+p810-shiny,Grookey Shiny,rare,p810-shiny.png,810008102
+p811-shiny,Thwackey Shiny,rare,p811-shiny.png,811008112
 p812-shiny,Rillaboom Shiny,epic,p812-shiny.png,812008122
-p813-shiny,Scorbunny Shiny,epic,p813-shiny.png,813008132
-p814-shiny,Raboot Shiny,epic,p814-shiny.png,814008142
+p813-shiny,Scorbunny Shiny,rare,p813-shiny.png,813008132
+p814-shiny,Raboot Shiny,rare,p814-shiny.png,814008142
 p815-shiny,Cinderace Shiny,epic,p815-shiny.png,815008152
-p816-shiny,Sobble Shiny,epic,p816-shiny.png,816008162
-p817-shiny,Drizzile Shiny,epic,p817-shiny.png,817008172
+p816-shiny,Sobble Shiny,rare,p816-shiny.png,816008162
+p817-shiny,Drizzile Shiny,rare,p817-shiny.png,817008172
 p818-shiny,Inteleon Shiny,epic,p818-shiny.png,818008182
 p819-shiny,Skwovet Shiny,common,p819-shiny.png,819008192
 p82-shiny,Magneton Shiny,rare,p82-shiny.png,82000822
@@ -2801,7 +2801,7 @@ p826-shiny,Orbeetle Shiny,epic,p826-shiny.png,826008262
 p827-shiny,Nickit Shiny,common,p827-shiny.png,827008272
 p828-shiny,Thievul Shiny,common,p828-shiny.png,828008282
 p829-shiny,Gossifleur Shiny,common,p829-shiny.png,829008292
-p83-shiny,Farfetchd Shiny,epic,p83-shiny.png,83000832
+p83-shiny,Farfetchd Shiny,rare,p83-shiny.png,83000832
 p830-shiny,Eldegoss Shiny,rare,p830-shiny.png,830008302
 p831-shiny,Wooloo Shiny,common,p831-shiny.png,831008312
 p832-shiny,Dubwool Shiny,common,p832-shiny.png,832008322
@@ -2814,20 +2814,20 @@ p838-shiny,Carkol Shiny,common,p838-shiny.png,838008382
 p839-shiny,Coalossal Shiny,epic,p839-shiny.png,839008392
 p84-shiny,Doduo Shiny,common,p84-shiny.png,84000842
 p840-shiny,Applin Shiny,common,p840-shiny.png,840008402
-p841-shiny,Flapple Shiny,epic,p841-shiny.png,841008412
-p842-shiny,Appletun Shiny,epic,p842-shiny.png,842008422
+p841-shiny,Flapple Shiny,rare,p841-shiny.png,841008412
+p842-shiny,Appletun Shiny,rare,p842-shiny.png,842008422
 p843-shiny,Silicobra Shiny,common,p843-shiny.png,843008432
 p844-shiny,Sandaconda Shiny,common,p844-shiny.png,844008442
-p845-shiny,Cramorant Shiny,epic,p845-shiny.png,845008452
+p845-shiny,Cramorant Shiny,rare,p845-shiny.png,845008452
 p846-shiny,Arrokuda Shiny,common,p846-shiny.png,846008462
 p847-shiny,Barraskewda Shiny,rare,p847-shiny.png,847008472
 p848-shiny,Toxel Shiny,rare,p848-shiny.png,848008482
-p849-shiny,Toxtricity Amped Shiny,epic,p849-shiny.png,849008492
-p85-shiny,Dodrio Shiny,epic,p85-shiny.png,85000852
+p849-shiny,Toxtricity Amped Shiny,rare,p849-shiny.png,849008492
+p85-shiny,Dodrio Shiny,rare,p85-shiny.png,85000852
 p850-shiny,Sizzlipede Shiny,common,p850-shiny.png,850008502
 p851-shiny,Centiskorch Shiny,rare,p851-shiny.png,851008512
 p852-shiny,Clobbopus Shiny,common,p852-shiny.png,852008522
-p853-shiny,Grapploct Shiny,epic,p853-shiny.png,853008532
+p853-shiny,Grapploct Shiny,rare,p853-shiny.png,853008532
 p854-shiny,Sinistea Shiny,common,p854-shiny.png,854008542
 p855-shiny,Polteageist Shiny,rare,p855-shiny.png,855008552
 p856-shiny,Hatenna Shiny,common,p856-shiny.png,856008562
@@ -2909,7 +2909,7 @@ p869-form-vanilla-cream-star-sweet-shiny,Alcremie Vanilla Cream Star Sweet Shiny
 p869-form-vanilla-cream-strawberry-sweet-shiny,Alcremie Vanilla Cream Strawberry Sweet Shiny,common,p869-form-vanilla-cream-strawberry-sweet-shiny.png,869008692
 p869-shiny,Alcremie Shiny,common,p869-shiny.png,869008692
 p87-shiny,Dewgong Shiny,rare,p87-shiny.png,87000872
-p870-shiny,Falinks Shiny,epic,p870-shiny.png,870008702
+p870-shiny,Falinks Shiny,rare,p870-shiny.png,870008702
 p871-shiny,Pincurchin Shiny,rare,p871-shiny.png,871008712
 p872-shiny,Snom Shiny,common,p872-shiny.png,872008722
 p873-shiny,Frosmoth Shiny,rare,p873-shiny.png,873008732
@@ -2925,8 +2925,8 @@ p881-shiny,Arctozolt Shiny,epic,p881-shiny.png,881008812
 p882-shiny,Dracovish Shiny,epic,p882-shiny.png,882008822
 p883-shiny,Arctovish Shiny,epic,p883-shiny.png,883008832
 p884-shiny,Duraludon Shiny,epic,p884-shiny.png,884008842
-p885-shiny,Dreepy Shiny,epic,p885-shiny.png,885008852
-p886-shiny,Drakloak Shiny,epic,p886-shiny.png,886008862
+p885-shiny,Dreepy Shiny,rare,p885-shiny.png,885008852
+p886-shiny,Drakloak Shiny,rare,p886-shiny.png,886008862
 p887-shiny,Dragapult Shiny,epic,p887-shiny.png,887008872
 p888-shiny,Zacian Shiny,legendary,p888-shiny.png,888008882
 p889-shiny,Zamazenta Shiny,legendary,p889-shiny.png,889008892
@@ -2949,15 +2949,15 @@ p902-shiny,Basculegion Male Shiny,common,p902-shiny.png,902009022
 p903-shiny,Sneasler Shiny,common,p903-shiny.png,903009032
 p904-shiny,Overqwil Shiny,common,p904-shiny.png,904009042
 p905-shiny,Enamorus Incarnate Shiny,legendary,p905-shiny.png,905009052
-p906-shiny,Sprigatito Shiny,epic,p906-shiny.png,906009062
-p907-shiny,Floragato Shiny,epic,p907-shiny.png,907009072
+p906-shiny,Sprigatito Shiny,rare,p906-shiny.png,906009062
+p907-shiny,Floragato Shiny,rare,p907-shiny.png,907009072
 p908-shiny,Meowscarada Shiny,epic,p908-shiny.png,908009082
-p909-shiny,Fuecoco Shiny,epic,p909-shiny.png,909009092
+p909-shiny,Fuecoco Shiny,rare,p909-shiny.png,909009092
 p91-shiny,Cloyster Shiny,rare,p91-shiny.png,91000912
-p910-shiny,Crocalor Shiny,epic,p910-shiny.png,910009102
+p910-shiny,Crocalor Shiny,rare,p910-shiny.png,910009102
 p911-shiny,Skeledirge Shiny,epic,p911-shiny.png,911009112
-p912-shiny,Quaxly Shiny,epic,p912-shiny.png,912009122
-p913-shiny,Quaxwell Shiny,epic,p913-shiny.png,913009132
+p912-shiny,Quaxly Shiny,rare,p912-shiny.png,912009122
+p913-shiny,Quaxwell Shiny,rare,p913-shiny.png,913009132
 p914-shiny,Quaquaval Shiny,epic,p914-shiny.png,914009142
 p915-shiny,Lechonk Shiny,common,p915-shiny.png,915009152
 p916-shiny,Oinkologne Male Shiny,common,p916-shiny.png,916009162
@@ -2994,15 +2994,15 @@ p943-shiny,Mabosstiff Shiny,rare,p943-shiny.png,943009432
 p944-shiny,Shroodle Shiny,common,p944-shiny.png,944009442
 p945-shiny,Grafaiai Shiny,common,p945-shiny.png,945009452
 p946-shiny,Bramblin Shiny,common,p946-shiny.png,946009462
-p947-shiny,Brambleghast Shiny,epic,p947-shiny.png,947009472
+p947-shiny,Brambleghast Shiny,rare,p947-shiny.png,947009472
 p948-shiny,Toedscool Shiny,common,p948-shiny.png,948009482
 p949-shiny,Toedscruel Shiny,common,p949-shiny.png,949009492
-p95-shiny,Onix Shiny,epic,p95-shiny.png,95000952
+p95-shiny,Onix Shiny,rare,p95-shiny.png,95000952
 p950-shiny,Klawf Shiny,common,p950-shiny.png,950009502
 p951-shiny,Capsakid Shiny,common,p951-shiny.png,951009512
 p952-shiny,Scovillain Shiny,rare,p952-shiny.png,952009522
 p953-shiny,Rellor Shiny,common,p953-shiny.png,953009532
-p954-shiny,Rabsca Shiny,epic,p954-shiny.png,954009542
+p954-shiny,Rabsca Shiny,rare,p954-shiny.png,954009542
 p955-shiny,Flittle Shiny,common,p955-shiny.png,955009552
 p956-shiny,Espathra Shiny,rare,p956-shiny.png,956009562
 p957-shiny,Tinkatink Shiny,common,p957-shiny.png,957009572
@@ -3013,7 +3013,7 @@ p960-shiny,Wiglett Shiny,common,p960-shiny.png,960009602
 p961-shiny,Wugtrio Shiny,rare,p961-shiny.png,961009612
 p962-shiny,Bombirdier Shiny,epic,p962-shiny.png,962009622
 p963-shiny,Finizen Shiny,common,p963-shiny.png,963009632
-p964-shiny,Palafin Zero Shiny,epic,p964-shiny.png,964009642
+p964-shiny,Palafin Zero Shiny,rare,p964-shiny.png,964009642
 p965-shiny,Varoom Shiny,common,p965-shiny.png,965009652
 p966-shiny,Revavroom Shiny,rare,p966-shiny.png,966009662
 p967-shiny,Cyclizar Shiny,common,p967-shiny.png,967009672
@@ -3033,7 +3033,7 @@ p979-shiny,Annihilape Shiny,epic,p979-shiny.png,979009792
 p98-shiny,Krabby Shiny,common,p98-shiny.png,98000982
 p980-shiny,Clodsire Shiny,common,p980-shiny.png,980009802
 p981-shiny,Farigiraf Shiny,epic,p981-shiny.png,981009812
-p982-shiny,Dudunsparce Two Segment Shiny,epic,p982-shiny.png,982009822
+p982-shiny,Dudunsparce Two Segment Shiny,rare,p982-shiny.png,982009822
 p983-shiny,Kingambit Shiny,epic,p983-shiny.png,983009832
 p984-shiny,Great Tusk Shiny,epic,p984-shiny.png,984009842
 p985-shiny,Scream Tail Shiny,rare,p985-shiny.png,985009852
@@ -3048,20 +3048,20 @@ p992-shiny,Iron Hands Shiny,rare,p992-shiny.png,992009922
 p993-shiny,Iron Jugulis Shiny,epic,p993-shiny.png,993009932
 p994-shiny,Iron Moth Shiny,epic,p994-shiny.png,994009942
 p995-shiny,Iron Thorns Shiny,epic,p995-shiny.png,995009952
-p996-shiny,Frigibax Shiny,epic,p996-shiny.png,996009962
+p996-shiny,Frigibax Shiny,rare,p996-shiny.png,996009962
 p997-shiny,Arctibax Shiny,epic,p997-shiny.png,997009972
 p998-shiny,Baxcalibur Shiny,epic,p998-shiny.png,998009982
-p999-shiny,Gimmighoul Shiny,epic,p999-shiny.png,999009992
+p999-shiny,Gimmighoul Shiny,rare,p999-shiny.png,999009992
 p10235-shiny-female,Sneasel Hisui Shiny (Hembra),rare,p10235-shiny-female.png,215102353
 p111-shiny-female,Rhyhorn Shiny (Hembra),common,p111-shiny-female.png,111001113
 p112-shiny-female,Rhydon Shiny (Hembra),rare,p112-shiny-female.png,112001123
 p118-shiny-female,Goldeen Shiny (Hembra),common,p118-shiny-female.png,118001183
 p119-shiny-female,Seaking Shiny (Hembra),rare,p119-shiny-female.png,119001193
-p12-shiny-female,Butterfree Shiny (Hembra),epic,p12-shiny-female.png,12000123
+p12-shiny-female,Butterfree Shiny (Hembra),rare,p12-shiny-female.png,12000123
 p123-shiny-female,Scyther Shiny (Hembra),epic,p123-shiny-female.png,123001233
 p129-shiny-female,Magikarp Shiny (Hembra),common,p129-shiny-female.png,129001293
 p130-shiny-female,Gyarados Shiny (Hembra),epic,p130-shiny-female.png,130001303
-p133-shiny-female,Eevee Shiny (Hembra),epic,p133-shiny-female.png,133001333
+p133-shiny-female,Eevee Shiny (Hembra),rare,p133-shiny-female.png,133001333
 p154-shiny-female,Meganium Shiny (Hembra),epic,p154-shiny-female.png,154001543
 p165-shiny-female,Ledyba Shiny (Hembra),common,p165-shiny-female.png,165001653
 p166-shiny-female,Ledian Shiny (Hembra),common,p166-shiny-female.png,166001663
@@ -3069,12 +3069,12 @@ p178-shiny-female,Xatu Shiny (Hembra),rare,p178-shiny-female.png,178001783
 p185-shiny-female,Sudowoodo Shiny (Hembra),rare,p185-shiny-female.png,185001853
 p186-shiny-female,Politoed Shiny (Hembra),epic,p186-shiny-female.png,186001863
 p19-shiny-female,Rattata Shiny (Hembra),common,p19-shiny-female.png,19000193
-p190-shiny-female,Aipom Shiny (Hembra),epic,p190-shiny-female.png,190001903
+p190-shiny-female,Aipom Shiny (Hembra),rare,p190-shiny-female.png,190001903
 p194-shiny-female,Wooper Shiny (Hembra),common,p194-shiny-female.png,194001943
 p195-shiny-female,Quagsire Shiny (Hembra),common,p195-shiny-female.png,195001953
 p198-shiny-female,Murkrow Shiny (Hembra),epic,p198-shiny-female.png,198001983
 p20-shiny-female,Raticate Shiny (Hembra),common,p20-shiny-female.png,20000203
-p202-shiny-female,Wobbuffet Shiny (Hembra),epic,p202-shiny-female.png,202002023
+p202-shiny-female,Wobbuffet Shiny (Hembra),rare,p202-shiny-female.png,202002023
 p203-shiny-female,Girafarig Shiny (Hembra),rare,p203-shiny-female.png,203002033
 p207-shiny-female,Gligar Shiny (Hembra),rare,p207-shiny-female.png,207002073
 p208-shiny-female,Steelix Shiny (Hembra),epic,p208-shiny-female.png,208002083
@@ -3087,15 +3087,15 @@ p224-shiny-female,Octillery Shiny (Hembra),rare,p224-shiny-female.png,224002243
 p229-shiny-female,Houndoom Shiny (Hembra),epic,p229-shiny-female.png,229002293
 p232-shiny-female,Donphan Shiny (Hembra),rare,p232-shiny-female.png,232002323
 p25-shiny-female,Pikachu Shiny (Hembra),common,p25-shiny-female.png,25000253
-p255-shiny-female,Torchic Shiny (Hembra),epic,p255-shiny-female.png,255002553
-p256-shiny-female,Combusken Shiny (Hembra),epic,p256-shiny-female.png,256002563
+p255-shiny-female,Torchic Shiny (Hembra),rare,p255-shiny-female.png,255002553
+p256-shiny-female,Combusken Shiny (Hembra),rare,p256-shiny-female.png,256002563
 p257-shiny-female,Blaziken Shiny (Hembra),epic,p257-shiny-female.png,257002573
 p26-shiny-female,Raichu Shiny (Hembra),rare,p26-shiny-female.png,26000263
-p267-shiny-female,Beautifly Shiny (Hembra),epic,p267-shiny-female.png,267002673
-p269-shiny-female,Dustox Shiny (Hembra),epic,p269-shiny-female.png,269002693
-p272-shiny-female,Ludicolo Shiny (Hembra),epic,p272-shiny-female.png,272002723
+p267-shiny-female,Beautifly Shiny (Hembra),rare,p267-shiny-female.png,267002673
+p269-shiny-female,Dustox Shiny (Hembra),rare,p269-shiny-female.png,269002693
+p272-shiny-female,Ludicolo Shiny (Hembra),rare,p272-shiny-female.png,272002723
 p274-shiny-female,Nuzleaf Shiny (Hembra),common,p274-shiny-female.png,274002743
-p275-shiny-female,Shiftry Shiny (Hembra),epic,p275-shiny-female.png,275002753
+p275-shiny-female,Shiftry Shiny (Hembra),rare,p275-shiny-female.png,275002753
 p3-shiny-female,Venusaur Shiny (Hembra),epic,p3-shiny-female.png,3000033
 p307-shiny-female,Meditite Shiny (Hembra),common,p307-shiny-female.png,307003073
 p308-shiny-female,Medicham Shiny (Hembra),common,p308-shiny-female.png,308003083
@@ -3109,11 +3109,11 @@ p350-shiny-female,Milotic Shiny (Hembra),rare,p350-shiny-female.png,350003503
 p369-shiny-female,Relicanth Shiny (Hembra),epic,p369-shiny-female.png,369003693
 p396-shiny-female,Starly Shiny (Hembra),common,p396-shiny-female.png,396003963
 p397-shiny-female,Staravia Shiny (Hembra),common,p397-shiny-female.png,397003973
-p398-shiny-female,Staraptor Shiny (Hembra),epic,p398-shiny-female.png,398003983
+p398-shiny-female,Staraptor Shiny (Hembra),rare,p398-shiny-female.png,398003983
 p399-shiny-female,Bidoof Shiny (Hembra),common,p399-shiny-female.png,399003993
 p400-shiny-female,Bibarel Shiny (Hembra),common,p400-shiny-female.png,400004003
 p401-shiny-female,Kricketot Shiny (Hembra),common,p401-shiny-female.png,401004013
-p402-shiny-female,Kricketune Shiny (Hembra),epic,p402-shiny-female.png,402004023
+p402-shiny-female,Kricketune Shiny (Hembra),rare,p402-shiny-female.png,402004023
 p403-shiny-female,Shinx Shiny (Hembra),common,p403-shiny-female.png,403004033
 p404-shiny-female,Luxio Shiny (Hembra),common,p404-shiny-female.png,404004043
 p405-shiny-female,Luxray Shiny (Hembra),epic,p405-shiny-female.png,405004053
@@ -3124,10 +3124,10 @@ p417-shiny-female,Pachirisu Shiny (Hembra),common,p417-shiny-female.png,41700417
 p418-shiny-female,Buizel Shiny (Hembra),common,p418-shiny-female.png,418004183
 p419-shiny-female,Floatzel Shiny (Hembra),rare,p419-shiny-female.png,419004193
 p42-shiny-female,Golbat Shiny (Hembra),common,p42-shiny-female.png,42000423
-p424-shiny-female,Ambipom Shiny (Hembra),epic,p424-shiny-female.png,424004243
+p424-shiny-female,Ambipom Shiny (Hembra),rare,p424-shiny-female.png,424004243
 p44-shiny-female,Gloom Shiny (Hembra),common,p44-shiny-female.png,44000443
-p443-shiny-female,Gible Shiny (Hembra),epic,p443-shiny-female.png,443004433
-p444-shiny-female,Gabite Shiny (Hembra),epic,p444-shiny-female.png,444004443
+p443-shiny-female,Gible Shiny (Hembra),rare,p443-shiny-female.png,443004433
+p444-shiny-female,Gabite Shiny (Hembra),rare,p444-shiny-female.png,444004443
 p445-shiny-female,Garchomp Shiny (Hembra),epic,p445-shiny-female.png,445004453
 p449-shiny-female,Hippopotas Shiny (Hembra),common,p449-shiny-female.png,449004493
 p45-shiny-female,Vileplume Shiny (Hembra),epic,p45-shiny-female.png,45000453
@@ -3142,7 +3142,7 @@ p461-shiny-female,Weavile Shiny (Hembra),epic,p461-shiny-female.png,461004613
 p464-shiny-female,Rhyperior Shiny (Hembra),epic,p464-shiny-female.png,464004643
 p465-shiny-female,Tangrowth Shiny (Hembra),epic,p465-shiny-female.png,465004653
 p473-shiny-female,Mamoswine Shiny (Hembra),rare,p473-shiny-female.png,473004733
-p521-shiny-female,Unfezant Shiny (Hembra),epic,p521-shiny-female.png,521005213
+p521-shiny-female,Unfezant Shiny (Hembra),rare,p521-shiny-female.png,521005213
 p592-shiny-female,Frillish Male Shiny (Hembra),common,p592-shiny-female.png,592005923
 p593-shiny-female,Jellicent Male Shiny (Hembra),rare,p593-shiny-female.png,593005933
 p64-shiny-female,Kadabra Shiny (Hembra),common,p64-shiny-female.png,64000643
@@ -3150,6 +3150,6 @@ p65-shiny-female,Alakazam Shiny (Hembra),rare,p65-shiny-female.png,65000653
 p668-shiny-female,Pyroar Male Shiny (Hembra),rare,p668-shiny-female.png,668006683
 p678-shiny-female,Meowstic Male Shiny (Hembra),rare,p678-shiny-female.png,678006783
 p84-shiny-female,Doduo Shiny (Hembra),common,p84-shiny-female.png,84000843
-p85-shiny-female,Dodrio Shiny (Hembra),epic,p85-shiny-female.png,85000853
+p85-shiny-female,Dodrio Shiny (Hembra),rare,p85-shiny-female.png,85000853
 p876-shiny-female,Indeedee Male Shiny (Hembra),epic,p876-shiny-female.png,876008763
 p97-shiny-female,Hypno Shiny (Hembra),rare,p97-shiny-female.png,97000973
