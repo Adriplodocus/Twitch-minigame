@@ -112,11 +112,13 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   animation: foil-shift 4s ease-in-out infinite;
 }
 .card.foil.card-rarity-legendary {
-  border-color: var(--gold);
   background: linear-gradient(115deg, var(--surface) 10%, #fbe9b8 30%, #eaddfb 45%, #d8f3f7 60%, #fbe9b8 75%, var(--surface) 90%);
   background-size: 320% 320%;
   animation: foil-shift 3.2s ease-in-out infinite;
   box-shadow: 0 4px 16px rgba(120, 90, 60, 0.10), 0 0 14px rgba(232, 185, 58, 0.4);
+}
+.card.foil.card-rarity-legendary:hover {
+  box-shadow: 0 10px 26px rgba(120, 90, 60, 0.18), 0 0 14px rgba(232, 185, 58, 0.4);
 }
 @keyframes foil-shift {
   0%, 100% { background-position: 0% 50%; }
@@ -171,10 +173,13 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card.foil,
-  .sparkle-layer .dot {
+  .card.foil {
     animation: none !important;
     background-position: 0% 50% !important;
+  }
+  .sparkle-layer .dot {
+    animation: none !important;
+    opacity: 1;
   }
 }
 
