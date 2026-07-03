@@ -711,10 +711,10 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .delete-offer-btn {
   background: transparent;
   color: var(--muted);
+  box-shadow: none;
 }
 .delete-offer-btn:hover {
   color: #E5173A;
-  border-color: rgba(229, 23, 58, 0.3);
 }
 
 .modal-overlay {

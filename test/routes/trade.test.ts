@@ -334,6 +334,64 @@ it("deletes a finished offer only from the deleting side's view", async () => {
   expect(toJson.received.find((o) => o.id === offerId)).toBeDefined();
 });
 
+it("deletes a finished offer from the receiver's view without hiding it from the sender", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+  await app.request(`/api/trade/offers/${offerId}/decline`, { method: "POST", headers: { Cookie: cookieTo } }, env);
+
+  const deleteRes = await app.request(
+    `/api/trade/offers/${offerId}`,
+    { method: "DELETE", headers: { Cookie: cookieTo } },
+    env
+  );
+  expect(deleteRes.status).toBe(200);
+
+  const toView = await app.request("/api/trade/offers", { headers: { Cookie: cookieTo } }, env);
+  const toJson = await toView.json<{ received: { id: number }[] }>();
+  expect(toJson.received.find((o) => o.id === offerId)).toBeUndefined();
+
+  const fromView = await app.request("/api/trade/offers", { headers: { Cookie: cookieFrom } }, env);
+  const fromJson = await fromView.json<{ sent: { id: number }[] }>();
+  expect(fromJson.sent.find((o) => o.id === offerId)).toBeDefined();
+});
+
+it("deletes an auto-expired offer the same way as a normally-declined one", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  await env.DB.prepare("UPDATE trade_offers SET created_at = datetime('now', '-8 days') WHERE id = ?")
+    .bind(offerId)
+    .run();
+  await app.request("/api/trade/offers", { headers: { Cookie: cookieTo } }, env);
+
+  const deleteRes = await app.request(
+    `/api/trade/offers/${offerId}`,
+    { method: "DELETE", headers: { Cookie: cookieFrom } },
+    env
+  );
+  expect(deleteRes.status).toBe(200);
+});
+
 it("rejects deleting an offer the user isn't a participant of", async () => {
   const cookieFrom = await sessionCookie("1", "viewer1");
   const cookieTo = await sessionCookie("2", "viewer2");
@@ -383,4 +441,26 @@ it("counts only received pending offers not hidden by the receiver", async () =>
   await app.request(`/api/trade/offers/${offerId}/decline`, { method: "POST", headers: { Cookie: cookieTo } }, env);
   const afterDeclineRes = await app.request("/api/trade/offers/pending-count", { headers: { Cookie: cookieTo } }, env);
   expect((await afterDeclineRes.json<{ count: number }>()).count).toBe(0);
+});
+
+it("excludes an offer older than 7 days from pending-count without first loading the offers list", async () => {
+  const cookieFrom = await sessionCookie("1", "viewer1");
+  const cookieTo = await sessionCookie("2", "viewer2");
+  const createRes = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieFrom, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  const { id: offerId } = await createRes.json<{ id: number }>();
+
+  await env.DB.prepare("UPDATE trade_offers SET created_at = datetime('now', '-8 days') WHERE id = ?")
+    .bind(offerId)
+    .run();
+
+  const countRes = await app.request("/api/trade/offers/pending-count", { headers: { Cookie: cookieTo } }, env);
+  expect((await countRes.json<{ count: number }>()).count).toBe(0);
 });

@@ -43,6 +43,13 @@ function mergeByCardId(items: TradeCardInput[]): TradeCardInput[] {
   return Array.from(byCardId, ([cardId, quantity]) => ({ cardId, quantity }));
 }
 
+async function expireStaleOffers(env: Env): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE trade_offers SET status = 'declined', auto_expired = 1
+     WHERE status = 'pending' AND created_at <= datetime('now', '-7 days')`
+  ).run();
+}
+
 trade.post("/offers", requireAuth, async (c) => {
   const user = c.get("user");
   const body = await c.req.json<{
@@ -131,10 +138,7 @@ async function itemsByOfferId(env: Env, offerIds: number[]): Promise<Map<number,
 trade.get("/offers", requireAuth, async (c) => {
   const user = c.get("user");
 
-  await c.env.DB.prepare(
-    `UPDATE trade_offers SET status = 'declined', auto_expired = 1
-     WHERE status = 'pending' AND created_at <= datetime('now', '-7 days')`
-  ).run();
+  await expireStaleOffers(c.env);
 
   const sent = await c.env.DB.prepare(
     `SELECT o.id, u.username AS toUser, o.status, o.auto_expired AS autoExpired
@@ -258,6 +262,9 @@ trade.delete("/offers/:id", requireAuth, async (c) => {
 
 trade.get("/offers/pending-count", requireAuth, async (c) => {
   const user = c.get("user");
+
+  await expireStaleOffers(c.env);
+
   const row = await c.env.DB.prepare(
     `SELECT COUNT(*) AS count FROM trade_offers
      WHERE to_user = ? AND status = 'pending' AND NOT hidden_from_receiver`
