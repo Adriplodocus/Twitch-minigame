@@ -71,19 +71,27 @@ export class AlbumBook {
     const nextIndex = this.spreadIndex + direction;
     if (nextIndex < 0 || nextIndex >= this.totalSpreads) return;
     this.spreadIndex = nextIndex;
-    this.flipTo();
+    this.flipTo(direction);
   }
 
-  private flipTo(): void {
+  private flipTo(direction: -1 | 1): void {
     const spread = this.deps.spreadEl;
+    const side = direction === 1 ? "next" : "prev";
+    const page =
+      direction === 1
+        ? spread.querySelector<HTMLElement>(".book-page:last-child")
+        : spread.querySelector<HTMLElement>(".book-page:first-child");
     this.deps.flipSound.currentTime = 0;
     this.deps.flipSound.play().catch(() => {});
-    spread.classList.add("book-spread-flip-out");
+    page?.classList.add(`book-page-flip-out-${side}`);
     window.setTimeout(() => {
       this.render();
-      spread.classList.remove("book-spread-flip-out");
-      spread.classList.add("book-spread-flip-in");
-      window.setTimeout(() => spread.classList.remove("book-spread-flip-in"), FLIP_IN_MS);
+      const newPage =
+        direction === 1
+          ? spread.querySelector<HTMLElement>(".book-page:last-child")
+          : spread.querySelector<HTMLElement>(".book-page:first-child");
+      newPage?.classList.add(`book-page-flip-in-${side}`);
+      window.setTimeout(() => newPage?.classList.remove(`book-page-flip-in-${side}`), FLIP_IN_MS);
     }, FLIP_OUT_MS);
   }
 }

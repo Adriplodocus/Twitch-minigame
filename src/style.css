@@ -344,33 +344,48 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   padding: 1.25rem;
   box-shadow: 0 10px 30px rgba(120, 90, 60, 0.15);
   transform-style: preserve-3d;
-  transform-origin: center;
   will-change: transform, opacity;
 }
 .book-page {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.6rem;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 .book-page:first-child {
   border-right: 1px dashed var(--border);
   padding-right: 0.75rem;
+  transform-origin: right center;
 }
-.book-page:last-child { padding-left: 0.75rem; }
+.book-page:last-child {
+  padding-left: 0.75rem;
+  transform-origin: left center;
+}
 .book-page-slot-empty {
   aspect-ratio: 1;
   border-radius: 14px;
   background: var(--surface2);
   opacity: 0.4;
 }
-.book-spread-flip-out { animation: book-flip-out 0.24s ease-in forwards; }
-.book-spread-flip-in { animation: book-flip-in 0.26s ease-out forwards; }
-@keyframes book-flip-out {
+.book-page-flip-out-next { animation: book-flip-out-next 0.24s ease-in forwards; }
+.book-page-flip-in-next { animation: book-flip-in-next 0.26s ease-out forwards; }
+.book-page-flip-out-prev { animation: book-flip-out-prev 0.24s ease-in forwards; }
+.book-page-flip-in-prev { animation: book-flip-in-prev 0.26s ease-out forwards; }
+@keyframes book-flip-out-next {
   from { transform: rotateY(0deg); opacity: 1; }
   to   { transform: rotateY(-90deg); opacity: 0.3; }
 }
-@keyframes book-flip-in {
+@keyframes book-flip-in-next {
   from { transform: rotateY(90deg); opacity: 0.3; }
+  to   { transform: rotateY(0deg); opacity: 1; }
+}
+@keyframes book-flip-out-prev {
+  from { transform: rotateY(0deg); opacity: 1; }
+  to   { transform: rotateY(90deg); opacity: 0.3; }
+}
+@keyframes book-flip-in-prev {
+  from { transform: rotateY(-90deg); opacity: 0.3; }
   to   { transform: rotateY(0deg); opacity: 1; }
 }
 .book-nav {
