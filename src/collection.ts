@@ -1,6 +1,7 @@
 import { getCollection, openPack, logout, type CardView, type PendingPack } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName, compareCards, type SortField } from "./card";
 import { attachTradeLinkButton } from "./trade-link";
+import { GENERATIONS } from "./generations";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
@@ -16,7 +17,40 @@ function renderOwnedGrid(): void {
     .join("");
 }
 
-function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => Promise<void>): void {
+function openAlbumPickerModal(): Promise<number | null> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.innerHTML = `
+      <div class="modal">
+        <h3>¿De qué álbum quieres abrir el sobre?</h3>
+        <div class="modal-gen-grid">
+          ${GENERATIONS.map(
+            (g) => `<button type="button" class="btn modal-gen-btn" data-gen="${g.id}">Gen ${g.id} · ${g.region}</button>`
+          ).join("")}
+        </div>
+        <button type="button" class="btn modal-cancel-btn">Cancelar</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const genBtn = target.closest<HTMLElement>(".modal-gen-btn");
+      if (genBtn) {
+        overlay.remove();
+        resolve(Number(genBtn.dataset.gen));
+        return;
+      }
+      if (target.closest(".modal-cancel-btn") || target === overlay) {
+        overlay.remove();
+        resolve(null);
+      }
+    });
+  });
+}
+
+function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generation: number) => Promise<void>): void {
   const container = document.getElementById("pending-packs")!;
   if (packs.length === 0) {
     container.innerHTML = "";
@@ -33,9 +67,11 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number) => Promis
     img.src = "/pack.webp";
     img.alt = "Abrir sobre";
     img.style.animationDelay = `-${(index * 0.7) % 2.4}s`;
-    img.addEventListener("click", () => {
+    img.addEventListener("click", async () => {
+      const generation = await openAlbumPickerModal();
+      if (generation === null) return;
       img.classList.add("opening");
-      onOpen(pack.id).finally(() => {
+      onOpen(pack.id, generation).finally(() => {
         img.classList.remove("opening");
       });
     });
@@ -97,8 +133,8 @@ async function load(): Promise<void> {
     `Obtenidas <span class="count">(${ownedCards.length}/${data.cards.length})</span>`;
   renderOwnedGrid();
 
-  renderPendingPacks(data.pendingPacks, async (packId) => {
-    const result = await openPack(packId);
+  renderPendingPacks(data.pendingPacks, async (packId, generation) => {
+    const result = await openPack(packId, generation);
     await revealPack(result.cards);
     await load();
   });
