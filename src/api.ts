@@ -45,8 +45,12 @@ export function getMe(): Promise<{ ok: boolean; username: string }> {
   return request("/auth/me");
 }
 
-export function openPack(packId: number): Promise<{ cards: CardView[] }> {
-  return request(`/collection/packs/${packId}/open`, { method: "POST" });
+export function openPack(packId: number, generation: number): Promise<{ cards: CardView[] }> {
+  return request(`/collection/packs/${packId}/open`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ generation }),
+  });
 }
 
 export function getUserCollection(username: string): Promise<{ username: string; cards: CardView[] }> {

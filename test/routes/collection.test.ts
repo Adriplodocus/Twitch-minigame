@@ -60,7 +60,7 @@ it("lists all catalog cards with owned quantities and pending packs", async () =
   expect(json.pendingPacks).toHaveLength(1);
 });
 
-it("opens a pending pack and grants 5 cards", async () => {
+it("opens a pending pack and grants 10 cards", async () => {
   const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
     .bind("1")
     .first<{ id: number }>();
@@ -68,7 +68,11 @@ it("opens a pending pack and grants 5 cards", async () => {
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request(
     `/api/collection/packs/${packResult!.id}/open`,
-    { method: "POST", headers: { Cookie: cookie } },
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1 }),
+    },
     env
   );
   expect(res.status).toBe(200);
@@ -79,6 +83,46 @@ it("opens a pending pack and grants 5 cards", async () => {
     .bind(packResult!.id)
     .first<{ opened_at: string | null }>();
   expect(pack?.opened_at).not.toBeNull();
+});
+
+it("only draws cards from the requested generation", async () => {
+  await env.DB.prepare("UPDATE cards SET generation = 2 WHERE id = 'r1'").run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 2 }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ cards: { id: string }[] }>();
+  expect(json.cards.length).toBeGreaterThan(0);
+  expect(json.cards.every((c) => c.id === "r1")).toBe(true);
+});
+
+it("rejects opening a pack with an invalid generation", async () => {
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 99 }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
 });
 
 it("rejects opening a pack that belongs to another user", async () => {
@@ -101,7 +145,15 @@ it("rejects opening an already-opened pack", async () => {
     .bind("1")
     .first<{ id: number }>();
   const cookie = await sessionCookie("1", "viewer1");
-  await app.request(`/api/collection/packs/${packResult!.id}/open`, { method: "POST", headers: { Cookie: cookie } }, env);
+  await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1 }),
+    },
+    env
+  );
 
   const res = await app.request(
     `/api/collection/packs/${packResult!.id}/open`,
