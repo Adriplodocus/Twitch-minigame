@@ -98,6 +98,7 @@ const RARITY_LABELS: Record<CardView["rarity"], string> = {
 let infoTooltipHandlerAttached = false;
 
 function ensureInfoTooltipHandler(): void {
+  if (typeof document === "undefined") return;
   if (infoTooltipHandlerAttached) return;
   infoTooltipHandlerAttached = true;
   document.addEventListener("click", (e) => {
@@ -118,7 +119,8 @@ export function renderCardHtml(
 ): string {
   ensureInfoTooltipHandler();
 
-  const ownedClass = card.quantity > 0 ? "" : "unowned";
+  const isOwned = card.quantity > 0;
+  const ownedClass = isOwned ? "" : "unowned";
   const { baseName: fullBaseName, isShiny, isFemale } = splitCardName(card.name);
   const formLabel = formLabels?.get(card.id);
   const baseName = formLabel ? fullBaseName.slice(0, -(formLabel.length + 1)) : fullBaseName;
@@ -128,8 +130,16 @@ export function renderCardHtml(
     : hasFemaleVariant
       ? `<span class="gender-icon gender-male">♂</span>`
       : "";
-  const shinyIcon = isShiny ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
+  const shinyIcon = isShiny && isOwned ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
   const qtyBadge = card.quantity > 0 ? `<span class="card-qty">x${card.quantity}</span>` : "";
+
+  const hasFoil = isOwned && (card.rarity !== "common" || isShiny);
+  const hasSparkle = isOwned && isShiny;
+  const vfxClasses = `${hasFoil ? " foil" : ""}${hasSparkle ? " shiny" : ""}`;
+  const glareHtml = hasFoil ? `<div class="glare"></div>` : "";
+  const sparkleHtml = hasSparkle
+    ? `<div class="sparkle-layer">${"<span class=\"dot\"></span>".repeat(6)}</div>`
+    : "";
 
   const genderLine = isFemale ? "Hembra" : hasFemaleVariant ? "Macho" : null;
   const infoTooltip = `
@@ -143,7 +153,9 @@ export function renderCardHtml(
   `;
 
   return `
-    <div class="card card-rarity-${card.rarity} ${ownedClass} card-in">
+    <div class="card card-rarity-${card.rarity}${vfxClasses} ${ownedClass} card-in">
+      ${glareHtml}
+      ${sparkleHtml}
       ${genderIcon}
       ${shinyIcon}
       <img class="card-art" src="${card.imagePath}" alt="${baseName}" loading="lazy" />
