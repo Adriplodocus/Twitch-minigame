@@ -390,6 +390,7 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .book-nav {
   align-self: center;
+  flex-shrink: 0;
   width: 44px;
   height: 44px;
   border-radius: 50%;
