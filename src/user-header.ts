@@ -1,4 +1,4 @@
-import { getMe, logout } from "./api";
+import { getMe, getPendingOfferCount, logout } from "./api";
 
 export function initUserHeader(): void {
   document.getElementById("logout-btn")!.addEventListener("click", async () => {
@@ -14,4 +14,15 @@ export function initUserHeader(): void {
       if (me.avatarUrl) avatar.src = me.avatarUrl;
     }
   });
+
+  const offersLink = document.querySelector<HTMLAnchorElement>('a[href="/offers.html"]');
+  if (offersLink) {
+    getPendingOfferCount().then(({ count }) => {
+      if (count > 0) {
+        const dot = document.createElement("span");
+        dot.className = "notif-dot";
+        offersLink.appendChild(dot);
+      }
+    });
+  }
 }
