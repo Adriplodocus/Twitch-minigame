@@ -9,6 +9,8 @@ interface HistoryRow {
   userId: string;
   username: string;
   tier: string;
+  source: string;
+  grantedBy: string | null;
   createdAt: string;
 }
 
@@ -24,7 +26,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<RequestResu
 
 let selectedUser: AdminUser | null = null;
 let searchDebounce: ReturnType<typeof setTimeout> | undefined;
-let currentUsersPage = 1;
 
 function showLoginView(): void {
   document.getElementById("login-view")!.style.display = "block";
@@ -42,15 +43,19 @@ function renderHistory(history: HistoryRow[]): void {
     const tr = document.createElement("tr");
     const tdUsername = document.createElement("td");
     tdUsername.style.padding = "0.4rem";
-    tdUsername.textContent = h.username;
+    tdUsername.textContent = h.source === "admin" ? `${h.grantedBy ?? "Admin"} -> ${h.username}` : h.username;
     const tdTier = document.createElement("td");
     tdTier.style.padding = "0.4rem";
     tdTier.textContent = h.tier;
+    const tdSource = document.createElement("td");
+    tdSource.style.padding = "0.4rem";
+    tdSource.textContent = h.source;
     const tdCreatedAt = document.createElement("td");
     tdCreatedAt.style.padding = "0.4rem";
     tdCreatedAt.textContent = h.createdAt;
     tr.appendChild(tdUsername);
     tr.appendChild(tdTier);
+    tr.appendChild(tdSource);
     tr.appendChild(tdCreatedAt);
     return tr;
   });
@@ -186,54 +191,19 @@ async function grantPacks(): Promise<void> {
   if (succeeded) clearSelection();
 }
 
-function renderAllUsers(users: AdminUser[]): void {
-  const container = document.getElementById("all-users-body")!;
-  const rows = users.map((u) => {
-    const tr = document.createElement("tr");
-
-    const tdUsername = document.createElement("td");
-    tdUsername.style.padding = "0.4rem";
-    tdUsername.textContent = u.username;
-
-    const tdAction = document.createElement("td");
-    tdAction.style.padding = "0.4rem";
-    const grantBtn = document.createElement("button");
-    grantBtn.className = "btn";
-    grantBtn.textContent = "+1 blíster";
-    grantBtn.addEventListener("click", () => performGrant(u.twitchId, 1, "gratis", u.username));
-    tdAction.appendChild(grantBtn);
-
-    tr.appendChild(tdUsername);
-    tr.appendChild(tdAction);
-    return tr;
-  });
-  container.replaceChildren(...rows);
-}
-
-async function loadAllUsers(page: number): Promise<void> {
-  const result = await request<{ users: AdminUser[]; page: number; hasMore: boolean }>(`/users/all?page=${page}`);
-  if (!result.ok) {
-    if (result.status === 401) showLoginView();
-    return;
-  }
-  currentUsersPage = result.data.page;
-  renderAllUsers(result.data.users);
-  (document.getElementById("users-prev-btn") as HTMLButtonElement).disabled = currentUsersPage <= 1;
-  (document.getElementById("users-next-btn") as HTMLButtonElement).disabled = !result.data.hasMore;
-}
-
 async function login(): Promise<void> {
+  const name = (document.getElementById("login-name") as HTMLInputElement).value;
   const password = (document.getElementById("login-password") as HTMLInputElement).value;
   const errorEl = document.getElementById("login-error")!;
 
   const result = await request<{ ok: true }>("/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password }),
+    body: JSON.stringify({ password, name }),
   });
 
   if (!result.ok) {
-    errorEl.textContent = "Clave incorrecta.";
+    errorEl.textContent = result.status === 400 ? "Falta el nombre." : "Clave incorrecta.";
     errorEl.style.display = "block";
     return;
   }
@@ -241,7 +211,6 @@ async function login(): Promise<void> {
   errorEl.style.display = "none";
   showPanelView();
   await loadHistory();
-  await loadAllUsers(1);
 }
 
 async function logout(): Promise<void> {
@@ -258,19 +227,11 @@ document.getElementById("search-input")!.addEventListener("input", (e) => {
   const query = (e.target as HTMLInputElement).value;
   searchDebounce = setTimeout(() => runSearch(query), 250);
 });
-document.getElementById("users-prev-btn")!.addEventListener("click", () => {
-  if (currentUsersPage > 1) loadAllUsers(currentUsersPage - 1);
-});
-document.getElementById("users-next-btn")!.addEventListener("click", () => {
-  loadAllUsers(currentUsersPage + 1);
-});
-
 async function init(): Promise<void> {
   const result = await request<{ history: HistoryRow[] }>("/history");
   if (result.ok) {
     showPanelView();
     renderHistory(result.data.history);
-    await loadAllUsers(1);
   } else {
     showLoginView();
   }
