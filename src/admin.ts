@@ -1,4 +1,5 @@
 import { GENERATIONS } from "./generations";
+import { sourceLabel } from "./pack-source-label";
 
 interface AdminUser {
   twitchId: string;
@@ -51,7 +52,7 @@ function renderHistory(history: HistoryRow[]): void {
     tdTier.textContent = h.tier;
     const tdSource = document.createElement("td");
     tdSource.style.padding = "0.4rem";
-    tdSource.textContent = h.source;
+    tdSource.textContent = sourceLabel(h.source);
     const tdCreatedAt = document.createElement("td");
     tdCreatedAt.style.padding = "0.4rem";
     tdCreatedAt.textContent = h.createdAt;
