@@ -34,7 +34,7 @@
         </button>
       </div>
     </header>
-    <div class="container" style="padding: 2rem 1rem;">
+    <div class="container container-admin" style="padding: 2rem 1rem;">
       <h1>Admin</h1>
 
       <div id="login-view" style="margin-top: 1.5rem; max-width: 320px;">
@@ -44,87 +44,90 @@
         <p id="login-error" style="color: #C2477F; margin-top: 0.5rem; display: none;"></p>
       </div>
 
-      <div id="panel-view" style="display: none; margin-top: 1.5rem;">
-        <div>
-          <input
-            class="input"
-            id="search-input"
-            placeholder="Buscar username de Twitch"
-            style="margin-top: 0.75rem; width: 100%; max-width: 320px;"
-          />
-          <div id="search-results" style="margin-top: 0.5rem;"></div>
+      <div id="panel-view" style="display: none;">
+        <div class="admin-grid">
+          <div class="card">
+            <h2>Buscar y dar sobres</h2>
+            <input
+              class="input"
+              id="search-input"
+              placeholder="Buscar username de Twitch"
+              style="margin-top: 0.75rem; width: 100%;"
+            />
+            <div id="search-results" style="margin-top: 0.5rem;"></div>
 
-          <div id="selected-user" style="display: none; margin-top: 0.75rem; align-items: center; gap: 0.5rem;">
-            <span class="badge" id="selected-user-name"></span>
-            <button class="btn" id="clear-selection-btn" style="padding: 0.3rem 0.8rem;">x</button>
+            <div id="selected-user" style="display: none; margin-top: 0.75rem; align-items: center; gap: 0.5rem;">
+              <span class="badge" id="selected-user-name"></span>
+              <button class="btn" id="clear-selection-btn" style="padding: 0.3rem 0.8rem;">x</button>
+            </div>
+
+            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <input class="input" id="quantity-input" type="number" min="1" max="50" value="1" style="width: 80px;" />
+              <select class="input" id="tier-select">
+                <option value="gratis">Gratis</option>
+                <option value="apoyo">Apoyo</option>
+              </select>
+              <button class="btn" id="grant-btn" disabled>Dar blíster(s)</button>
+            </div>
+            <p id="grant-message" style="margin-top: 0.5rem;"></p>
           </div>
 
-          <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-            <input class="input" id="quantity-input" type="number" min="1" max="50" value="1" style="width: 80px;" />
-            <select class="input" id="tier-select">
-              <option value="gratis">Gratis</option>
-              <option value="apoyo">Apoyo</option>
-            </select>
-            <button class="btn" id="grant-btn" disabled>Dar blíster(s)</button>
+          <div class="card">
+            <h2>Sobre de prueba</h2>
+            <p style="margin-top: 0.25rem;">Envía un sobre al overlay sin tocar ninguna colección real.</p>
+            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <select class="input" id="test-pack-generation"></select>
+              <select class="input" id="test-pack-tier">
+                <option value="gratis">Gratis</option>
+                <option value="apoyo">Apoyo</option>
+              </select>
+              <button class="btn" id="test-pack-btn">Abrir sobre de prueba</button>
+            </div>
+            <p id="test-pack-message" style="margin-top: 0.5rem;"></p>
           </div>
-          <p id="grant-message" style="margin-top: 0.5rem;"></p>
-        </div>
 
-        <div style="margin-top: 2rem;">
-          <h2>Sobre de prueba</h2>
-          <p style="margin-top: 0.25rem;">Envía un sobre al overlay sin tocar ninguna colección real.</p>
-          <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-            <select class="input" id="test-pack-generation"></select>
-            <select class="input" id="test-pack-tier">
-              <option value="gratis">Gratis</option>
-              <option value="apoyo">Apoyo</option>
-            </select>
-            <button class="btn" id="test-pack-btn">Abrir sobre de prueba</button>
+          <div class="card span-2">
+            <h2>Configuración de sobres automáticos</h2>
+            <div class="cfg-fields" style="margin-top: 0.75rem;">
+              <label>
+                Sobres por canje de puntos
+                <input class="input" id="cfg-reward-quantity" type="number" min="0" max="1000" />
+              </label>
+              <label>
+                Bits por sobre
+                <input class="input" id="cfg-bits-threshold" type="number" min="1" max="1000" />
+              </label>
+              <label>
+                Sobres por umbral de bits
+                <input class="input" id="cfg-bits-quantity" type="number" min="0" max="1000" />
+              </label>
+              <label>
+                Sobres por suscripción/renovación
+                <input class="input" id="cfg-sub-quantity" type="number" min="0" max="1000" />
+              </label>
+              <label>
+                Sobres por sub regalada
+                <input class="input" id="cfg-gift-sub-multiplier" type="number" min="0" max="1000" />
+              </label>
+            </div>
+            <button class="btn" id="cfg-save-btn" style="margin-top: 0.75rem;">Guardar configuración</button>
+            <p id="cfg-message" style="margin-top: 0.5rem;"></p>
           </div>
-          <p id="test-pack-message" style="margin-top: 0.5rem;"></p>
-        </div>
 
-        <div style="margin-top: 2rem;">
-          <h2>Configuración de sobres automáticos</h2>
-          <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; max-width: 320px;">
-            <label>
-              Sobres por canje de puntos
-              <input class="input" id="cfg-reward-quantity" type="number" min="0" max="1000" style="width: 100%;" />
-            </label>
-            <label>
-              Bits por sobre
-              <input class="input" id="cfg-bits-threshold" type="number" min="1" max="1000" style="width: 100%;" />
-            </label>
-            <label>
-              Sobres por umbral de bits
-              <input class="input" id="cfg-bits-quantity" type="number" min="0" max="1000" style="width: 100%;" />
-            </label>
-            <label>
-              Sobres por suscripción/renovación
-              <input class="input" id="cfg-sub-quantity" type="number" min="0" max="1000" style="width: 100%;" />
-            </label>
-            <label>
-              Sobres por sub regalada
-              <input class="input" id="cfg-gift-sub-multiplier" type="number" min="0" max="1000" style="width: 100%;" />
-            </label>
+          <div class="card span-2">
+            <h2>Historial</h2>
+            <table style="width: 100%; margin-top: 0.75rem; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="text-align: left; padding: 0.4rem;">Usuario</th>
+                  <th style="text-align: left; padding: 0.4rem;">Tier</th>
+                  <th style="text-align: left; padding: 0.4rem;">Fuente</th>
+                  <th style="text-align: left; padding: 0.4rem;">Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
           </div>
-          <button class="btn" id="cfg-save-btn" style="margin-top: 0.75rem;">Guardar configuración</button>
-          <p id="cfg-message" style="margin-top: 0.5rem;"></p>
-        </div>
-
-        <div style="margin-top: 2rem;">
-          <h2>Historial</h2>
-          <table style="width: 100%; margin-top: 0.75rem; border-collapse: collapse;">
-            <thead>
-              <tr>
-                <th style="text-align: left; padding: 0.4rem;">Usuario</th>
-                <th style="text-align: left; padding: 0.4rem;">Tier</th>
-                <th style="text-align: left; padding: 0.4rem;">Fuente</th>
-                <th style="text-align: left; padding: 0.4rem;">Fecha</th>
-              </tr>
-            </thead>
-            <tbody id="history-body"></tbody>
-          </table>
         </div>
       </div>
     </div>

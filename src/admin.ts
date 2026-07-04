@@ -351,6 +351,7 @@ async function init(): Promise<void> {
   if (result.ok) {
     showPanelView();
     renderHistory(result.data.history);
+    await loadPackGrantConfig();
   } else {
     showLoginView();
   }
