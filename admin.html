@@ -85,6 +85,34 @@
         </div>
 
         <div style="margin-top: 2rem;">
+          <h2>Configuración de sobres automáticos</h2>
+          <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; max-width: 320px;">
+            <label>
+              Sobres por canje de puntos
+              <input class="input" id="cfg-reward-quantity" type="number" min="0" max="1000" style="width: 100%;" />
+            </label>
+            <label>
+              Bits por sobre
+              <input class="input" id="cfg-bits-threshold" type="number" min="1" max="1000" style="width: 100%;" />
+            </label>
+            <label>
+              Sobres por umbral de bits
+              <input class="input" id="cfg-bits-quantity" type="number" min="0" max="1000" style="width: 100%;" />
+            </label>
+            <label>
+              Sobres por suscripción/renovación
+              <input class="input" id="cfg-sub-quantity" type="number" min="0" max="1000" style="width: 100%;" />
+            </label>
+            <label>
+              Sobres por sub regalada
+              <input class="input" id="cfg-gift-sub-multiplier" type="number" min="0" max="1000" style="width: 100%;" />
+            </label>
+          </div>
+          <button class="btn" id="cfg-save-btn" style="margin-top: 0.75rem;">Guardar configuración</button>
+          <p id="cfg-message" style="margin-top: 0.5rem;"></p>
+        </div>
+
+        <div style="margin-top: 2rem;">
           <h2>Historial</h2>
           <table style="width: 100%; margin-top: 0.75rem; border-collapse: collapse;">
             <thead>

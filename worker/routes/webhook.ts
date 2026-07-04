@@ -5,7 +5,22 @@ import { verifyEventSubSignature } from "../lib/eventsub";
 
 const webhook = new Hono<{ Bindings: Env }>();
 
-const BITS_PER_PACK = 200;
+interface PackGrantConfig {
+  reward_quantity: number;
+  bits_threshold: number;
+  bits_quantity: number;
+  sub_quantity: number;
+  gift_sub_multiplier: number;
+}
+
+async function getPackGrantConfig(db: D1Database): Promise<PackGrantConfig> {
+  const row = await db
+    .prepare(
+      "SELECT reward_quantity, bits_threshold, bits_quantity, sub_quantity, gift_sub_multiplier FROM pack_grant_config WHERE id = 1"
+    )
+    .first<PackGrantConfig>();
+  return row!;
+}
 
 async function upsertUser(db: D1Database, userId: string, username: string): Promise<void> {
   await db
@@ -31,7 +46,13 @@ async function grantPacks(
   await db.batch(statements);
 }
 
-async function addBitsAndGetPackCount(db: D1Database, userId: string, bits: number): Promise<number> {
+async function addBitsAndGetPackCount(
+  db: D1Database,
+  userId: string,
+  bits: number,
+  threshold: number,
+  quantity: number
+): Promise<number> {
   const row = await db
     .prepare("SELECT bits_balance FROM users WHERE twitch_id = ?")
     .bind(userId)
@@ -39,9 +60,9 @@ async function addBitsAndGetPackCount(db: D1Database, userId: string, bits: numb
   const balance = (row?.bits_balance ?? 0) + bits;
   await db
     .prepare("UPDATE users SET bits_balance = ? WHERE twitch_id = ?")
-    .bind(balance % BITS_PER_PACK, userId)
+    .bind(balance % threshold, userId)
     .run();
-  return Math.floor(balance / BITS_PER_PACK);
+  return Math.floor(balance / threshold) * quantity;
 }
 
 interface RewardRedemptionEvent {
@@ -102,20 +123,27 @@ webhook.post("/eventsub", async (c) => {
   }
 
   const subscriptionType = payload.subscription?.type ?? "";
+  const config = await getPackGrantConfig(c.env.DB);
 
   switch (subscriptionType) {
     case "channel.channel_points_custom_reward_redemption.add": {
       const event = payload.event as unknown as RewardRedemptionEvent;
       if (event.reward.id !== c.env.TWITCH_REWARD_ID) break;
       await upsertUser(c.env.DB, event.user_id, event.user_login);
-      await grantPacks(c.env.DB, event.user_id, 1, "reward", "gratis");
+      await grantPacks(c.env.DB, event.user_id, config.reward_quantity, "reward", "gratis");
       break;
     }
     case "channel.cheer": {
       const event = payload.event as unknown as CheerEvent;
       if (event.is_anonymous || !event.user_id) break;
       await upsertUser(c.env.DB, event.user_id, event.user_login ?? event.user_id);
-      const packs = await addBitsAndGetPackCount(c.env.DB, event.user_id, event.bits);
+      const packs = await addBitsAndGetPackCount(
+        c.env.DB,
+        event.user_id,
+        event.bits,
+        config.bits_threshold,
+        config.bits_quantity
+      );
       await grantPacks(c.env.DB, event.user_id, packs, "bits", "apoyo");
       break;
     }
@@ -123,20 +151,20 @@ webhook.post("/eventsub", async (c) => {
       const event = payload.event as unknown as SubscribeEvent;
       if (event.is_gift) break;
       await upsertUser(c.env.DB, event.user_id, event.user_login);
-      await grantPacks(c.env.DB, event.user_id, 1, "sub", "apoyo");
+      await grantPacks(c.env.DB, event.user_id, config.sub_quantity, "sub", "apoyo");
       break;
     }
     case "channel.subscription.message": {
       const event = payload.event as unknown as SubscriptionMessageEvent;
       await upsertUser(c.env.DB, event.user_id, event.user_login);
-      await grantPacks(c.env.DB, event.user_id, 1, "sub", "apoyo");
+      await grantPacks(c.env.DB, event.user_id, config.sub_quantity, "sub", "apoyo");
       break;
     }
     case "channel.subscription.gift": {
       const event = payload.event as unknown as SubscriptionGiftEvent;
       if (event.is_anonymous || !event.user_id) break;
       await upsertUser(c.env.DB, event.user_id, event.user_login ?? event.user_id);
-      await grantPacks(c.env.DB, event.user_id, event.total, "gift_sub", "apoyo");
+      await grantPacks(c.env.DB, event.user_id, event.total * config.gift_sub_multiplier, "gift_sub", "apoyo");
       break;
     }
   }

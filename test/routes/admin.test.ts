@@ -205,3 +205,94 @@ it("logs out by clearing the admin session cookie", async () => {
   expect(res.headers.get("set-cookie")).toContain("admin_session=");
 });
 
+it("rejects pack-grant-config requests without an admin session", async () => {
+  const res = await app.request("/api/admin/pack-grant-config", {}, env);
+  expect(res.status).toBe(401);
+});
+
+it("returns the default pack-grant-config", async () => {
+  const cookie = await adminCookie();
+  const res = await app.request("/api/admin/pack-grant-config", { headers: { Cookie: cookie } }, env);
+  expect(res.status).toBe(200);
+  const { config } = await res.json<{
+    config: {
+      rewardQuantity: number;
+      bitsThreshold: number;
+      bitsQuantity: number;
+      subQuantity: number;
+      giftSubMultiplier: number;
+    };
+  }>();
+  expect(config).toEqual({
+    rewardQuantity: 1,
+    bitsThreshold: 200,
+    bitsQuantity: 1,
+    subQuantity: 1,
+    giftSubMultiplier: 1,
+  });
+});
+
+it("persists a valid pack-grant-config update", async () => {
+  const cookie = await adminCookie();
+  const putRes = await app.request(
+    "/api/admin/pack-grant-config",
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({
+        rewardQuantity: 2,
+        bitsThreshold: 300,
+        bitsQuantity: 3,
+        subQuantity: 4,
+        giftSubMultiplier: 5,
+      }),
+    },
+    env
+  );
+  expect(putRes.status).toBe(200);
+
+  const getRes = await app.request("/api/admin/pack-grant-config", { headers: { Cookie: cookie } }, env);
+  const { config } = await getRes.json<{ config: Record<string, number> }>();
+  expect(config).toEqual({
+    rewardQuantity: 2,
+    bitsThreshold: 300,
+    bitsQuantity: 3,
+    subQuantity: 4,
+    giftSubMultiplier: 5,
+  });
+});
+
+it("rejects a pack-grant-config update with an out-of-range value", async () => {
+  const cookie = await adminCookie();
+  const res = await app.request(
+    "/api/admin/pack-grant-config",
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({
+        rewardQuantity: 1,
+        bitsThreshold: 0,
+        bitsQuantity: 1,
+        subQuantity: 1,
+        giftSubMultiplier: 1,
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("rejects a pack-grant-config update with a missing field", async () => {
+  const cookie = await adminCookie();
+  const res = await app.request(
+    "/api/admin/pack-grant-config",
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ rewardQuantity: 1, bitsThreshold: 200, bitsQuantity: 1, subQuantity: 1 }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+

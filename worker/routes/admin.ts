@@ -76,6 +76,52 @@ admin.post("/grant-packs", requireAdmin, async (c) => {
   return c.json({ ok: true });
 });
 
+interface PackGrantConfig {
+  rewardQuantity: number;
+  bitsThreshold: number;
+  bitsQuantity: number;
+  subQuantity: number;
+  giftSubMultiplier: number;
+}
+
+admin.get("/pack-grant-config", requireAdmin, async (c) => {
+  const row = await c.env.DB.prepare(
+    `SELECT reward_quantity AS rewardQuantity, bits_threshold AS bitsThreshold, bits_quantity AS bitsQuantity,
+            sub_quantity AS subQuantity, gift_sub_multiplier AS giftSubMultiplier
+     FROM pack_grant_config WHERE id = 1`
+  ).first<PackGrantConfig>();
+  return c.json({ config: row });
+});
+
+admin.put("/pack-grant-config", requireAdmin, async (c) => {
+  const body = await c.req.json<Partial<PackGrantConfig>>().catch(() => ({}) as Partial<PackGrantConfig>);
+  const { rewardQuantity, bitsThreshold, bitsQuantity, subQuantity, giftSubMultiplier } = body;
+
+  const isValidCount = (n: unknown): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n <= 1000;
+  const isValidThreshold = (n: unknown): n is number =>
+    typeof n === "number" && Number.isInteger(n) && n >= 1 && n <= 1000;
+
+  if (
+    !isValidCount(rewardQuantity) ||
+    !isValidThreshold(bitsThreshold) ||
+    !isValidCount(bitsQuantity) ||
+    !isValidCount(subQuantity) ||
+    !isValidCount(giftSubMultiplier)
+  ) {
+    return c.json({ error: "Invalid config" }, 400);
+  }
+
+  await c.env.DB.prepare(
+    `UPDATE pack_grant_config
+     SET reward_quantity = ?, bits_threshold = ?, bits_quantity = ?, sub_quantity = ?, gift_sub_multiplier = ?
+     WHERE id = 1`
+  )
+    .bind(rewardQuantity, bitsThreshold, bitsQuantity, subQuantity, giftSubMultiplier)
+    .run();
+
+  return c.json({ ok: true });
+});
+
 admin.post("/test-pack", requireAdmin, async (c) => {
   const body = await c.req
     .json<{ generation?: number; tier?: string }>()

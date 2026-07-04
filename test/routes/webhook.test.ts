@@ -20,6 +20,9 @@ async function signBody(messageId: string, timestamp: string, body: string): Pro
 beforeEach(async () => {
   await env.DB.exec("DELETE FROM packs");
   await env.DB.exec("DELETE FROM users");
+  await env.DB.exec(
+    "UPDATE pack_grant_config SET reward_quantity = 1, bits_threshold = 200, bits_quantity = 1, sub_quantity = 1, gift_sub_multiplier = 1 WHERE id = 1"
+  );
   env.TWITCH_EVENTSUB_SECRET = SECRET;
   env.TWITCH_REWARD_ID = "reward-1";
 });
@@ -449,4 +452,126 @@ it("ignores an anonymous subscription gift", async () => {
   expect(res.status).toBe(200);
   const packs = await env.DB.prepare("SELECT * FROM packs").all();
   expect(packs.results).toHaveLength(0);
+});
+
+it("respects a configured reward_quantity greater than 1", async () => {
+  await env.DB.prepare("UPDATE pack_grant_config SET reward_quantity = 3 WHERE id = 1").run();
+  const body = JSON.stringify({
+    subscription: { type: "channel.channel_points_custom_reward_redemption.add" },
+    event: { user_id: "42", user_login: "mrklypp", reward: { id: "reward-1" } },
+  });
+  const messageId = "msg-cfg-reward";
+  const timestamp = new Date().toISOString();
+  const signature = await signBody(messageId, timestamp, body);
+
+  await app.request(
+    "/webhook/eventsub",
+    {
+      method: "POST",
+      body,
+      headers: {
+        "Twitch-Eventsub-Message-Id": messageId,
+        "Twitch-Eventsub-Message-Timestamp": timestamp,
+        "Twitch-Eventsub-Message-Signature": signature,
+        "Twitch-Eventsub-Message-Type": "notification",
+      },
+    },
+    env
+  );
+
+  const packs = await env.DB.prepare("SELECT * FROM packs WHERE user_id = ?").bind("42").all();
+  expect(packs.results).toHaveLength(3);
+});
+
+it("respects a configured bits_threshold and bits_quantity", async () => {
+  await env.DB.prepare("UPDATE pack_grant_config SET bits_threshold = 100, bits_quantity = 2 WHERE id = 1").run();
+  const body = JSON.stringify({
+    subscription: { type: "channel.cheer" },
+    event: { user_id: "42", user_login: "mrklypp", bits: 250, is_anonymous: false },
+  });
+  const messageId = "msg-cfg-bits";
+  const timestamp = new Date().toISOString();
+  const signature = await signBody(messageId, timestamp, body);
+
+  await app.request(
+    "/webhook/eventsub",
+    {
+      method: "POST",
+      body,
+      headers: {
+        "Twitch-Eventsub-Message-Id": messageId,
+        "Twitch-Eventsub-Message-Timestamp": timestamp,
+        "Twitch-Eventsub-Message-Signature": signature,
+        "Twitch-Eventsub-Message-Type": "notification",
+      },
+    },
+    env
+  );
+
+  // 250 bits / 100 threshold = 2 crossings * 2 quantity = 4 packs, remainder 50
+  const packs = await env.DB.prepare("SELECT * FROM packs WHERE user_id = ?").bind("42").all();
+  expect(packs.results).toHaveLength(4);
+  const user = await env.DB.prepare("SELECT bits_balance FROM users WHERE twitch_id = ?")
+    .bind("42")
+    .first<{ bits_balance: number }>();
+  expect(user?.bits_balance).toBe(50);
+});
+
+it("respects a configured sub_quantity", async () => {
+  await env.DB.prepare("UPDATE pack_grant_config SET sub_quantity = 5 WHERE id = 1").run();
+  const body = JSON.stringify({
+    subscription: { type: "channel.subscribe" },
+    event: { user_id: "42", user_login: "mrklypp", is_gift: false },
+  });
+  const messageId = "msg-cfg-sub";
+  const timestamp = new Date().toISOString();
+  const signature = await signBody(messageId, timestamp, body);
+
+  await app.request(
+    "/webhook/eventsub",
+    {
+      method: "POST",
+      body,
+      headers: {
+        "Twitch-Eventsub-Message-Id": messageId,
+        "Twitch-Eventsub-Message-Timestamp": timestamp,
+        "Twitch-Eventsub-Message-Signature": signature,
+        "Twitch-Eventsub-Message-Type": "notification",
+      },
+    },
+    env
+  );
+
+  const packs = await env.DB.prepare("SELECT * FROM packs WHERE user_id = ?").bind("42").all();
+  expect(packs.results).toHaveLength(5);
+});
+
+it("respects a configured gift_sub_multiplier", async () => {
+  await env.DB.prepare("UPDATE pack_grant_config SET gift_sub_multiplier = 2 WHERE id = 1").run();
+  const body = JSON.stringify({
+    subscription: { type: "channel.subscription.gift" },
+    event: { user_id: "55", user_login: "generous", total: 3, is_anonymous: false },
+  });
+  const messageId = "msg-cfg-gift";
+  const timestamp = new Date().toISOString();
+  const signature = await signBody(messageId, timestamp, body);
+
+  await app.request(
+    "/webhook/eventsub",
+    {
+      method: "POST",
+      body,
+      headers: {
+        "Twitch-Eventsub-Message-Id": messageId,
+        "Twitch-Eventsub-Message-Timestamp": timestamp,
+        "Twitch-Eventsub-Message-Signature": signature,
+        "Twitch-Eventsub-Message-Type": "notification",
+      },
+    },
+    env
+  );
+
+  // 3 gifted subs * multiplier 2 = 6 packs
+  const packs = await env.DB.prepare("SELECT * FROM packs WHERE user_id = ?").bind("55").all();
+  expect(packs.results).toHaveLength(6);
 });

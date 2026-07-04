@@ -17,6 +17,14 @@ interface HistoryRow {
   createdAt: string;
 }
 
+interface PackGrantConfig {
+  rewardQuantity: number;
+  bitsThreshold: number;
+  bitsQuantity: number;
+  subQuantity: number;
+  giftSubMultiplier: number;
+}
+
 const BASE = "/api/admin";
 
 type RequestResult<T> = { ok: true; data: T } | { ok: false; status: number };
@@ -229,6 +237,48 @@ async function openTestPack(): Promise<void> {
   messageEl.textContent = "Sobre de prueba enviado al overlay.";
 }
 
+async function loadPackGrantConfig(): Promise<void> {
+  const result = await request<{ config: PackGrantConfig }>("/pack-grant-config");
+  if (!result.ok) {
+    if (result.status === 401) showLoginView();
+    return;
+  }
+  const { config } = result.data;
+  (document.getElementById("cfg-reward-quantity") as HTMLInputElement).value = String(config.rewardQuantity);
+  (document.getElementById("cfg-bits-threshold") as HTMLInputElement).value = String(config.bitsThreshold);
+  (document.getElementById("cfg-bits-quantity") as HTMLInputElement).value = String(config.bitsQuantity);
+  (document.getElementById("cfg-sub-quantity") as HTMLInputElement).value = String(config.subQuantity);
+  (document.getElementById("cfg-gift-sub-multiplier") as HTMLInputElement).value = String(config.giftSubMultiplier);
+}
+
+async function savePackGrantConfig(): Promise<void> {
+  const messageEl = document.getElementById("cfg-message")!;
+  const config: PackGrantConfig = {
+    rewardQuantity: Number((document.getElementById("cfg-reward-quantity") as HTMLInputElement).value),
+    bitsThreshold: Number((document.getElementById("cfg-bits-threshold") as HTMLInputElement).value),
+    bitsQuantity: Number((document.getElementById("cfg-bits-quantity") as HTMLInputElement).value),
+    subQuantity: Number((document.getElementById("cfg-sub-quantity") as HTMLInputElement).value),
+    giftSubMultiplier: Number((document.getElementById("cfg-gift-sub-multiplier") as HTMLInputElement).value),
+  };
+
+  const result = await request<{ ok: true }>("/pack-grant-config", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config),
+  });
+
+  if (!result.ok) {
+    if (result.status === 401) {
+      showLoginView();
+      return;
+    }
+    messageEl.textContent = "Error al guardar la configuración.";
+    return;
+  }
+
+  messageEl.textContent = "Configuración guardada.";
+}
+
 async function login(): Promise<void> {
   const name = (document.getElementById("login-name") as HTMLInputElement).value;
   const password = (document.getElementById("login-password") as HTMLInputElement).value;
@@ -249,6 +299,7 @@ async function login(): Promise<void> {
   errorEl.style.display = "none";
   showPanelView();
   await loadHistory();
+  await loadPackGrantConfig();
 }
 
 async function logout(): Promise<void> {
@@ -261,6 +312,7 @@ document.getElementById("logout-btn")!.addEventListener("click", logout);
 document.getElementById("clear-selection-btn")!.addEventListener("click", clearSelection);
 document.getElementById("grant-btn")!.addEventListener("click", grantPacks);
 document.getElementById("test-pack-btn")!.addEventListener("click", openTestPack);
+document.getElementById("cfg-save-btn")!.addEventListener("click", savePackGrantConfig);
 populateTestPackGenerations();
 document.getElementById("search-input")!.addEventListener("input", (e) => {
   clearTimeout(searchDebounce);
