@@ -1,3 +1,16 @@
+PRAGMA defer_foreign_keys = TRUE;
+
+CREATE TABLE pack_cards_new (
+  pack_id INTEGER NOT NULL,
+  card_id TEXT NOT NULL REFERENCES cards(id)
+);
+
+INSERT INTO pack_cards_new (pack_id, card_id)
+SELECT pack_id, card_id FROM pack_cards;
+
+DROP TABLE pack_cards;
+ALTER TABLE pack_cards_new RENAME TO pack_cards;
+
 CREATE TABLE packs_new (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id TEXT NOT NULL REFERENCES users(twitch_id),
