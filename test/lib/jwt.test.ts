@@ -21,24 +21,24 @@ it("rejects a malformed token", async () => {
 });
 
 it("round-trips a signed admin session", async () => {
-  const token = await signAdminSession(SECRET);
+  const token = await signAdminSession(SECRET, "Test Admin");
   const valid = await verifyAdminSession(token, SECRET);
-  expect(valid).toBe(true);
+  expect(valid).toEqual({ adminName: "Test Admin" });
 });
 
 it("rejects an admin session signed with a different secret", async () => {
-  const token = await signAdminSession(SECRET);
+  const token = await signAdminSession(SECRET, "Test Admin");
   const valid = await verifyAdminSession(token, "a-completely-different-secret");
-  expect(valid).toBe(false);
+  expect(valid).toBeNull();
 });
 
 it("rejects a malformed admin session token", async () => {
   const valid = await verifyAdminSession("not-a-jwt", SECRET);
-  expect(valid).toBe(false);
+  expect(valid).toBeNull();
 });
 
 it("does not accept a player session token as an admin session", async () => {
   const playerToken = await signSession({ twitchId: "123", username: "mrklypp" }, SECRET);
   const valid = await verifyAdminSession(playerToken, SECRET);
-  expect(valid).toBe(false);
+  expect(valid).toBeNull();
 });
