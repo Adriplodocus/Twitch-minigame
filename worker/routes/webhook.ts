@@ -1,8 +1,75 @@
 import { Hono } from "hono";
 import type { Env } from "../types";
+import type { PackTier } from "../lib/packs";
 import { verifyEventSubSignature } from "../lib/eventsub";
 
 const webhook = new Hono<{ Bindings: Env }>();
+
+const BITS_PER_PACK = 200;
+
+async function upsertUser(db: D1Database, userId: string, username: string): Promise<void> {
+  await db
+    .prepare(
+      `INSERT INTO users (twitch_id, username) VALUES (?, ?)
+       ON CONFLICT(twitch_id) DO UPDATE SET username = excluded.username`
+    )
+    .bind(userId, username)
+    .run();
+}
+
+async function grantPacks(
+  db: D1Database,
+  userId: string,
+  quantity: number,
+  source: string,
+  tier: PackTier
+): Promise<void> {
+  if (quantity < 1) return;
+  const statements = Array.from({ length: quantity }, () =>
+    db.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, ?, ?)").bind(userId, source, tier)
+  );
+  await db.batch(statements);
+}
+
+async function addBitsAndGetPackCount(db: D1Database, userId: string, bits: number): Promise<number> {
+  const row = await db
+    .prepare("SELECT bits_balance FROM users WHERE twitch_id = ?")
+    .bind(userId)
+    .first<{ bits_balance: number }>();
+  const balance = (row?.bits_balance ?? 0) + bits;
+  await db
+    .prepare("UPDATE users SET bits_balance = ? WHERE twitch_id = ?")
+    .bind(balance % BITS_PER_PACK, userId)
+    .run();
+  return Math.floor(balance / BITS_PER_PACK);
+}
+
+interface RewardRedemptionEvent {
+  user_id: string;
+  user_login: string;
+  reward: { id: string };
+}
+interface CheerEvent {
+  user_id?: string;
+  user_login?: string;
+  bits: number;
+  is_anonymous: boolean;
+}
+interface SubscribeEvent {
+  user_id: string;
+  user_login: string;
+  is_gift: boolean;
+}
+interface SubscriptionMessageEvent {
+  user_id: string;
+  user_login: string;
+}
+interface SubscriptionGiftEvent {
+  user_id?: string;
+  user_login?: string;
+  total: number;
+  is_anonymous: boolean;
+}
 
 webhook.post("/eventsub", async (c) => {
   const body = await c.req.text();
@@ -22,25 +89,56 @@ webhook.post("/eventsub", async (c) => {
 
   const payload = JSON.parse(body) as {
     challenge?: string;
-    event?: { user_id: string; user_login: string; user_name: string; reward: { id: string } };
+    subscription?: { type: string };
+    event?: Record<string, unknown>;
   };
 
   if (messageType === "webhook_callback_verification") {
     return c.text(payload.challenge ?? "", 200);
   }
 
-  if (messageType === "notification" && payload.event) {
-    const { user_id, user_login, reward } = payload.event;
-    if (reward.id !== c.env.TWITCH_REWARD_ID) return c.json({ ok: true }, 200);
-
-    await c.env.DB.prepare(
-      `INSERT INTO users (twitch_id, username) VALUES (?, ?)
-       ON CONFLICT(twitch_id) DO UPDATE SET username = excluded.username`
-    )
-      .bind(user_id, user_login)
-      .run();
-    await c.env.DB.prepare("INSERT INTO packs (user_id) VALUES (?)").bind(user_id).run();
+  if (messageType !== "notification" || !payload.event) {
     return c.json({ ok: true }, 200);
+  }
+
+  const subscriptionType = payload.subscription?.type ?? "";
+
+  switch (subscriptionType) {
+    case "channel.channel_points_custom_reward_redemption.add": {
+      const event = payload.event as unknown as RewardRedemptionEvent;
+      if (event.reward.id !== c.env.TWITCH_REWARD_ID) break;
+      await upsertUser(c.env.DB, event.user_id, event.user_login);
+      await grantPacks(c.env.DB, event.user_id, 1, "reward", "gratis");
+      break;
+    }
+    case "channel.cheer": {
+      const event = payload.event as unknown as CheerEvent;
+      if (event.is_anonymous || !event.user_id) break;
+      await upsertUser(c.env.DB, event.user_id, event.user_login ?? event.user_id);
+      const packs = await addBitsAndGetPackCount(c.env.DB, event.user_id, event.bits);
+      await grantPacks(c.env.DB, event.user_id, packs, "bits", "apoyo");
+      break;
+    }
+    case "channel.subscribe": {
+      const event = payload.event as unknown as SubscribeEvent;
+      if (event.is_gift) break;
+      await upsertUser(c.env.DB, event.user_id, event.user_login);
+      await grantPacks(c.env.DB, event.user_id, 1, "sub", "apoyo");
+      break;
+    }
+    case "channel.subscription.message": {
+      const event = payload.event as unknown as SubscriptionMessageEvent;
+      await upsertUser(c.env.DB, event.user_id, event.user_login);
+      await grantPacks(c.env.DB, event.user_id, 1, "sub", "apoyo");
+      break;
+    }
+    case "channel.subscription.gift": {
+      const event = payload.event as unknown as SubscriptionGiftEvent;
+      if (event.is_anonymous || !event.user_id) break;
+      await upsertUser(c.env.DB, event.user_id, event.user_login ?? event.user_id);
+      await grantPacks(c.env.DB, event.user_id, event.total, "gift_sub", "apoyo");
+      break;
+    }
   }
 
   return c.json({ ok: true }, 200);
