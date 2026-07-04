@@ -65,8 +65,9 @@ export async function createEventSubSubscription(
   opts: {
     accessToken: string;
     clientId: string;
-    broadcasterId: string;
-    rewardId: string;
+    type: string;
+    version: string;
+    condition: Record<string, string>;
     callbackUrl: string;
     secret: string;
   },
@@ -80,11 +81,13 @@ export async function createEventSubSubscription(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      type: "channel.channel_points_custom_reward_redemption.add",
-      version: "1",
-      condition: { broadcaster_user_id: opts.broadcasterId, reward_id: opts.rewardId },
+      type: opts.type,
+      version: opts.version,
+      condition: opts.condition,
       transport: { method: "webhook", callback: opts.callbackUrl, secret: opts.secret },
     }),
   });
-  if (!res.ok) throw new Error(`EventSub subscription creation failed: ${res.status}`);
+  if (!res.ok && res.status !== 409) {
+    throw new Error(`EventSub subscription creation failed (${opts.type}): ${res.status}`);
+  }
 }

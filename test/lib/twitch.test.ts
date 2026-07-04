@@ -57,8 +57,9 @@ it("creates an EventSub subscription", async () => {
     {
       accessToken: "at",
       clientId: "abc",
-      broadcasterId: "99",
-      rewardId: "reward-1",
+      type: "channel.channel_points_custom_reward_redemption.add",
+      version: "1",
+      condition: { broadcaster_user_id: "99", reward_id: "reward-1" },
       callbackUrl: "https://example.com/webhook/eventsub",
       secret: "whsecret",
     },
@@ -71,6 +72,42 @@ it("creates an EventSub subscription", async () => {
   const body = JSON.parse((fetchImpl.mock.calls[0][1] as RequestInit).body as string);
   expect(body.type).toBe("channel.channel_points_custom_reward_redemption.add");
   expect(body.condition).toEqual({ broadcaster_user_id: "99", reward_id: "reward-1" });
+});
+
+it("treats a 409 (already subscribed) as success", async () => {
+  const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ error: "Conflict" }), { status: 409 }));
+  await expect(
+    createEventSubSubscription(
+      {
+        accessToken: "at",
+        clientId: "abc",
+        type: "channel.cheer",
+        version: "1",
+        condition: { broadcaster_user_id: "99" },
+        callbackUrl: "https://example.com/webhook/eventsub",
+        secret: "whsecret",
+      },
+      fetchImpl as unknown as typeof fetch
+    )
+  ).resolves.toBeUndefined();
+});
+
+it("throws on a non-409 failure", async () => {
+  const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ error: "boom" }), { status: 500 }));
+  await expect(
+    createEventSubSubscription(
+      {
+        accessToken: "at",
+        clientId: "abc",
+        type: "channel.cheer",
+        version: "1",
+        condition: { broadcaster_user_id: "99" },
+        callbackUrl: "https://example.com/webhook/eventsub",
+        secret: "whsecret",
+      },
+      fetchImpl as unknown as typeof fetch
+    )
+  ).rejects.toThrow();
 });
 
 it("fetches an app access token via client credentials", async () => {
