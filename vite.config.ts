@@ -15,6 +15,7 @@ export default defineConfig({
             offers: path.resolve(__dirname, "offers.html"),
             album: path.resolve(__dirname, "album.html"),
             admin: path.resolve(__dirname, "admin.html"),
+            overlay: path.resolve(__dirname, "overlay.html"),
           },
         },
       },
