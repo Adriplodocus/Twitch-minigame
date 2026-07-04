@@ -894,6 +894,15 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   opacity: 1;
 }
 
+.overlay-intro-avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface2);
+  animation: avatar-pulse 2.2s ease-in-out infinite;
+}
+
 .overlay-intro-username {
   font-family: 'Russo One', sans-serif;
   font-size: 1.8rem;
@@ -954,4 +963,65 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .card-slot .card {
   width: 100%;
   height: 100%;
+}
+
+/* Hype cards: legendary or shiny pulls get a punch entrance + color ring instead of the plain slide */
+.card-slot.hype.entering {
+  transform: scale(0.4);
+  opacity: 0;
+}
+.card-slot.hype.current {
+  animation: card-punch 0.4s ease-out;
+}
+.card-slot.hype::before {
+  content: "";
+  position: absolute;
+  inset: -1.4rem;
+  border-radius: 50%;
+  filter: blur(18px);
+  animation: ring-pulse 1s ease-in-out infinite;
+}
+.card-slot.hype-legendary::before { background: radial-gradient(circle, var(--gold), transparent 70%); }
+.card-slot.hype-shiny::before { background: radial-gradient(circle, var(--pink), transparent 70%); }
+
+@keyframes avatar-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(90, 200, 216, 0.6); }
+  50% { box-shadow: 0 0 0 3px rgba(242, 115, 158, 0.6); }
+}
+
+@keyframes card-punch {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.overlay-alert.shake {
+  animation: alert-shake 0.3s ease-in-out;
+}
+
+@keyframes alert-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -0.5rem;
+  width: 0.4rem;
+  height: 0.8rem;
+  pointer-events: none;
+  animation: confetti-fall 1.2s ease-in forwards;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--drift), 300px) rotate(calc(var(--spin) * 360deg)); opacity: 0; }
 }
