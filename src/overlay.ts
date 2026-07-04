@@ -48,7 +48,7 @@ function showNextAlert(): void {
 
   event.cards.forEach((c, i) => {
     setTimeout(() => {
-      cardsEl.insertAdjacentHTML("beforeend", renderCardHtml(toCardView(c)));
+      cardsEl.innerHTML = renderCardHtml(toCardView(c));
     }, i * CARD_STAGGER_MS);
   });
 
