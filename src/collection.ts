@@ -93,7 +93,7 @@ async function revealPack(cards: CardView[]): Promise<void> {
   const grid = document.getElementById("owned-grid")!;
   const overlay = document.createElement("div");
   overlay.style.cssText =
-    "position: fixed; inset: 0; background: rgba(59,46,34,0.80); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; z-index: 10; padding: 1rem;";
+    "position: fixed; inset: 0; background: rgba(59,46,34,0.80); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; z-index: 10; padding: 1rem; overflow-y: auto;";
   document.body.appendChild(overlay);
 
   const cardsRow = document.createElement("div");
