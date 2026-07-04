@@ -3,8 +3,8 @@ import { it, expect, beforeEach } from "vitest";
 import app from "../../worker";
 import { signAdminSession, signSession } from "../../worker/lib/jwt";
 
-async function adminCookie(): Promise<string> {
-  const token = await signAdminSession(env.JWT_SECRET);
+async function adminCookie(adminName = "Test Admin"): Promise<string> {
+  const token = await signAdminSession(env.JWT_SECRET, adminName);
   return `admin_session=${token}`;
 }
 
@@ -17,22 +17,52 @@ beforeEach(async () => {
   ]);
 });
 
-it("rejects login with the wrong password", async () => {
-  const res = await app.request(
-    "/api/admin/login",
-    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "wrong" }) },
-    env
-  );
-  expect(res.status).toBe(401);
-});
-
-it("accepts login with the correct password and sets a cookie", async () => {
+it("rejects login with a missing name", async () => {
   const res = await app.request(
     "/api/admin/login",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password: env.ADMIN_PASSWORD }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("rejects login with a blank name", async () => {
+  const res = await app.request(
+    "/api/admin/login",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: env.ADMIN_PASSWORD, name: "   " }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("rejects login with the wrong password", async () => {
+  const res = await app.request(
+    "/api/admin/login",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: "wrong", name: "Test Admin" }),
+    },
+    env
+  );
+  expect(res.status).toBe(401);
+});
+
+it("accepts login with the correct password and name, and sets a cookie", async () => {
+  const res = await app.request(
+    "/api/admin/login",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: env.ADMIN_PASSWORD, name: "Test Admin" }),
     },
     env
   );

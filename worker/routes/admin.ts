@@ -7,11 +7,17 @@ import { signAdminSession } from "../lib/jwt";
 const admin = new Hono<{ Bindings: Env }>();
 
 admin.post("/login", async (c) => {
-  const body = await c.req.json<{ password?: string }>().catch(() => ({}) as { password?: string });
+  const body = await c.req
+    .json<{ password?: string; name?: string }>()
+    .catch(() => ({}) as { password?: string; name?: string });
+  const name = body.name?.trim();
+  if (!name) {
+    return c.json({ error: "Name required" }, 400);
+  }
   if (!body.password || body.password !== c.env.ADMIN_PASSWORD) {
     return c.json({ error: "Invalid password" }, 401);
   }
-  const token = await signAdminSession(c.env.JWT_SECRET);
+  const token = await signAdminSession(c.env.JWT_SECRET, name);
   setCookie(c, "admin_session", token, {
     httpOnly: true,
     secure: true,
