@@ -277,7 +277,9 @@ async function main(): Promise<void> {
   console.log("Rarity breakdown:", rarityCounts);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
