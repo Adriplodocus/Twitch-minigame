@@ -103,6 +103,29 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   50% { transform: translateY(-3px) rotate(-1.5deg); }
 }
 
+.pack-wrapper { position: relative; display: inline-block; }
+
+.pack-wrapper.apoyo .pack-open-img {
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+}
+
+.pack-foil-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.65) 50%, transparent 60%);
+  background-size: 250% 250%;
+  mix-blend-mode: overlay;
+  animation: shimmer 2.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
 .card.card-rarity-rare { border-color: var(--blue); }
 .card.card-rarity-epic { border-color: var(--purple); }
 .card.card-rarity-legendary { border-color: var(--gold); }

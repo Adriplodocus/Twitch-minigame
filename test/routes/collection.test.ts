@@ -60,6 +60,18 @@ it("lists all catalog cards with owned quantities and pending packs", async () =
   expect(json.pendingPacks).toHaveLength(1);
 });
 
+it("includes the tier of each pending pack", async () => {
+  await env.DB.prepare("INSERT INTO packs (user_id, tier) VALUES (?, 'apoyo')").bind("1").run();
+  await env.DB.prepare("INSERT INTO packs (user_id, tier) VALUES (?, 'gratis')").bind("1").run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/collection", { headers: { Cookie: cookie } }, env);
+  const json = await res.json<{ pendingPacks: { tier: string }[] }>();
+
+  const tiers = json.pendingPacks.map((p) => p.tier).sort();
+  expect(tiers).toEqual(["apoyo", "gratis"]);
+});
+
 it("opens a pending pack and grants 10 cards", async () => {
   const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
     .bind("1")

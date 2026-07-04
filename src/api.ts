@@ -16,6 +16,7 @@ export interface CardView {
 export interface PendingPack {
   id: number;
   createdAt: string;
+  tier: "gratis" | "apoyo";
 }
 
 export interface CollectionResponse {

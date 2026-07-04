@@ -3,6 +3,7 @@ import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, split
 import { attachTradeLinkButton } from "./trade-link";
 import { initUserHeader } from "./user-header";
 import { GENERATIONS } from "./generations";
+import { shouldShowFoil } from "./pack-tier-foil";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
@@ -76,7 +77,18 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
         img.classList.remove("opening");
       });
     });
-    row.appendChild(img);
+
+    if (shouldShowFoil(pack.tier)) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "pack-wrapper apoyo";
+      const shine = document.createElement("div");
+      shine.className = "pack-foil-shine";
+      wrapper.appendChild(img);
+      wrapper.appendChild(shine);
+      row.appendChild(wrapper);
+    } else {
+      row.appendChild(img);
+    }
   });
 }
 

@@ -19,7 +19,7 @@ collection.get("/", requireAuth, async (c) => {
     .all();
 
   const pendingPacks = await c.env.DB.prepare(
-    "SELECT id, created_at AS createdAt FROM packs WHERE user_id = ? AND opened_at IS NULL ORDER BY created_at"
+    "SELECT id, created_at AS createdAt, tier FROM packs WHERE user_id = ? AND opened_at IS NULL ORDER BY created_at"
   )
     .bind(user.twitchId)
     .all();
