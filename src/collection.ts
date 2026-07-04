@@ -1,4 +1,4 @@
-import { getCollection, openPack, type CardView, type PendingPack } from "./api";
+import { getCollection, openPack, broadcastPack, type CardView, type PendingPack } from "./api";
 import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName, compareCards, type SortField } from "./card";
 import { attachTradeLinkButton } from "./trade-link";
 import { initUserHeader } from "./user-header";
@@ -89,7 +89,7 @@ function preloadImage(src: string): Promise<void> {
   });
 }
 
-async function revealPack(cards: CardView[]): Promise<void> {
+async function revealPack(packId: number, cards: CardView[]): Promise<void> {
   const grid = document.getElementById("owned-grid")!;
   const overlay = document.createElement("div");
   overlay.style.cssText =
@@ -115,11 +115,31 @@ async function revealPack(cards: CardView[]): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
 
+  const buttonsRow = document.createElement("div");
+  buttonsRow.style.cssText = "display: flex; gap: 0.75rem;";
+
   const closeBtn = document.createElement("button");
   closeBtn.className = "btn";
   closeBtn.textContent = "Cerrar";
   closeBtn.addEventListener("click", () => overlay.remove());
-  overlay.appendChild(closeBtn);
+
+  const broadcastBtn = document.createElement("button");
+  broadcastBtn.className = "btn";
+  broadcastBtn.textContent = "Cerrar y mostrar en stream";
+  broadcastBtn.addEventListener("click", async () => {
+    broadcastBtn.disabled = true;
+    try {
+      await broadcastPack(packId);
+      overlay.remove();
+    } catch {
+      broadcastBtn.disabled = false;
+      broadcastBtn.textContent = "Error, reintentar";
+    }
+  });
+
+  buttonsRow.appendChild(closeBtn);
+  buttonsRow.appendChild(broadcastBtn);
+  overlay.appendChild(buttonsRow);
 
   grid.dispatchEvent(new Event("reload-collection"));
 }
@@ -136,7 +156,7 @@ async function load(): Promise<void> {
 
   renderPendingPacks(data.pendingPacks, async (packId, generation) => {
     const result = await openPack(packId, generation);
-    await revealPack(result.cards);
+    await revealPack(packId, result.cards);
     await load();
   });
 }

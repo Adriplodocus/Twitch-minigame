@@ -53,6 +53,10 @@ export function openPack(packId: number, generation: number): Promise<{ cards: C
   });
 }
 
+export function broadcastPack(packId: number): Promise<{ ok: true }> {
+  return request(`/collection/packs/${packId}/broadcast`, { method: "POST" });
+}
+
 export function getUserCollection(username: string): Promise<{ username: string; cards: CardView[] }> {
   return request(`/trade/users/${encodeURIComponent(username)}`);
 }
