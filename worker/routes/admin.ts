@@ -58,19 +58,22 @@ admin.get("/users", requireAdmin, async (c) => {
 
 admin.post("/grant-packs", requireAdmin, async (c) => {
   const body = await c.req
-    .json<{ twitchId?: string; quantity?: number }>()
-    .catch(() => ({}) as { twitchId?: string; quantity?: number });
-  const { twitchId, quantity } = body;
+    .json<{ twitchId?: string; quantity?: number; tier?: string }>()
+    .catch(() => ({}) as { twitchId?: string; quantity?: number; tier?: string });
+  const { twitchId, quantity, tier } = body;
 
   if (!twitchId || typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1 || quantity > 50) {
     return c.json({ error: "Invalid twitchId or quantity" }, 400);
+  }
+  if (tier !== "gratis" && tier !== "apoyo") {
+    return c.json({ error: "Invalid tier" }, 400);
   }
 
   const user = await c.env.DB.prepare("SELECT twitch_id FROM users WHERE twitch_id = ?").bind(twitchId).first();
   if (!user) return c.json({ error: "User not found" }, 404);
 
   const statements = Array.from({ length: quantity }, () =>
-    c.env.DB.prepare("INSERT INTO packs (user_id, source) VALUES (?, 'admin')").bind(twitchId)
+    c.env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'admin', ?)").bind(twitchId, tier)
   );
   await c.env.DB.batch(statements);
 
@@ -79,11 +82,11 @@ admin.post("/grant-packs", requireAdmin, async (c) => {
 
 admin.get("/history", requireAdmin, async (c) => {
   const history = await c.env.DB.prepare(
-    `SELECT p.id, p.user_id AS userId, u.username, p.created_at AS createdAt
+    `SELECT p.id, p.user_id AS userId, u.username, p.tier AS tier, p.created_at AS createdAt
      FROM packs p JOIN users u ON u.twitch_id = p.user_id
      WHERE p.source = 'admin'
      ORDER BY p.created_at DESC LIMIT 20`
-  ).all<{ id: number; userId: string; username: string; createdAt: string }>();
+  ).all<{ id: number; userId: string; username: string; tier: string; createdAt: string }>();
   return c.json({ history: history.results });
 });
 

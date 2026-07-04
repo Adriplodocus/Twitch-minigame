@@ -31,9 +31,9 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   const user = c.get("user");
   const packId = Number(c.req.param("id"));
 
-  const pack = await c.env.DB.prepare("SELECT id, user_id, opened_at FROM packs WHERE id = ?")
+  const pack = await c.env.DB.prepare("SELECT id, user_id, opened_at, tier FROM packs WHERE id = ?")
     .bind(packId)
-    .first<{ id: number; user_id: string; opened_at: string | null }>();
+    .first<{ id: number; user_id: string; opened_at: string | null; tier: "gratis" | "apoyo" }>();
   if (!pack || pack.user_id !== user.twitchId) return c.json({ error: "Not found" }, 404);
   if (pack.opened_at) return c.json({ error: "Pack already opened" }, 409);
 
@@ -59,7 +59,7 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
     return c.json({ error: "Catalog is empty" }, 500);
   }
 
-  const picked = pickRandomCards(catalog.results, 10, "gratis");
+  const picked = pickRandomCards(catalog.results, 10, pack.tier);
 
   const statements = picked.map((card) =>
     c.env.DB.prepare("INSERT INTO pack_cards (pack_id, card_id) VALUES (?, ?)").bind(packId, card.id)

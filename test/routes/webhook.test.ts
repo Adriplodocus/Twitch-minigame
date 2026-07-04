@@ -114,10 +114,11 @@ it("defaults new pack rows to source 'reward'", async () => {
     env
   );
 
-  const pack = await env.DB.prepare("SELECT source FROM packs WHERE user_id = ?")
+  const pack = await env.DB.prepare("SELECT source, tier FROM packs WHERE user_id = ?")
     .bind("42")
-    .first<{ source: string }>();
+    .first<{ source: string; tier: string }>();
   expect(pack?.source).toBe("reward");
+  expect(pack?.tier).toBe("gratis");
 });
 
 it("rejects a notification with an invalid signature", async () => {

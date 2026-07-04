@@ -180,3 +180,23 @@ it("rejects opening an already-opened pack", async () => {
   );
   expect(res.status).toBe(409);
 });
+
+it("opens a pack using its stored tier without erroring", async () => {
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id, tier) VALUES (?, 'apoyo') RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1 }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ cards: { id: string }[] }>();
+  expect(json.cards).toHaveLength(10);
+});

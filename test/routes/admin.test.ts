@@ -67,11 +67,36 @@ it("rejects grant-packs with an out-of-range quantity", async () => {
     {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: cookie },
-      body: JSON.stringify({ twitchId: "1", quantity: 0 }),
+      body: JSON.stringify({ twitchId: "1", quantity: 0, tier: "gratis" }),
     },
     env
   );
   expect(res.status).toBe(400);
+});
+
+it("rejects grant-packs with a missing or invalid tier", async () => {
+  const cookie = await adminCookie();
+  const missingTier = await app.request(
+    "/api/admin/grant-packs",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ twitchId: "1", quantity: 1 }),
+    },
+    env
+  );
+  expect(missingTier.status).toBe(400);
+
+  const invalidTier = await app.request(
+    "/api/admin/grant-packs",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ twitchId: "1", quantity: 1, tier: "premium" }),
+    },
+    env
+  );
+  expect(invalidTier.status).toBe(400);
 });
 
 it("rejects grant-packs for a nonexistent user", async () => {
@@ -81,34 +106,37 @@ it("rejects grant-packs for a nonexistent user", async () => {
     {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: cookie },
-      body: JSON.stringify({ twitchId: "does-not-exist", quantity: 1 }),
+      body: JSON.stringify({ twitchId: "does-not-exist", quantity: 1, tier: "gratis" }),
     },
     env
   );
   expect(res.status).toBe(404);
 });
 
-it("grants packs with source 'admin' and lists them in history", async () => {
+it("grants packs with the chosen tier and lists them in history", async () => {
   const cookie = await adminCookie();
   const res = await app.request(
     "/api/admin/grant-packs",
     {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: cookie },
-      body: JSON.stringify({ twitchId: "1", quantity: 3 }),
+      body: JSON.stringify({ twitchId: "1", quantity: 3, tier: "apoyo" }),
     },
     env
   );
   expect(res.status).toBe(200);
 
-  const packs = await env.DB.prepare("SELECT source FROM packs WHERE user_id = ?").bind("1").all<{ source: string }>();
+  const packs = await env.DB.prepare("SELECT source, tier FROM packs WHERE user_id = ?")
+    .bind("1")
+    .all<{ source: string; tier: string }>();
   expect(packs.results).toHaveLength(3);
-  expect(packs.results.every((p) => p.source === "admin")).toBe(true);
+  expect(packs.results.every((p) => p.source === "admin" && p.tier === "apoyo")).toBe(true);
 
   const historyRes = await app.request("/api/admin/history", { headers: { Cookie: cookie } }, env);
-  const historyJson = await historyRes.json<{ history: { username: string }[] }>();
+  const historyJson = await historyRes.json<{ history: { username: string; tier: string }[] }>();
   expect(historyJson.history).toHaveLength(3);
   expect(historyJson.history[0].username).toBe("viewer1");
+  expect(historyJson.history[0].tier).toBe("apoyo");
 });
 
 it("logs out by clearing the admin session cookie", async () => {
