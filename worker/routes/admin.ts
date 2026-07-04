@@ -1,8 +1,11 @@
 import { Hono } from "hono";
 import { setCookie, deleteCookie } from "hono/cookie";
-import type { Env } from "../types";
+import type { Category, Env, Rarity } from "../types";
 import { requireAdmin } from "../middleware/auth";
 import { signAdminSession } from "../lib/jwt";
+import { pickRandomCards } from "../lib/packs";
+
+const TEST_USER_ID = "__test__";
 
 const admin = new Hono<{ Bindings: Env }>();
 
@@ -73,11 +76,51 @@ admin.post("/grant-packs", requireAdmin, async (c) => {
   return c.json({ ok: true });
 });
 
+admin.post("/test-pack", requireAdmin, async (c) => {
+  const body = await c.req
+    .json<{ generation?: number; tier?: string }>()
+    .catch(() => ({}) as { generation?: number; tier?: string });
+  const { generation, tier } = body;
+
+  if (!Number.isInteger(generation) || generation! < 1 || generation! > 9) {
+    return c.json({ error: "Invalid generation" }, 400);
+  }
+  if (tier !== "gratis" && tier !== "apoyo") {
+    return c.json({ error: "Invalid tier" }, 400);
+  }
+
+  const catalog = await c.env.DB.prepare("SELECT id, rarity, category FROM cards WHERE generation = ?")
+    .bind(generation)
+    .all<{ id: string; rarity: Rarity; category: Category }>();
+  if (!catalog.results || catalog.results.length === 0) {
+    return c.json({ error: "Catalog is empty" }, 500);
+  }
+
+  const picked = pickRandomCards(catalog.results, 10, tier);
+  const adminName = c.get("adminName");
+
+  const packInsert = await c.env.DB.prepare(
+    `INSERT INTO packs (user_id, source, tier, granted_by, opened_at, broadcast_at, is_test)
+     VALUES (?, 'admin', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)`
+  )
+    .bind(TEST_USER_ID, tier, adminName)
+    .run();
+  const packId = packInsert.meta.last_row_id;
+
+  const statements = picked.map((card) =>
+    c.env.DB.prepare("INSERT INTO pack_cards (pack_id, card_id) VALUES (?, ?)").bind(packId, card.id)
+  );
+  await c.env.DB.batch(statements);
+
+  return c.json({ ok: true });
+});
+
 admin.get("/history", requireAdmin, async (c) => {
   const history = await c.env.DB.prepare(
     `SELECT p.id, p.user_id AS userId, u.username, p.tier AS tier, p.source AS source,
             p.granted_by AS grantedBy, p.created_at AS createdAt
      FROM packs p JOIN users u ON u.twitch_id = p.user_id
+     WHERE p.is_test = 0
      ORDER BY p.created_at DESC LIMIT 25`
   ).all<{
     id: number;

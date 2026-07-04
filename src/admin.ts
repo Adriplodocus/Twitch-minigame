@@ -1,3 +1,5 @@
+import { GENERATIONS } from "./generations";
+
 interface AdminUser {
   twitchId: string;
   username: string;
@@ -191,6 +193,41 @@ async function grantPacks(): Promise<void> {
   if (succeeded) clearSelection();
 }
 
+function populateTestPackGenerations(): void {
+  const select = document.getElementById("test-pack-generation") as HTMLSelectElement;
+  select.replaceChildren(
+    ...GENERATIONS.map((g) => {
+      const option = document.createElement("option");
+      option.value = String(g.id);
+      option.textContent = `Gen ${g.id} · ${g.region}`;
+      return option;
+    })
+  );
+}
+
+async function openTestPack(): Promise<void> {
+  const messageEl = document.getElementById("test-pack-message")!;
+  const generation = Number((document.getElementById("test-pack-generation") as HTMLSelectElement).value);
+  const tier = (document.getElementById("test-pack-tier") as HTMLSelectElement).value;
+
+  const result = await request<{ ok: true }>("/test-pack", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ generation, tier }),
+  });
+
+  if (!result.ok) {
+    if (result.status === 401) {
+      showLoginView();
+      return;
+    }
+    messageEl.textContent = "Error al abrir el sobre de prueba.";
+    return;
+  }
+
+  messageEl.textContent = "Sobre de prueba enviado al overlay.";
+}
+
 async function login(): Promise<void> {
   const name = (document.getElementById("login-name") as HTMLInputElement).value;
   const password = (document.getElementById("login-password") as HTMLInputElement).value;
@@ -222,6 +259,8 @@ document.getElementById("login-btn")!.addEventListener("click", login);
 document.getElementById("logout-btn")!.addEventListener("click", logout);
 document.getElementById("clear-selection-btn")!.addEventListener("click", clearSelection);
 document.getElementById("grant-btn")!.addEventListener("click", grantPacks);
+document.getElementById("test-pack-btn")!.addEventListener("click", openTestPack);
+populateTestPackGenerations();
 document.getElementById("search-input")!.addEventListener("input", (e) => {
   clearTimeout(searchDebounce);
   const query = (e.target as HTMLInputElement).value;
