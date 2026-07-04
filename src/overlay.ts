@@ -18,6 +18,7 @@ interface OverlayEvent {
 
 const POLL_INTERVAL_MS = 4000;
 const ALERT_DURATION_MS = 6000;
+const CARD_STAGGER_MS = 1000;
 
 let cursor = "";
 const queue: OverlayEvent[] = [];
@@ -40,17 +41,23 @@ function showNextAlert(): void {
       <img class="overlay-alert-avatar" src="${event.avatarUrl ?? "/favicon.png"}" alt="" />
       <span class="overlay-alert-username">${event.username}</span>
     </div>
-    <div class="overlay-alert-cards">
-      ${event.cards.map((c) => renderCardHtml(toCardView(c))).join("")}
-    </div>
+    <div class="overlay-alert-cards"></div>
   `;
   document.getElementById("alerts")!.appendChild(alertEl);
+  const cardsEl = alertEl.querySelector(".overlay-alert-cards")!;
 
+  event.cards.forEach((c, i) => {
+    setTimeout(() => {
+      cardsEl.insertAdjacentHTML("beforeend", renderCardHtml(toCardView(c)));
+    }, i * CARD_STAGGER_MS);
+  });
+
+  const totalDuration = (event.cards.length - 1) * CARD_STAGGER_MS + ALERT_DURATION_MS;
   setTimeout(() => {
     alertEl.remove();
     showing = false;
     showNextAlert();
-  }, ALERT_DURATION_MS);
+  }, totalDuration);
 }
 
 async function poll(): Promise<void> {
