@@ -31,7 +31,7 @@ function applyTilt(card: HTMLElement, rect: DOMRect, clientX: number, clientY: n
   // (e.g. the info-btn) resolve to a sibling card or the page background
   // instead. Keeping the card in front of Z=0 through the whole rotation
   // range avoids the fight without needing to dampen or disable the tilt.
-  card.style.transform = `perspective(600px) translateZ(40px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.04)`;
+  card.style.transform = `perspective(600px) translateZ(40px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
   const glare = card.querySelector<HTMLElement>(".glare");
   if (glare) {
     glare.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,0.65), transparent 55%)`;
