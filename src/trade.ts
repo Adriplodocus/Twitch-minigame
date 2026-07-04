@@ -43,8 +43,11 @@ function renderSelectableCard(
 }
 
 function renderTargetGrid(): void {
+  const field = (document.getElementById("target-sort-field") as HTMLSelectElement).value as SortField;
+  const direction = (document.getElementById("target-sort-direction") as HTMLSelectElement).value;
+  const sign = direction === "desc" ? -1 : 1;
   const query = (document.getElementById("target-filter") as HTMLInputElement).value;
-  const filtered = filterCardsByName(targetCards, query);
+  const filtered = filterCardsByName(targetCards, query).sort((a, b) => compareCards(a, b, field) * sign);
   document.getElementById("target-collection")!.innerHTML = filtered
     .map((c) => renderSelectableCard(c, "request-qty", requestQuantities, targetFemaleVariants, targetFormLabels))
     .join("");
@@ -131,6 +134,8 @@ async function sendOffer(): Promise<void> {
 }
 
 document.getElementById("target-filter")!.addEventListener("input", renderTargetGrid);
+document.getElementById("target-sort-field")!.addEventListener("change", renderTargetGrid);
+document.getElementById("target-sort-direction")!.addEventListener("change", renderTargetGrid);
 document.getElementById("sort-field")!.addEventListener("change", renderMyGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderMyGrid);
 document.getElementById("my-filter")!.addEventListener("input", renderMyGrid);

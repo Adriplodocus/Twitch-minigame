@@ -43,12 +43,18 @@
 
       <div id="offer-builder" style="display: none; margin-top: 1.5rem;">
         <h2 id="target-heading">Cartas</h2>
-        <input
-          class="input"
-          id="target-filter"
-          placeholder="Buscar por nombre"
-          style="margin-top: 0.75rem; width: 100%; max-width: 320px;"
-        />
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
+          <select id="target-sort-field" class="input">
+            <option value="pokedex">Pokédex</option>
+            <option value="recent">Recientes</option>
+            <option value="quantity">Cantidad</option>
+          </select>
+          <select id="target-sort-direction" class="input">
+            <option value="asc">Ascendente</option>
+            <option value="desc">Descendente</option>
+          </select>
+          <input class="input" id="target-filter" placeholder="Buscar por nombre" style="flex: 1; min-width: 160px;" />
+        </div>
         <div id="target-collection" class="card-grid"></div>
 
         <h2 style="margin-top: 1.5rem;">Tus cartas</h2>
