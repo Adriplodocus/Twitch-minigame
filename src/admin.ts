@@ -8,6 +8,7 @@ interface HistoryRow {
   id: number;
   userId: string;
   username: string;
+  tier: string;
   createdAt: string;
 }
 
@@ -42,10 +43,14 @@ function renderHistory(history: HistoryRow[]): void {
     const tdUsername = document.createElement("td");
     tdUsername.style.padding = "0.4rem";
     tdUsername.textContent = h.username;
+    const tdTier = document.createElement("td");
+    tdTier.style.padding = "0.4rem";
+    tdTier.textContent = h.tier;
     const tdCreatedAt = document.createElement("td");
     tdCreatedAt.style.padding = "0.4rem";
     tdCreatedAt.textContent = h.createdAt;
     tr.appendChild(tdUsername);
+    tr.appendChild(tdTier);
     tr.appendChild(tdCreatedAt);
     return tr;
   });
@@ -147,7 +152,7 @@ async function loadHistory(): Promise<void> {
   renderHistory(result.data.history);
 }
 
-async function performGrant(twitchId: string, quantity: number, username: string): Promise<boolean> {
+async function performGrant(twitchId: string, quantity: number, tier: string, username: string): Promise<boolean> {
   const messageEl = document.getElementById("grant-message")!;
 
   const confirmed = await showConfirmModal(quantity, username);
@@ -156,7 +161,7 @@ async function performGrant(twitchId: string, quantity: number, username: string
   const result = await request<{ ok: true }>("/grant-packs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ twitchId, quantity }),
+    body: JSON.stringify({ twitchId, quantity, tier }),
   });
 
   if (!result.ok) {
@@ -176,7 +181,8 @@ async function performGrant(twitchId: string, quantity: number, username: string
 async function grantPacks(): Promise<void> {
   if (!selectedUser) return;
   const quantity = Number((document.getElementById("quantity-input") as HTMLInputElement).value);
-  const succeeded = await performGrant(selectedUser.twitchId, quantity, selectedUser.username);
+  const tier = (document.getElementById("tier-select") as HTMLSelectElement).value;
+  const succeeded = await performGrant(selectedUser.twitchId, quantity, tier, selectedUser.username);
   if (succeeded) clearSelection();
 }
 
@@ -194,7 +200,7 @@ function renderAllUsers(users: AdminUser[]): void {
     const grantBtn = document.createElement("button");
     grantBtn.className = "btn";
     grantBtn.textContent = "+1 blíster";
-    grantBtn.addEventListener("click", () => performGrant(u.twitchId, 1, u.username));
+    grantBtn.addEventListener("click", () => performGrant(u.twitchId, 1, "gratis", u.username));
     tdAction.appendChild(grantBtn);
 
     tr.appendChild(tdUsername);

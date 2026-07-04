@@ -44,6 +44,10 @@
 
           <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
             <input class="input" id="quantity-input" type="number" min="1" max="50" value="1" style="width: 80px;" />
+            <select class="input" id="tier-select">
+              <option value="gratis">Gratis</option>
+              <option value="apoyo">Apoyo</option>
+            </select>
             <button class="btn" id="grant-btn" disabled>Dar blíster(s)</button>
           </div>
           <p id="grant-message" style="margin-top: 0.5rem;"></p>
@@ -72,6 +76,7 @@
             <thead>
               <tr>
                 <th style="text-align: left; padding: 0.4rem;">Usuario</th>
+                <th style="text-align: left; padding: 0.4rem;">Tier</th>
                 <th style="text-align: left; padding: 0.4rem;">Fecha</th>
               </tr>
             </thead>
