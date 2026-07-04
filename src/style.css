@@ -158,23 +158,36 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .sparkle-layer .dot {
   position: absolute;
+  top: var(--t1);
+  left: var(--l1);
   width: 8px;
   height: 8px;
   background: #ffd700;
   clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
   filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.95)) drop-shadow(0 0 9px rgba(255, 215, 0, 0.7));
   opacity: 0;
-  animation: twinkle 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-name: twinkle;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-iteration-count: infinite;
 }
-.sparkle-layer .dot:nth-child(1) { top: 12%; left: 15%; animation-delay: 0s; }
-.sparkle-layer .dot:nth-child(2) { top: 25%; left: 82%; animation-delay: 0.5s; }
-.sparkle-layer .dot:nth-child(3) { top: 52%; left: 8%; animation-delay: 1s; }
-.sparkle-layer .dot:nth-child(4) { top: 72%; left: 55%; animation-delay: 1.5s; }
-.sparkle-layer .dot:nth-child(5) { top: 85%; left: 88%; animation-delay: 2s; }
 @keyframes twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.5) rotate(20deg); }
-  65% { transform: scale(1) rotate(20deg); }
+  0% { opacity: 0; top: var(--t1); left: var(--l1); transform: scale(0.2) rotate(0deg); }
+  6% { opacity: 1; transform: scale(1.5) rotate(20deg); }
+  16% { transform: scale(1) rotate(20deg); }
+  22% { opacity: 0; top: var(--t1); left: var(--l1); transform: scale(0.2) rotate(0deg); }
+  23% { top: var(--t2); left: var(--l2); }
+  29% { opacity: 1; transform: scale(1.5) rotate(20deg); }
+  39% { transform: scale(1) rotate(20deg); }
+  45% { opacity: 0; top: var(--t2); left: var(--l2); transform: scale(0.2) rotate(0deg); }
+  46% { top: var(--t3); left: var(--l3); }
+  52% { opacity: 1; transform: scale(1.5) rotate(20deg); }
+  62% { transform: scale(1) rotate(20deg); }
+  68% { opacity: 0; top: var(--t3); left: var(--l3); transform: scale(0.2) rotate(0deg); }
+  69% { top: var(--t4); left: var(--l4); }
+  75% { opacity: 1; transform: scale(1.5) rotate(20deg); }
+  85% { transform: scale(1) rotate(20deg); }
+  91% { opacity: 0; top: var(--t4); left: var(--l4); transform: scale(0.2) rotate(0deg); }
+  100% { opacity: 0; top: var(--t1); left: var(--l1); transform: scale(0.2) rotate(0deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {

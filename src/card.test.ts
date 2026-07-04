@@ -35,7 +35,7 @@ it("owned common shiny gets foil, shiny, tiltable, glare, and sparkle layer", ()
   expect(html).toMatch(/class="card card-rarity-common foil shiny tiltable/);
   expect(html).toContain('class="glare"');
   const dotCount = (html.match(/class="dot"/g) ?? []).length;
-  expect(dotCount).toBe(5);
+  expect(dotCount).toBe(7);
 });
 
 it("owned legendary shiny gets foil, shiny, tiltable, glare, and sparkle layer", () => {

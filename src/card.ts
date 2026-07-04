@@ -132,6 +132,14 @@ function ensureInfoTooltipHandler(): void {
   });
 }
 
+function renderSparkleDot(): string {
+  const pos = () => `${(8 + Math.random() * 80).toFixed(1)}%`;
+  const vars = [1, 2, 3, 4].map((i) => `--t${i}:${pos()};--l${i}:${pos()}`).join(";");
+  const duration = (2.4 + Math.random() * 1.6).toFixed(2);
+  const delay = (Math.random() * parseFloat(duration)).toFixed(2);
+  return `<span class="dot" style="${vars};animation-duration:${duration}s;animation-delay:-${delay}s;"></span>`;
+}
+
 export function renderCardHtml(
   card: CardView,
   innerExtra = "",
@@ -168,7 +176,7 @@ export function renderCardHtml(
   const vfxClasses = `${hasFoil ? " foil" : ""}${hasSparkle ? " shiny" : ""}${isOwned ? " tiltable" : ""}`;
   const glareHtml = isOwned ? `<div class="glare"></div>` : "";
   const sparkleHtml = hasSparkle
-    ? `<div class="sparkle-layer">${"<span class=\"dot\"></span>".repeat(5)}</div>`
+    ? `<div class="sparkle-layer">${Array.from({ length: 7 }, () => renderSparkleDot()).join("")}</div>`
     : "";
 
   const genderLine = isFemale ? "Hembra" : hasFemaleVariant ? "Macho" : null;
