@@ -4,6 +4,7 @@ import type { Category, Env, Rarity } from "../types";
 import { requireAdmin } from "../middleware/auth";
 import { signAdminSession } from "../lib/jwt";
 import { pickRandomCards } from "../lib/packs";
+import * as twitch from "../lib/twitch";
 
 const TEST_USER_ID = "__test__";
 
@@ -45,6 +46,37 @@ admin.get("/users", requireAdmin, async (c) => {
     .bind(`%${q}%`)
     .all<{ twitchId: string; username: string; avatarUrl: string | null }>();
   return c.json({ users: users.results });
+});
+
+admin.post("/lookup-user", requireAdmin, async (c) => {
+  const body = await c.req.json<{ username?: string }>().catch(() => ({}) as { username?: string });
+  const username = body.username?.trim();
+  if (!username) return c.json({ error: "Username required" }, 400);
+
+  const existing = await c.env.DB.prepare(
+    "SELECT twitch_id AS twitchId, username, avatar_url AS avatarUrl FROM users WHERE username = ?"
+  )
+    .bind(username)
+    .first<{ twitchId: string; username: string; avatarUrl: string | null }>();
+  if (existing) return c.json({ user: existing });
+
+  const appAccessToken = await twitch.getAppAccessToken({
+    clientId: c.env.TWITCH_CLIENT_ID,
+    clientSecret: c.env.TWITCH_CLIENT_SECRET,
+  });
+  const twitchUser = await twitch.getUserByLogin(username, appAccessToken, c.env.TWITCH_CLIENT_ID);
+  if (!twitchUser) return c.json({ error: "Twitch user not found" }, 404);
+
+  await c.env.DB.prepare(
+    `INSERT INTO users (twitch_id, username, avatar_url) VALUES (?, ?, ?)
+     ON CONFLICT(twitch_id) DO UPDATE SET username = excluded.username, avatar_url = excluded.avatar_url`
+  )
+    .bind(twitchUser.id, twitchUser.login, twitchUser.profileImageUrl)
+    .run();
+
+  return c.json({
+    user: { twitchId: twitchUser.id, username: twitchUser.login, avatarUrl: twitchUser.profileImageUrl },
+  });
 });
 
 admin.post("/grant-packs", requireAdmin, async (c) => {

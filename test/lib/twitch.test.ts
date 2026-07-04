@@ -3,6 +3,7 @@ import {
   buildAuthorizeUrl,
   exchangeCodeForToken,
   getTwitchUser,
+  getUserByLogin,
   createEventSubSubscription,
   getAppAccessToken,
 } from "../../worker/lib/twitch";
@@ -49,6 +50,26 @@ it("fetches the authenticated Twitch user", async () => {
   );
   const user = await getTwitchUser("at", "abc", fetchImpl as unknown as typeof fetch);
   expect(user).toEqual({ id: "42", login: "mrklypp", profileImageUrl: "https://img" });
+});
+
+it("looks up a Twitch user by exact login", async () => {
+  const fetchImpl = vi.fn(async () =>
+    new Response(JSON.stringify({ data: [{ id: "99", login: "someviewer", profile_image_url: "https://img2" }] }), {
+      status: 200,
+    })
+  );
+  const user = await getUserByLogin("someviewer", "app-token", "abc", fetchImpl as unknown as typeof fetch);
+  expect(user).toEqual({ id: "99", login: "someviewer", profileImageUrl: "https://img2" });
+  expect(fetchImpl).toHaveBeenCalledWith(
+    "https://api.twitch.tv/helix/users?login=someviewer",
+    expect.objectContaining({ headers: { Authorization: "Bearer app-token", "Client-Id": "abc" } })
+  );
+});
+
+it("returns null when a Twitch login has no matching user", async () => {
+  const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ data: [] }), { status: 200 }));
+  const user = await getUserByLogin("doesnotexist", "app-token", "abc", fetchImpl as unknown as typeof fetch);
+  expect(user).toBeNull();
 });
 
 it("creates an EventSub subscription", async () => {

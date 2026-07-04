@@ -1,7 +1,8 @@
 import { env } from "cloudflare:test";
-import { it, expect, beforeEach } from "vitest";
+import { it, expect, vi, beforeEach } from "vitest";
 import app from "../../worker";
 import { signAdminSession, signSession } from "../../worker/lib/jwt";
+import * as twitch from "../../worker/lib/twitch";
 
 async function adminCookie(adminName = "Test Admin"): Promise<string> {
   const token = await signAdminSession(env.JWT_SECRET, adminName);
@@ -203,6 +204,93 @@ it("logs out by clearing the admin session cookie", async () => {
   const res = await app.request("/api/admin/logout", { method: "POST" }, env);
   expect(res.status).toBe(200);
   expect(res.headers.get("set-cookie")).toContain("admin_session=");
+});
+
+it("rejects lookup-user requests without an admin session", async () => {
+  const res = await app.request(
+    "/api/admin/lookup-user",
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: "x" }) },
+    env
+  );
+  expect(res.status).toBe(401);
+});
+
+it("rejects lookup-user with a missing username", async () => {
+  const cookie = await adminCookie();
+  const res = await app.request(
+    "/api/admin/lookup-user",
+    { method: "POST", headers: { "Content-Type": "application/json", Cookie: cookie }, body: JSON.stringify({}) },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("returns an existing local user without calling Twitch", async () => {
+  const getAppAccessTokenSpy = vi.spyOn(twitch, "getAppAccessToken");
+  const cookie = await adminCookie();
+  const res = await app.request(
+    "/api/admin/lookup-user",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ username: "viewer1" }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const { user } = await res.json<{ user: { twitchId: string; username: string } }>();
+  expect(user).toEqual({ twitchId: "1", username: "viewer1", avatarUrl: null });
+  expect(getAppAccessTokenSpy).not.toHaveBeenCalled();
+  vi.restoreAllMocks();
+});
+
+it("creates a user from Twitch when there is no local match", async () => {
+  vi.spyOn(twitch, "getAppAccessToken").mockResolvedValue("app-token");
+  vi.spyOn(twitch, "getUserByLogin").mockResolvedValue({
+    id: "999",
+    login: "brandnew",
+    profileImageUrl: "https://img",
+  });
+
+  const cookie = await adminCookie();
+  const res = await app.request(
+    "/api/admin/lookup-user",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ username: "brandnew" }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const { user } = await res.json<{ user: { twitchId: string; username: string; avatarUrl: string } }>();
+  expect(user).toEqual({ twitchId: "999", username: "brandnew", avatarUrl: "https://img" });
+
+  const row = await env.DB.prepare("SELECT twitch_id, username, avatar_url FROM users WHERE twitch_id = ?")
+    .bind("999")
+    .first();
+  expect(row).toEqual({ twitch_id: "999", username: "brandnew", avatar_url: "https://img" });
+
+  vi.restoreAllMocks();
+});
+
+it("returns 404 when Twitch has no user with that login", async () => {
+  vi.spyOn(twitch, "getAppAccessToken").mockResolvedValue("app-token");
+  vi.spyOn(twitch, "getUserByLogin").mockResolvedValue(null);
+
+  const cookie = await adminCookie();
+  const res = await app.request(
+    "/api/admin/lookup-user",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ username: "doesnotexist" }),
+    },
+    env
+  );
+  expect(res.status).toBe(404);
+
+  vi.restoreAllMocks();
 });
 
 it("rejects pack-grant-config requests without an admin session", async () => {

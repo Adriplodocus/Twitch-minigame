@@ -46,6 +46,21 @@ export async function getTwitchUser(
   return { id: user.id, login: user.login, profileImageUrl: user.profile_image_url };
 }
 
+export async function getUserByLogin(
+  login: string,
+  accessToken: string,
+  clientId: string,
+  fetchImpl: typeof fetch = fetch
+): Promise<{ id: string; login: string; profileImageUrl: string } | null> {
+  const res = await fetchImpl(`https://api.twitch.tv/helix/users?login=${encodeURIComponent(login)}`, {
+    headers: { Authorization: `Bearer ${accessToken}`, "Client-Id": clientId },
+  });
+  if (!res.ok) throw new Error(`Twitch get user by login failed: ${res.status}`);
+  const json = (await res.json()) as { data: { id: string; login: string; profile_image_url: string }[] };
+  const user = json.data[0];
+  return user ? { id: user.id, login: user.login, profileImageUrl: user.profile_image_url } : null;
+}
+
 export async function getAppAccessToken(
   opts: { clientId: string; clientSecret: string },
   fetchImpl: typeof fetch = fetch

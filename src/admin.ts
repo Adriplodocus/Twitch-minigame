@@ -73,10 +73,19 @@ function renderHistory(history: HistoryRow[]): void {
   container.replaceChildren(...rows);
 }
 
-function renderSearchResults(users: AdminUser[]): void {
+function renderSearchResults(users: AdminUser[], query: string): void {
   const container = document.getElementById("search-results")!;
   if (users.length === 0) {
-    container.replaceChildren();
+    if (!query) {
+      container.replaceChildren();
+      return;
+    }
+    const lookupSpan = document.createElement("span");
+    lookupSpan.className = "badge";
+    lookupSpan.style.cssText = "cursor: pointer; margin: 0.2rem;";
+    lookupSpan.textContent = `Dar sobres a "${query}" (buscar en Twitch)`;
+    lookupSpan.addEventListener("click", () => lookupTwitchUser(query));
+    container.replaceChildren(lookupSpan);
     return;
   }
   const spans = users.map((u) => {
@@ -92,6 +101,24 @@ function renderSearchResults(users: AdminUser[]): void {
     return span;
   });
   container.replaceChildren(...spans);
+}
+
+async function lookupTwitchUser(username: string): Promise<void> {
+  const result = await request<{ user: AdminUser }>("/lookup-user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  });
+  if (!result.ok) {
+    if (result.status === 401) {
+      showLoginView();
+      return;
+    }
+    document.getElementById("search-results")!.innerHTML =
+      "<p>No existe ningún usuario de Twitch con ese nombre.</p>";
+    return;
+  }
+  selectUser(result.data.user);
 }
 
 function selectUser(user: AdminUser): void {
@@ -111,7 +138,7 @@ function clearSelection(): void {
 
 async function runSearch(query: string): Promise<void> {
   if (!query) {
-    renderSearchResults([]);
+    renderSearchResults([], "");
     return;
   }
   const result = await request<{ users: AdminUser[] }>(`/users?q=${encodeURIComponent(query)}`);
@@ -119,7 +146,7 @@ async function runSearch(query: string): Promise<void> {
     if (result.status === 401) showLoginView();
     return;
   }
-  renderSearchResults(result.data.users);
+  renderSearchResults(result.data.users, query);
 }
 
 function showConfirmModal(quantity: number, username: string): Promise<boolean> {
