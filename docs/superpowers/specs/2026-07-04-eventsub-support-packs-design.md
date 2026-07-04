@@ -23,7 +23,7 @@ Reglas de negocio (dadas por el usuario):
 
 ## Cambios de datos
 
-**`migrations/0013_expand_pack_source.sql`** — SQLite no permite alterar un `CHECK` in-place, así que se reconstruye la tabla `packs` con el `CHECK` ampliado:
+**`migrations/0013_expand_pack_source.sql`** — SQLite no permite alterar un `CHECK` in-place, así que se reconstruye la tabla `packs` con el `CHECK` ampliado (sin `PRAGMA foreign_keys` en el proyecto, el rebuild es seguro):
 
 ```sql
 CREATE TABLE packs_new (
@@ -57,164 +57,27 @@ ALTER TABLE users ADD COLUMN bits_balance INTEGER NOT NULL DEFAULT 0;
 
 ## `worker/lib/twitch.ts`
 
-`createEventSubSubscription` pasa de estar hardcodeado al tipo de canje de puntos a aceptar `type` y `condition` genéricos:
-
-```ts
-export async function createEventSubSubscription(
-  opts: {
-    accessToken: string;
-    clientId: string;
-    type: string;
-    version: string;
-    condition: Record<string, string>;
-    callbackUrl: string;
-    secret: string;
-  },
-  fetchImpl: typeof fetch = fetch
-): Promise<void> {
-  const res = await fetchImpl("https://api.twitch.tv/helix/eventsub/subscriptions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${opts.accessToken}`, "Client-Id": opts.clientId, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: opts.type,
-      version: opts.version,
-      condition: opts.condition,
-      transport: { method: "webhook", callback: opts.callbackUrl, secret: opts.secret },
-    }),
-  });
-  // 409 = ya registrada (re-ejecutar el login no debe romper lo existente)
-  if (!res.ok && res.status !== 409) throw new Error(`EventSub subscription creation failed (${opts.type}): ${res.status}`);
-}
-```
+`createEventSubSubscription` pasa de estar hardcodeado al tipo de canje de puntos a aceptar `type`, `version` y `condition` genéricos, para poder registrar los 5 tipos de subscripción desde `auth.ts`. Tolera 409 (ya registrada) para que reintentar el registro no rompa lo existente.
 
 ## `worker/routes/auth.ts` — `broadcaster-callback`
 
-Amplía los scopes pedidos en `broadcaster-login`:
-
-```ts
-scopes: ["channel:read:redemptions", "bits:read", "channel:read:subscriptions"],
-```
-
-Y tras obtener el app access token, registra las 5 subscripciones en vez de 1:
-
-```ts
-const callbackUrl = new URL("/webhook/eventsub", c.req.url).toString();
-const broadcasterId = c.env.TWITCH_BROADCASTER_ID;
-const subs: { type: string; version: string; condition: Record<string, string> }[] = [
-  { type: "channel.channel_points_custom_reward_redemption.add", version: "1", condition: { broadcaster_user_id: broadcasterId, reward_id: c.env.TWITCH_REWARD_ID } },
-  { type: "channel.cheer", version: "1", condition: { broadcaster_user_id: broadcasterId } },
-  { type: "channel.subscribe", version: "1", condition: { broadcaster_user_id: broadcasterId } },
-  { type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id: broadcasterId } },
-  { type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id: broadcasterId } },
-];
-for (const sub of subs) {
-  await twitch.createEventSubSubscription({ accessToken: appAccessToken, clientId: c.env.TWITCH_CLIENT_ID, callbackUrl, secret: c.env.TWITCH_EVENTSUB_SECRET, ...sub });
-}
-```
-
-Nota operativa: el broadcaster tiene que repetir el login (`/api/auth/broadcaster-login`) una vez desplegado, para conceder los scopes nuevos (`bits:read`, `channel:read:subscriptions`) — el token actual no los tiene.
+Amplía los scopes pedidos en `broadcaster-login` (`channel:read:redemptions` → añade `bits:read`, `channel:read:subscriptions`) y registra las 5 subscripciones (redemption + cheer + subscribe + subscription.message + subscription.gift) en vez de 1. El broadcaster tendrá que repetir el login una vez desplegado para conceder los scopes nuevos.
 
 ## `worker/routes/webhook.ts`
 
-Se reescribe para despachar por `Twitch-Eventsub-Subscription-Type` en vez de asumir siempre canje de puntos. Helpers locales:
-
-```ts
-const BITS_PER_PACK = 200;
-
-async function upsertUser(db: D1Database, userId: string, username: string): Promise<void> {
-  await db.prepare(
-    `INSERT INTO users (twitch_id, username) VALUES (?, ?)
-     ON CONFLICT(twitch_id) DO UPDATE SET username = excluded.username`
-  ).bind(userId, username).run();
-}
-
-async function grantPacks(db: D1Database, userId: string, quantity: number, source: string, tier: PackTier): Promise<void> {
-  if (quantity < 1) return;
-  const statements = Array.from({ length: quantity }, () =>
-    db.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, ?, ?)").bind(userId, source, tier)
-  );
-  await db.batch(statements);
-}
-
-async function addBitsAndGetPackCount(db: D1Database, userId: string, bits: number): Promise<number> {
-  const row = await db.prepare("SELECT bits_balance FROM users WHERE twitch_id = ?").bind(userId).first<{ bits_balance: number }>();
-  const balance = (row?.bits_balance ?? 0) + bits;
-  await db.prepare("UPDATE users SET bits_balance = ? WHERE twitch_id = ?").bind(balance % BITS_PER_PACK, userId).run();
-  return Math.floor(balance / BITS_PER_PACK);
-}
-```
-
-Despacho principal (reemplaza el bloque `if (messageType === "notification" && payload.event)` actual):
-
-```ts
-const subscriptionType = c.req.header("Twitch-Eventsub-Subscription-Type") ?? "";
-
-if (messageType === "notification" && payload.event) {
-  const event = payload.event;
-  switch (subscriptionType) {
-    case "channel.channel_points_custom_reward_redemption.add":
-      if (event.reward.id !== c.env.TWITCH_REWARD_ID) break;
-      await upsertUser(c.env.DB, event.user_id, event.user_login);
-      await grantPacks(c.env.DB, event.user_id, 1, "reward", "gratis");
-      break;
-
-    case "channel.cheer": {
-      if (event.is_anonymous || !event.user_id) break;
-      await upsertUser(c.env.DB, event.user_id, event.user_login);
-      const packs = await addBitsAndGetPackCount(c.env.DB, event.user_id, event.bits);
-      await grantPacks(c.env.DB, event.user_id, packs, "bits", "apoyo");
-      break;
-    }
-
-    case "channel.subscribe":
-      if (event.is_gift) break;
-      await upsertUser(c.env.DB, event.user_id, event.user_login);
-      await grantPacks(c.env.DB, event.user_id, 1, "sub", "apoyo");
-      break;
-
-    case "channel.subscription.message":
-      await upsertUser(c.env.DB, event.user_id, event.user_login);
-      await grantPacks(c.env.DB, event.user_id, 1, "sub", "apoyo");
-      break;
-
-    case "channel.subscription.gift":
-      if (event.is_anonymous || !event.user_id) break;
-      await upsertUser(c.env.DB, event.user_id, event.user_login);
-      await grantPacks(c.env.DB, event.user_id, event.total, "gift_sub", "apoyo");
-      break;
-  }
-  return c.json({ ok: true }, 200);
-}
-```
-
-La verificación de firma HMAC y el manejo de `webhook_callback_verification` no cambian.
+Se reescribe para despachar por `subscription.type` (viene en el body de la notificación, junto a `event` — Twitch siempre lo incluye ahí, y los tests existentes ya lo estaban poniendo en el body aunque el código actual lo ignore). Helpers nuevos: `upsertUser`, `grantPacks` (batch insert de N filas), `addBitsAndGetPackCount` (lee `bits_balance`, sube, calcula sobres y guarda el resto).
 
 ## Admin — historial (label en español)
 
-`src/admin.ts` `renderHistory`: hoy `tdSource.textContent = h.source` muestra el valor crudo. Se añade un mapeo:
-
-```ts
-const SOURCE_LABELS: Record<string, string> = {
-  reward: "Recompensa",
-  admin: "Admin",
-  bits: "Bits",
-  sub: "Suscripción",
-  gift_sub: "Regalo sub",
-};
-tdSource.textContent = SOURCE_LABELS[h.source] ?? h.source;
-```
+`src/admin.ts` `renderHistory`: hoy `tdSource.textContent = h.source` muestra el valor crudo. Se extrae una función pura `sourceLabel(source: string): string` con el mapeo `reward→Recompensa, admin→Admin, bits→Bits, sub→Suscripción, gift_sub→Regalo sub` (fallback al valor crudo si no está en la tabla), para poder testearla sin DOM.
 
 ## Testing
 
-En `test/webhook.test.ts` (Miniflare/D1, vía `vitest.workers.config.ts`):
+En `test/webhook.test.ts` (Miniflare/D1): cheer por debajo del umbral, cheer que cruza el umbral (con resto), cheer que cruza varias veces en un solo evento, cheer anónimo ignorado, sub nueva concede, sub-regalo-al-receptor no concede (evita duplicar), renovación concede, gift-sub concede `total` al gifter, gift-sub anónimo no concede. El canje de puntos existente sigue funcionando igual (regresión, tests ya existentes).
 
-- Cheer: bits por debajo del umbral no concede sobre y deja `bits_balance` actualizado; cruzar el umbral concede 1 sobre y guarda el resto; acumular en cheers sucesivos hasta cruzar varias veces concede varios sobres a lo largo del tiempo.
-- Cheer anónimo (`is_anonymous: true` o sin `user_id`): no concede nada, no crea usuario.
-- `channel.subscribe` con `is_gift: false`: concede 1 sobre tier `apoyo`.
-- `channel.subscribe` con `is_gift: true`: no concede nada (evita duplicar con el evento de gift).
-- `channel.subscription.message`: concede 1 sobre tier `apoyo`.
-- `channel.subscription.gift`: concede `total` sobres al gifter; si `is_anonymous`, no concede nada.
-- El canje de puntos existente (`channel.channel_points_custom_reward_redemption.add`) sigue funcionando igual (regresión).
+En `test/lib/twitch.test.ts` y `test/routes/auth.test.ts`: adaptar al nuevo signature de `createEventSubSubscription` y verificar que se registran las 5 subscripciones con los scopes ampliados.
+
+En `src/admin.test.ts` (nuevo): `sourceLabel` para cada valor conocido + fallback.
 
 ## Fuera de alcance
 
