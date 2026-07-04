@@ -160,9 +160,9 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   position: absolute;
   width: 8px;
   height: 8px;
-  background: #fff;
+  background: #ffd700;
   clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 9px rgba(255, 255, 255, 0.7));
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.95)) drop-shadow(0 0 9px rgba(255, 215, 0, 0.7));
   opacity: 0;
   animation: twinkle 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
