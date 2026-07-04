@@ -33,24 +33,6 @@ admin.post("/logout", (c) => {
   return c.json({ ok: true });
 });
 
-admin.get("/users/all", requireAdmin, async (c) => {
-  const pageParam = Number(c.req.query("page"));
-  const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
-  const offset = (page - 1) * 20;
-
-  const result = await c.env.DB.prepare(
-    `SELECT twitch_id AS twitchId, username, avatar_url AS avatarUrl
-     FROM users ORDER BY username LIMIT 21 OFFSET ?`
-  )
-    .bind(offset)
-    .all<{ twitchId: string; username: string; avatarUrl: string | null }>();
-
-  const hasMore = result.results.length > 20;
-  const users = result.results.slice(0, 20);
-
-  return c.json({ users, page, hasMore });
-});
-
 admin.get("/users", requireAdmin, async (c) => {
   const q = c.req.query("q") ?? "";
   const users = await c.env.DB.prepare(
@@ -78,8 +60,13 @@ admin.post("/grant-packs", requireAdmin, async (c) => {
   const user = await c.env.DB.prepare("SELECT twitch_id FROM users WHERE twitch_id = ?").bind(twitchId).first();
   if (!user) return c.json({ error: "User not found" }, 404);
 
+  const adminName = c.get("adminName");
   const statements = Array.from({ length: quantity }, () =>
-    c.env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'admin', ?)").bind(twitchId, tier)
+    c.env.DB.prepare("INSERT INTO packs (user_id, source, tier, granted_by) VALUES (?, 'admin', ?, ?)").bind(
+      twitchId,
+      tier,
+      adminName
+    )
   );
   await c.env.DB.batch(statements);
 
@@ -88,11 +75,19 @@ admin.post("/grant-packs", requireAdmin, async (c) => {
 
 admin.get("/history", requireAdmin, async (c) => {
   const history = await c.env.DB.prepare(
-    `SELECT p.id, p.user_id AS userId, u.username, p.tier AS tier, p.created_at AS createdAt
+    `SELECT p.id, p.user_id AS userId, u.username, p.tier AS tier, p.source AS source,
+            p.granted_by AS grantedBy, p.created_at AS createdAt
      FROM packs p JOIN users u ON u.twitch_id = p.user_id
-     WHERE p.source = 'admin'
-     ORDER BY p.created_at DESC LIMIT 20`
-  ).all<{ id: number; userId: string; username: string; tier: string; createdAt: string }>();
+     ORDER BY p.created_at DESC LIMIT 25`
+  ).all<{
+    id: number;
+    userId: string;
+    username: string;
+    tier: string;
+    source: string;
+    grantedBy: string | null;
+    createdAt: string;
+  }>();
   return c.json({ history: history.results });
 });
 

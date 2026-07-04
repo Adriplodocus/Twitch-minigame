@@ -143,8 +143,8 @@ it("rejects grant-packs for a nonexistent user", async () => {
   expect(res.status).toBe(404);
 });
 
-it("grants packs with the chosen tier and lists them in history", async () => {
-  const cookie = await adminCookie();
+it("grants packs with the chosen tier, records who granted them, and lists them in history", async () => {
+  const cookie = await adminCookie("Grantor Name");
   const res = await app.request(
     "/api/admin/grant-packs",
     {
@@ -156,17 +156,47 @@ it("grants packs with the chosen tier and lists them in history", async () => {
   );
   expect(res.status).toBe(200);
 
-  const packs = await env.DB.prepare("SELECT source, tier FROM packs WHERE user_id = ?")
+  const packs = await env.DB.prepare("SELECT source, tier, granted_by AS grantedBy FROM packs WHERE user_id = ?")
     .bind("1")
-    .all<{ source: string; tier: string }>();
+    .all<{ source: string; tier: string; grantedBy: string | null }>();
   expect(packs.results).toHaveLength(3);
-  expect(packs.results.every((p) => p.source === "admin" && p.tier === "apoyo")).toBe(true);
+  expect(packs.results.every((p) => p.source === "admin" && p.tier === "apoyo" && p.grantedBy === "Grantor Name")).toBe(
+    true
+  );
 
   const historyRes = await app.request("/api/admin/history", { headers: { Cookie: cookie } }, env);
-  const historyJson = await historyRes.json<{ history: { username: string; tier: string }[] }>();
-  expect(historyJson.history).toHaveLength(3);
-  expect(historyJson.history[0].username).toBe("viewer1");
-  expect(historyJson.history[0].tier).toBe("apoyo");
+  const { history } = await historyRes.json<{
+    history: { username: string; tier: string; source: string; grantedBy: string | null }[];
+  }>();
+  expect(history).toHaveLength(3);
+  expect(history[0].username).toBe("viewer1");
+  expect(history[0].tier).toBe("apoyo");
+  expect(history[0].source).toBe("admin");
+  expect(history[0].grantedBy).toBe("Grantor Name");
+});
+
+it("includes non-admin (reward) sourced packs in history with a null grantedBy", async () => {
+  await env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'reward', 'gratis')").bind("2").run();
+  const cookie = await adminCookie();
+  const historyRes = await app.request("/api/admin/history", { headers: { Cookie: cookie } }, env);
+  const { history } = await historyRes.json<{
+    history: { username: string; source: string; grantedBy: string | null }[];
+  }>();
+  const rewardRow = history.find((h) => h.username === "viewer2");
+  expect(rewardRow).toBeDefined();
+  expect(rewardRow!.source).toBe("reward");
+  expect(rewardRow!.grantedBy).toBeNull();
+});
+
+it("caps history at 25 rows", async () => {
+  const statements = Array.from({ length: 30 }, () =>
+    env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'reward', 'gratis')").bind("1")
+  );
+  await env.DB.batch(statements);
+  const cookie = await adminCookie();
+  const historyRes = await app.request("/api/admin/history", { headers: { Cookie: cookie } }, env);
+  const { history } = await historyRes.json<{ history: unknown[] }>();
+  expect(history).toHaveLength(25);
 });
 
 it("logs out by clearing the admin session cookie", async () => {
@@ -175,38 +205,3 @@ it("logs out by clearing the admin session cookie", async () => {
   expect(res.headers.get("set-cookie")).toContain("admin_session=");
 });
 
-it("lists all users alphabetically on page 1 with hasMore false when there are 20 or fewer", async () => {
-  const cookie = await adminCookie();
-  const res = await app.request("/api/admin/users/all", { headers: { Cookie: cookie } }, env);
-  expect(res.status).toBe(200);
-  const json = await res.json<{ users: { username: string }[]; page: number; hasMore: boolean }>();
-  expect(json.page).toBe(1);
-  expect(json.hasMore).toBe(false);
-  expect(json.users.map((u) => u.username)).toEqual(["viewer1", "viewer2"]);
-});
-
-it("paginates the full user list with hasMore true when a 21st user exists", async () => {
-  const statements = Array.from({ length: 19 }, (_, i) =>
-    env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind(`extra-${i}`, `zzz-user-${String(i).padStart(2, "0")}`)
-  );
-  await env.DB.batch(statements);
-  // Now 21 users total: viewer1, viewer2, and 19 "zzz-user-*" (alphabetically last).
-
-  const cookie = await adminCookie();
-  const page1 = await app.request("/api/admin/users/all?page=1", { headers: { Cookie: cookie } }, env);
-  const page1Json = await page1.json<{ users: { username: string }[]; page: number; hasMore: boolean }>();
-  expect(page1Json.page).toBe(1);
-  expect(page1Json.users).toHaveLength(20);
-  expect(page1Json.hasMore).toBe(true);
-
-  const page2 = await app.request("/api/admin/users/all?page=2", { headers: { Cookie: cookie } }, env);
-  const page2Json = await page2.json<{ users: { username: string }[]; page: number; hasMore: boolean }>();
-  expect(page2Json.page).toBe(2);
-  expect(page2Json.users).toHaveLength(1);
-  expect(page2Json.hasMore).toBe(false);
-});
-
-it("requires an admin session for the full user list", async () => {
-  const res = await app.request("/api/admin/users/all", {}, env);
-  expect(res.status).toBe(401);
-});
