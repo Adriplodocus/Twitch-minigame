@@ -89,4 +89,18 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   return c.json({ cards });
 });
 
+collection.post("/packs/:id/broadcast", requireAuth, async (c) => {
+  const user = c.get("user");
+  const packId = Number(c.req.param("id"));
+
+  const pack = await c.env.DB.prepare("SELECT id, user_id, opened_at FROM packs WHERE id = ?")
+    .bind(packId)
+    .first<{ id: number; user_id: string; opened_at: string | null }>();
+  if (!pack || pack.user_id !== user.twitchId) return c.json({ error: "Not found" }, 404);
+  if (!pack.opened_at) return c.json({ error: "Pack not opened yet" }, 409);
+
+  await c.env.DB.prepare("UPDATE packs SET broadcast_at = CURRENT_TIMESTAMP WHERE id = ?").bind(packId).run();
+  return c.json({ ok: true });
+});
+
 export default collection;

@@ -200,3 +200,55 @@ it("opens a pack using its stored tier without erroring", async () => {
   const json = await res.json<{ cards: { id: string }[] }>();
   expect(json.cards).toHaveLength(10);
 });
+
+it("marks an opened pack as broadcast", async () => {
+  const packResult = await env.DB.prepare(
+    "INSERT INTO packs (user_id, opened_at) VALUES (?, CURRENT_TIMESTAMP) RETURNING id"
+  )
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/broadcast`,
+    { method: "POST", headers: { Cookie: cookie } },
+    env
+  );
+  expect(res.status).toBe(200);
+
+  const pack = await env.DB.prepare("SELECT broadcast_at FROM packs WHERE id = ?")
+    .bind(packResult!.id)
+    .first<{ broadcast_at: string | null }>();
+  expect(pack?.broadcast_at).not.toBeNull();
+});
+
+it("rejects broadcasting a pack that hasn't been opened yet", async () => {
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/broadcast`,
+    { method: "POST", headers: { Cookie: cookie } },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+
+it("rejects broadcasting a pack that belongs to another user", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind("2", "viewer2").run();
+  const packResult = await env.DB.prepare(
+    "INSERT INTO packs (user_id, opened_at) VALUES (?, CURRENT_TIMESTAMP) RETURNING id"
+  )
+    .bind("2")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/broadcast`,
+    { method: "POST", headers: { Cookie: cookie } },
+    env
+  );
+  expect(res.status).toBe(404);
+});
