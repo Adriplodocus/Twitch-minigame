@@ -168,7 +168,7 @@ export function renderCardHtml(
   const vfxClasses = `${hasFoil ? " foil" : ""}${hasSparkle ? " shiny" : ""}${isOwned ? " tiltable" : ""}`;
   const glareHtml = isOwned ? `<div class="glare"></div>` : "";
   const sparkleHtml = hasSparkle
-    ? `<div class="sparkle-layer">${"<span class=\"dot\"></span>".repeat(6)}</div>`
+    ? `<div class="sparkle-layer">${"<span class=\"dot\"></span>".repeat(5)}</div>`
     : "";
 
   const genderLine = isFemale ? "Hembra" : hasFemaleVariant ? "Macho" : null;

@@ -153,29 +153,28 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .sparkle-layer {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  border-radius: 20px;
+  overflow: visible;
   pointer-events: none;
 }
 .sparkle-layer .dot {
   position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
+  width: 8px;
+  height: 8px;
   background: #fff;
-  box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.95);
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 9px rgba(255, 255, 255, 0.7));
   opacity: 0;
-  animation: twinkle 2.6s ease-in-out infinite;
+  animation: twinkle 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
-.sparkle-layer .dot:nth-child(1) { top: 14%; left: 20%; animation-delay: 0s; }
-.sparkle-layer .dot:nth-child(2) { top: 30%; left: 78%; animation-delay: 0.4s; }
-.sparkle-layer .dot:nth-child(3) { top: 55%; left: 12%; animation-delay: 0.9s; }
-.sparkle-layer .dot:nth-child(4) { top: 68%; left: 60%; animation-delay: 1.3s; }
-.sparkle-layer .dot:nth-child(5) { top: 20%; left: 50%; animation-delay: 1.8s; }
-.sparkle-layer .dot:nth-child(6) { top: 80%; left: 85%; animation-delay: 2.2s; }
+.sparkle-layer .dot:nth-child(1) { top: 12%; left: 15%; animation-delay: 0s; }
+.sparkle-layer .dot:nth-child(2) { top: 25%; left: 82%; animation-delay: 0.5s; }
+.sparkle-layer .dot:nth-child(3) { top: 52%; left: 8%; animation-delay: 1s; }
+.sparkle-layer .dot:nth-child(4) { top: 72%; left: 55%; animation-delay: 1.5s; }
+.sparkle-layer .dot:nth-child(5) { top: 85%; left: 88%; animation-delay: 2s; }
 @keyframes twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.3); }
-  50% { opacity: 1; transform: scale(1); }
+  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.5) rotate(20deg); }
+  65% { transform: scale(1) rotate(20deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
