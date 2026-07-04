@@ -14,7 +14,7 @@
 1. `npm run build`
 2. `npx wrangler deploy`
 3. Update the Twitch app's OAuth redirect URLs to the deployed domain.
-4. Log in once as the broadcaster via `/api/auth/broadcaster-login` to register the EventSub subscription (requires the deployed HTTPS URL — Twitch cannot call back to localhost).
+4. Log in once as the broadcaster via `/api/auth/broadcaster-login` to register the EventSub subscriptions (channel points, bits, subs, gift subs) — requires the deployed HTTPS URL (Twitch cannot call back to localhost). If the broadcaster already logged in before scopes changed, repeat this step to re-authorize with the new scopes.
 
 ## Testing
 

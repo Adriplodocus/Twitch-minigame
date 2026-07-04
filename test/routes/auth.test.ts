@@ -91,7 +91,7 @@ it("rejects broadcaster callback when the logged-in Twitch user is not the broad
   vi.restoreAllMocks();
 });
 
-it("creates an EventSub subscription with an app access token on a valid broadcaster callback", async () => {
+it("registers all 5 EventSub subscriptions with an app access token on a valid broadcaster callback", async () => {
   vi.spyOn(twitch, "exchangeCodeForToken").mockResolvedValue({
     accessToken: "broadcaster-user-token",
     refreshToken: "rt",
@@ -112,7 +112,38 @@ it("creates an EventSub subscription with an app access token on a valid broadca
   );
 
   expect(res.status).toBe(200);
-  expect(createSpy).toHaveBeenCalledWith(expect.objectContaining({ accessToken: "app-token" }));
+  expect(createSpy).toHaveBeenCalledTimes(5);
+  const types = createSpy.mock.calls.map((call) => call[0].type);
+  expect(types).toEqual([
+    "channel.channel_points_custom_reward_redemption.add",
+    "channel.cheer",
+    "channel.subscribe",
+    "channel.subscription.message",
+    "channel.subscription.gift",
+  ]);
+  expect(createSpy).toHaveBeenCalledWith(
+    expect.objectContaining({
+      accessToken: "app-token",
+      type: "channel.channel_points_custom_reward_redemption.add",
+      condition: { broadcaster_user_id: env.TWITCH_BROADCASTER_ID, reward_id: env.TWITCH_REWARD_ID },
+    })
+  );
+  expect(createSpy).toHaveBeenCalledWith(
+    expect.objectContaining({
+      type: "channel.cheer",
+      condition: { broadcaster_user_id: env.TWITCH_BROADCASTER_ID },
+    })
+  );
 
   vi.restoreAllMocks();
+});
+
+it("requests the extended scopes on broadcaster-login", async () => {
+  const res = await app.request("/api/auth/broadcaster-login", { redirect: "manual" }, env);
+  expect(res.status).toBe(302);
+  const location = new URL(res.headers.get("Location") ?? "");
+  const scopes = (location.searchParams.get("scope") ?? "").split(" ");
+  expect(scopes).toEqual(
+    expect.arrayContaining(["channel:read:redemptions", "bits:read", "channel:read:subscriptions"])
+  );
 });

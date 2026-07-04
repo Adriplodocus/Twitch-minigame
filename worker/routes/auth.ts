@@ -89,7 +89,7 @@ auth.get("/broadcaster-login", (c) => {
     clientId: c.env.TWITCH_CLIENT_ID,
     redirectUri: c.env.TWITCH_BROADCASTER_REDIRECT_URI,
     state,
-    scopes: ["channel:read:redemptions"],
+    scopes: ["channel:read:redemptions", "bits:read", "channel:read:subscriptions"],
   });
   return c.redirect(url, 302);
 });
@@ -126,14 +126,28 @@ auth.get("/broadcaster-callback", async (c) => {
     clientId: c.env.TWITCH_CLIENT_ID,
     clientSecret: c.env.TWITCH_CLIENT_SECRET,
   });
-  await twitch.createEventSubSubscription({
-    accessToken: appAccessToken,
-    clientId: c.env.TWITCH_CLIENT_ID,
-    broadcasterId: c.env.TWITCH_BROADCASTER_ID,
-    rewardId: c.env.TWITCH_REWARD_ID,
-    callbackUrl: new URL("/webhook/eventsub", c.req.url).toString(),
-    secret: c.env.TWITCH_EVENTSUB_SECRET,
-  });
+  const callbackUrl = new URL("/webhook/eventsub", c.req.url).toString();
+  const broadcasterId = c.env.TWITCH_BROADCASTER_ID;
+  const subscriptions: { type: string; version: string; condition: Record<string, string> }[] = [
+    {
+      type: "channel.channel_points_custom_reward_redemption.add",
+      version: "1",
+      condition: { broadcaster_user_id: broadcasterId, reward_id: c.env.TWITCH_REWARD_ID },
+    },
+    { type: "channel.cheer", version: "1", condition: { broadcaster_user_id: broadcasterId } },
+    { type: "channel.subscribe", version: "1", condition: { broadcaster_user_id: broadcasterId } },
+    { type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id: broadcasterId } },
+    { type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id: broadcasterId } },
+  ];
+  for (const subscription of subscriptions) {
+    await twitch.createEventSubSubscription({
+      accessToken: appAccessToken,
+      clientId: c.env.TWITCH_CLIENT_ID,
+      callbackUrl,
+      secret: c.env.TWITCH_EVENTSUB_SECRET,
+      ...subscription,
+    });
+  }
 
   deleteCookie(c, "broadcaster_oauth_state", { path: "/" });
   return c.json({ ok: true, message: "EventSub subscription created" });
