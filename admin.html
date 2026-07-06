@@ -109,9 +109,22 @@
                 Sobres por sub regalada
                 <input class="input" id="cfg-gift-sub-multiplier" type="number" min="0" max="1000" />
               </label>
+              <label>
+                € por sobre (PayPal)
+                <input class="input" id="cfg-paypal-threshold" type="number" min="1" max="1000" />
+              </label>
+              <label>
+                Sobres por umbral de PayPal
+                <input class="input" id="cfg-paypal-quantity" type="number" min="0" max="1000" />
+              </label>
             </div>
             <button class="btn" id="cfg-save-btn" style="margin-top: 0.75rem;">Guardar configuración</button>
             <p id="cfg-message" style="margin-top: 0.5rem;"></p>
+          </div>
+
+          <div class="card span-2">
+            <h2>Donaciones de PayPal sin asignar</h2>
+            <div id="paypal-donations-list" style="margin-top: 0.75rem;"></div>
           </div>
 
           <div class="card span-2">

@@ -23,6 +23,16 @@ interface PackGrantConfig {
   bitsQuantity: number;
   subQuantity: number;
   giftSubMultiplier: number;
+  paypalThreshold: number;
+  paypalQuantity: number;
+}
+
+interface PaypalDonation {
+  txnId: string;
+  amount: number;
+  currency: string;
+  noteRaw: string | null;
+  createdAt: string;
 }
 
 const BASE = "/api/admin";
@@ -264,6 +274,84 @@ async function openTestPack(): Promise<void> {
   messageEl.textContent = "Sobre de prueba enviado al overlay.";
 }
 
+function renderPaypalDonations(donations: PaypalDonation[]): void {
+  const container = document.getElementById("paypal-donations-list")!;
+  if (donations.length === 0) {
+    container.innerHTML = "<p>Sin donaciones pendientes.</p>";
+    return;
+  }
+  const rows = donations.map((d) => {
+    const row = document.createElement("div");
+    row.style.cssText = "display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;";
+
+    const info = document.createElement("span");
+    info.textContent = `${d.amount} ${d.currency} · nota: "${d.noteRaw ?? "(vacía)"}" · ${d.createdAt}`;
+
+    const usernameInput = document.createElement("input");
+    usernameInput.className = "input";
+    usernameInput.placeholder = "Twitch username";
+    usernameInput.style.width = "160px";
+
+    const quantityInput = document.createElement("input");
+    quantityInput.className = "input";
+    quantityInput.type = "number";
+    quantityInput.min = "1";
+    quantityInput.max = "50";
+    quantityInput.value = "1";
+    quantityInput.style.width = "70px";
+
+    const resolveBtn = document.createElement("button");
+    resolveBtn.className = "btn";
+    resolveBtn.textContent = "Asignar";
+    resolveBtn.addEventListener("click", () => resolveDonation(d.txnId, usernameInput, quantityInput, row));
+
+    row.append(info, usernameInput, quantityInput, resolveBtn);
+    return row;
+  });
+  container.replaceChildren(...rows);
+}
+
+async function resolveDonation(
+  txnId: string,
+  usernameInput: HTMLInputElement,
+  quantityInput: HTMLInputElement,
+  row: HTMLElement
+): Promise<void> {
+  const username = usernameInput.value.trim();
+  if (!username) return;
+
+  const lookup = await request<{ user: AdminUser }>("/lookup-user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  });
+  if (!lookup.ok) {
+    if (lookup.status === 401) showLoginView();
+    return;
+  }
+
+  const quantity = Number(quantityInput.value);
+  const result = await request<{ ok: true }>(`/paypal-donations/${txnId}/resolve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ twitchId: lookup.data.user.twitchId, quantity }),
+  });
+  if (!result.ok) {
+    if (result.status === 401) showLoginView();
+    return;
+  }
+  row.remove();
+}
+
+async function loadPaypalDonations(): Promise<void> {
+  const result = await request<{ donations: PaypalDonation[] }>("/paypal-donations?status=unmatched");
+  if (!result.ok) {
+    if (result.status === 401) showLoginView();
+    return;
+  }
+  renderPaypalDonations(result.data.donations);
+}
+
 async function loadPackGrantConfig(): Promise<void> {
   const result = await request<{ config: PackGrantConfig }>("/pack-grant-config");
   if (!result.ok) {
@@ -276,6 +364,8 @@ async function loadPackGrantConfig(): Promise<void> {
   (document.getElementById("cfg-bits-quantity") as HTMLInputElement).value = String(config.bitsQuantity);
   (document.getElementById("cfg-sub-quantity") as HTMLInputElement).value = String(config.subQuantity);
   (document.getElementById("cfg-gift-sub-multiplier") as HTMLInputElement).value = String(config.giftSubMultiplier);
+  (document.getElementById("cfg-paypal-threshold") as HTMLInputElement).value = String(config.paypalThreshold);
+  (document.getElementById("cfg-paypal-quantity") as HTMLInputElement).value = String(config.paypalQuantity);
 }
 
 async function savePackGrantConfig(): Promise<void> {
@@ -286,6 +376,8 @@ async function savePackGrantConfig(): Promise<void> {
     bitsQuantity: Number((document.getElementById("cfg-bits-quantity") as HTMLInputElement).value),
     subQuantity: Number((document.getElementById("cfg-sub-quantity") as HTMLInputElement).value),
     giftSubMultiplier: Number((document.getElementById("cfg-gift-sub-multiplier") as HTMLInputElement).value),
+    paypalThreshold: Number((document.getElementById("cfg-paypal-threshold") as HTMLInputElement).value),
+    paypalQuantity: Number((document.getElementById("cfg-paypal-quantity") as HTMLInputElement).value),
   };
 
   const result = await request<{ ok: true }>("/pack-grant-config", {
@@ -327,6 +419,7 @@ async function login(): Promise<void> {
   showPanelView();
   await loadHistory();
   await loadPackGrantConfig();
+  await loadPaypalDonations();
 }
 
 async function logout(): Promise<void> {
@@ -352,6 +445,7 @@ async function init(): Promise<void> {
     showPanelView();
     renderHistory(result.data.history);
     await loadPackGrantConfig();
+    await loadPaypalDonations();
   } else {
     showLoginView();
   }
