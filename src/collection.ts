@@ -5,6 +5,7 @@ import { initUserHeader } from "./user-header";
 import { GENERATIONS } from "./generations";
 import { shouldShowFoil } from "./pack-tier-foil";
 import { showPackReveal } from "./pack-reveal";
+import { completionPercent } from "./completion-percent";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
@@ -110,7 +111,7 @@ function renderGenFilterOptions(cards: CardView[]): void {
   const optionsHtml = GENERATIONS.map((g) => {
     const genCards = cards.filter((c) => c.generation === g.id);
     const genOwned = genCards.filter((c) => c.quantity > 0).length;
-    const pct = genCards.length === 0 ? 0 : Math.round((genOwned / genCards.length) * 100);
+    const pct = completionPercent(genOwned, genCards.length);
     return `<option value="${g.id}">Gen ${g.id} · ${g.region} (${genOwned}/${genCards.length} · ${pct}%)</option>`;
   }).join("");
   genFilter.innerHTML = `<option value="">Todas</option>${optionsHtml}`;

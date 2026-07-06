@@ -4,15 +4,12 @@ import { attachTradeLinkButton } from "./trade-link";
 import { initUserHeader } from "./user-header";
 import { GENERATIONS } from "./generations";
 import { AlbumBook } from "./album-book";
-
-function percent(owned: number, total: number): number {
-  return total === 0 ? 0 : Math.round((owned / total) * 100);
-}
+import { completionPercent } from "./completion-percent";
 
 function renderPicker(cards: CardView[]): void {
   const owned = cards.filter((c) => c.quantity > 0).length;
   document.getElementById("picker-heading")!.innerHTML =
-    `Elige un álbum <span class="count">(${owned}/${cards.length} · ${percent(owned, cards.length)}%)</span>`;
+    `Elige un álbum <span class="count">(${owned}/${cards.length} · ${completionPercent(owned, cards.length)}%)</span>`;
 
   const grid = document.getElementById("album-picker-grid")!;
   grid.innerHTML = GENERATIONS.map((gen) => {
@@ -28,7 +25,7 @@ function renderPicker(cards: CardView[]): void {
             <span class="album-cover-gen-number">${gen.id}</span>
           </p>
           <p class="album-cover-region">${gen.region}</p>
-          <span class="album-cover-count">${genOwned}/${genCards.length} · ${percent(genOwned, genCards.length)}%</span>
+          <span class="album-cover-count">${genOwned}/${genCards.length} · ${completionPercent(genOwned, genCards.length)}%</span>
         </span>
       </a>
     `;
@@ -45,7 +42,7 @@ function renderBook(
   const genCards = cards.filter((c) => c.generation === gen);
   const owned = genCards.filter((c) => c.quantity > 0).length;
   document.getElementById("book-heading")!.innerHTML =
-    `Álbum - Generación ${genInfo.id} · ${genInfo.region} <span class="count">(${owned}/${genCards.length} · ${percent(owned, genCards.length)}%)</span>`;
+    `Álbum - Generación ${genInfo.id} · ${genInfo.region} <span class="count">(${owned}/${genCards.length} · ${completionPercent(owned, genCards.length)}%)</span>`;
 
   new AlbumBook(genCards, {
     spreadEl: document.getElementById("book-spread")!,
