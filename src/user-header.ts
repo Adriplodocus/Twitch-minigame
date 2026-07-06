@@ -43,7 +43,7 @@ export function initUserHeader(): void {
   if (dailyPackBtn) {
     const markClaimed = () => {
       dailyPackBtn.disabled = true;
-      dailyPackBtn.textContent = "✅ Sobre reclamado hoy";
+      dailyPackBtn.classList.add("claimed");
     };
 
     getDailyPackStatus().then(({ claimed }) => {
