@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Env } from "../types";
-import type { PackTier } from "../lib/packs";
 import { verifyEventSubSignature } from "../lib/eventsub";
+import { upsertUser, grantPacks } from "../lib/grants";
 
 const webhook = new Hono<{ Bindings: Env }>();
 
@@ -20,30 +20,6 @@ async function getPackGrantConfig(db: D1Database): Promise<PackGrantConfig> {
     )
     .first<PackGrantConfig>();
   return row!;
-}
-
-async function upsertUser(db: D1Database, userId: string, username: string): Promise<void> {
-  await db
-    .prepare(
-      `INSERT INTO users (twitch_id, username) VALUES (?, ?)
-       ON CONFLICT(twitch_id) DO UPDATE SET username = excluded.username`
-    )
-    .bind(userId, username)
-    .run();
-}
-
-async function grantPacks(
-  db: D1Database,
-  userId: string,
-  quantity: number,
-  source: string,
-  tier: PackTier
-): Promise<void> {
-  if (quantity < 1) return;
-  const statements = Array.from({ length: quantity }, () =>
-    db.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, ?, ?)").bind(userId, source, tier)
-  );
-  await db.batch(statements);
 }
 
 async function addBitsAndGetPackCount(
