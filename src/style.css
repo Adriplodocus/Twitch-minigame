@@ -160,25 +160,68 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 
 .pack-wrapper { position: relative; display: inline-block; }
 
+.pack-wrapper {
+  animation: pack-idle 2.4s ease-in-out infinite;
+}
+.pack-wrapper:hover {
+  animation-play-state: paused;
+}
+.pack-wrapper:has(.pack-open-img.opening) {
+  animation: none;
+}
+.pack-wrapper .pack-open-img {
+  animation: none;
+}
+
+.pack-wrapper.apoyo {
+  overflow: hidden;
+}
 .pack-wrapper.apoyo .pack-open-img {
   border: 2px solid var(--gold);
   border-radius: 14px;
 }
 
+.pack-apoyo-ribbon {
+  position: absolute;
+  top: 14px;
+  left: -34px;
+  width: 110px;
+  padding: 2px 0;
+  text-align: center;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.8rem;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(120, 90, 60, 0.3);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .pack-foil-shine {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   border-radius: 14px;
   pointer-events: none;
+}
+.pack-foil-shine::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.65) 50%, transparent 60%);
-  background-size: 250% 250%;
   mix-blend-mode: overlay;
-  animation: shimmer 2.6s linear infinite;
+  animation: shimmer-sweep 2.6s linear infinite;
+}
+.pack-wrapper:has(.pack-open-img.opening) .pack-foil-shine::before {
+  animation-play-state: paused;
 }
 
-@keyframes shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
+@keyframes shimmer-sweep {
+  from { transform: translateX(-60%); }
+  to { transform: translateX(60%); }
 }
 
 .card.card-rarity-rare { border-color: var(--blue); }

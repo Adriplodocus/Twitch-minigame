@@ -76,7 +76,8 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
     img.className = "pack-open-img";
     img.src = "/pack.webp";
     img.alt = "Abrir sobre";
-    img.style.animationDelay = `-${(index * 0.7) % 2.4}s`;
+    const idleDelay = `-${(index * 0.7) % 2.4}s`;
+    img.style.animationDelay = idleDelay;
     img.addEventListener("click", async () => {
       const generation = await openAlbumPickerModal();
       if (generation === null) return;
@@ -86,17 +87,20 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
       });
     });
 
+    const wrapper = document.createElement("div");
+    wrapper.className = shouldShowFoil(pack.tier) ? "pack-wrapper apoyo" : "pack-wrapper";
+    wrapper.style.animationDelay = idleDelay;
+    const shine = document.createElement("div");
+    shine.className = "pack-foil-shine";
+    wrapper.appendChild(img);
+    wrapper.appendChild(shine);
     if (shouldShowFoil(pack.tier)) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "pack-wrapper apoyo";
-      const shine = document.createElement("div");
-      shine.className = "pack-foil-shine";
-      wrapper.appendChild(img);
-      wrapper.appendChild(shine);
-      row.appendChild(wrapper);
-    } else {
-      row.appendChild(img);
+      const ribbon = document.createElement("div");
+      ribbon.className = "pack-apoyo-ribbon";
+      ribbon.textContent = "★";
+      wrapper.appendChild(ribbon);
     }
+    row.appendChild(wrapper);
   });
 }
 
