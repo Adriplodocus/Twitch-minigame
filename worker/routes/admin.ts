@@ -3,7 +3,7 @@ import { setCookie, deleteCookie } from "hono/cookie";
 import type { Category, Env, Rarity } from "../types";
 import { requireAdmin } from "../middleware/auth";
 import { signAdminSession } from "../lib/jwt";
-import { pickRandomCards } from "../lib/packs";
+import { pickRandomCards, pickExactCards, type ExactCounts } from "../lib/packs";
 import { grantPacks } from "../lib/grants";
 import * as twitch from "../lib/twitch";
 
@@ -208,15 +208,26 @@ admin.post("/paypal-donations/:txnId/resolve", requireAdmin, async (c) => {
 
 admin.post("/test-pack", requireAdmin, async (c) => {
   const body = await c.req
-    .json<{ generation?: number; tier?: string }>()
-    .catch(() => ({}) as { generation?: number; tier?: string });
-  const { generation, tier } = body;
+    .json<{ generation?: number; tier?: string; counts?: ExactCounts }>()
+    .catch(() => ({}) as { generation?: number; tier?: string; counts?: ExactCounts });
+  const { generation, tier, counts } = body;
 
   if (!Number.isInteger(generation) || generation! < 1 || generation! > 9) {
     return c.json({ error: "Invalid generation" }, 400);
   }
   if (tier !== "gratis" && tier !== "apoyo") {
     return c.json({ error: "Invalid tier" }, 400);
+  }
+
+  const countValues = counts ? [counts.common, counts.rare, counts.epic, counts.legendary, counts.shiny] : [];
+  const forcingCounts = countValues.some((n) => n > 0);
+  if (forcingCounts) {
+    if (!countValues.every((n) => Number.isInteger(n) && n >= 0)) {
+      return c.json({ error: "Invalid counts" }, 400);
+    }
+    if (countValues.reduce((a, b) => a + b, 0) !== 10) {
+      return c.json({ error: "La suma debe ser 10" }, 400);
+    }
   }
 
   const catalog = await c.env.DB.prepare("SELECT id, rarity, category FROM cards WHERE generation = ?")
@@ -226,7 +237,12 @@ admin.post("/test-pack", requireAdmin, async (c) => {
     return c.json({ error: "Catalog is empty" }, 500);
   }
 
-  const picked = pickRandomCards(catalog.results, 10, tier);
+  let picked: { id: string; rarity: Rarity; category: Category }[];
+  try {
+    picked = forcingCounts ? pickExactCards(catalog.results, counts!) : pickRandomCards(catalog.results, 10, tier);
+  } catch (e) {
+    return c.json({ error: e instanceof Error ? e.message : "Invalid counts" }, 400);
+  }
   const adminName = c.get("adminName");
 
   const packInsert = await c.env.DB.prepare(

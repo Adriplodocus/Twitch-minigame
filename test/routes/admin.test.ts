@@ -10,7 +10,9 @@ async function adminCookie(adminName = "Test Admin"): Promise<string> {
 }
 
 beforeEach(async () => {
+  await env.DB.exec("DELETE FROM pack_cards");
   await env.DB.exec("DELETE FROM packs");
+  await env.DB.exec("DELETE FROM cards");
   await env.DB.exec("DELETE FROM users");
   await env.DB.batch([
     env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind("1", "viewer1"),
@@ -531,5 +533,82 @@ it("rejects broadcasting a test pack that has not been opened", async () => {
     env
   );
   expect(res.status).toBe(409);
+});
+
+it("opens a test pack with an exact forced composition", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  await env.DB.batch([
+    env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('c1', 'Common', 'common', '/c1.png', 1)"),
+    env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('r1', 'Rare', 'rare', '/r1.png', 1)"),
+    env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('e1', 'Epic', 'epic', '/e1.png', 1)"),
+    env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('l1', 'Legendary', 'legendary', '/l1.png', 1)"),
+    env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('l1-shiny', 'Legendary Shiny', 'legendary', '/l1s.png', 1)"),
+  ]);
+
+  const res = await app.request(
+    "/api/admin/test-pack",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({
+        generation: 1,
+        tier: "gratis",
+        counts: { common: 3, rare: 2, epic: 2, legendary: 2, shiny: 1 },
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ cards: { id: string; rarity: string }[] }>();
+  expect(json.cards).toHaveLength(10);
+  expect(json.cards.filter((c) => c.rarity === "common")).toHaveLength(3);
+  expect(json.cards.filter((c) => c.rarity === "rare")).toHaveLength(2);
+  expect(json.cards.filter((c) => c.rarity === "epic")).toHaveLength(2);
+  expect(json.cards.filter((c) => c.id === "l1")).toHaveLength(2);
+  expect(json.cards.filter((c) => c.id === "l1-shiny")).toHaveLength(1);
+});
+
+it("rejects a test pack with counts that don't sum to 10", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  await env.DB.prepare(
+    "INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('c1', 'Common', 'common', '/c1.png', 1)"
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/test-pack",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({
+        generation: 1,
+        tier: "gratis",
+        counts: { common: 1, rare: 0, epic: 0, legendary: 0, shiny: 0 },
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("rejects forced counts requesting a rarity with no cards in that generation", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  await env.DB.prepare(
+    "INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('c1', 'Common', 'common', '/c1.png', 1)"
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/test-pack",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({
+        generation: 1,
+        tier: "gratis",
+        counts: { common: 0, rare: 0, epic: 0, legendary: 10, shiny: 0 },
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
 });
 

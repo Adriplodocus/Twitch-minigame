@@ -74,8 +74,8 @@
 
           <div class="card">
             <h2>Sobre de prueba</h2>
-            <p style="margin-top: 0.25rem;">Envía un sobre al overlay sin tocar ninguna colección real.</p>
-            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            <p style="margin-top: 0.25rem;">Abre un sobre sin tocar ninguna colección real; luego eliges si mandarlo al overlay.</p>
+            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <select class="input" id="test-pack-generation"></select>
               <select class="input" id="test-pack-tier">
                 <option value="gratis">Gratis</option>
@@ -83,6 +83,24 @@
               </select>
               <button class="btn" id="test-pack-btn">Abrir sobre de prueba</button>
             </div>
+            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 0.3rem;">Common
+                <input type="number" min="0" id="tp-common" value="0" class="input" style="width: 3.5rem;" />
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.3rem;">Rare
+                <input type="number" min="0" id="tp-rare" value="0" class="input" style="width: 3.5rem;" />
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.3rem;">Epic
+                <input type="number" min="0" id="tp-epic" value="0" class="input" style="width: 3.5rem;" />
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.3rem;">Legendary
+                <input type="number" min="0" id="tp-legendary" value="0" class="input" style="width: 3.5rem;" />
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.3rem;">Shiny
+                <input type="number" min="0" id="tp-shiny" value="0" class="input" style="width: 3.5rem;" />
+              </label>
+            </div>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text);">Déjalo en 0 para probabilidades reales. Si rellenas, debe sumar 10.</p>
             <p id="test-pack-message" style="margin-top: 0.5rem;"></p>
           </div>
 

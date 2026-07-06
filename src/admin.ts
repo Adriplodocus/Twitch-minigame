@@ -39,11 +39,14 @@ interface PaypalDonation {
 
 const BASE = "/api/admin";
 
-type RequestResult<T> = { ok: true; data: T } | { ok: false; status: number };
+type RequestResult<T> = { ok: true; data: T } | { ok: false; status: number; error?: string };
 
 async function request<T>(path: string, init?: RequestInit): Promise<RequestResult<T>> {
   const res = await fetch(`${BASE}${path}`, { credentials: "include", ...init });
-  if (!res.ok) return { ok: false, status: res.status };
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: string } | null;
+    return { ok: false, status: res.status, error: body?.error };
+  }
   return { ok: true, data: (await res.json()) as T };
 }
 
@@ -253,15 +256,28 @@ function populateTestPackGenerations(): void {
   );
 }
 
+function readTestPackCounts(): { common: number; rare: number; epic: number; legendary: number; shiny: number } {
+  const value = (id: string) => Number((document.getElementById(id) as HTMLInputElement).value) || 0;
+  return {
+    common: value("tp-common"),
+    rare: value("tp-rare"),
+    epic: value("tp-epic"),
+    legendary: value("tp-legendary"),
+    shiny: value("tp-shiny"),
+  };
+}
+
 async function openTestPack(): Promise<void> {
   const messageEl = document.getElementById("test-pack-message")!;
   const generation = Number((document.getElementById("test-pack-generation") as HTMLSelectElement).value);
   const tier = (document.getElementById("test-pack-tier") as HTMLSelectElement).value;
+  const counts = readTestPackCounts();
+  const forcingCounts = Object.values(counts).some((n) => n > 0);
 
   const result = await request<{ packId: number; cards: CardView[] }>("/test-pack", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ generation, tier }),
+    body: JSON.stringify(forcingCounts ? { generation, tier, counts } : { generation, tier }),
   });
 
   if (!result.ok) {
@@ -269,7 +285,7 @@ async function openTestPack(): Promise<void> {
       showLoginView();
       return;
     }
-    messageEl.textContent = "Error al abrir el sobre de prueba.";
+    messageEl.textContent = result.error ?? "Error al abrir el sobre de prueba.";
     return;
   }
 

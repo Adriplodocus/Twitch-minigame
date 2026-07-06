@@ -83,6 +83,49 @@ function buildCardWeights<T extends { id: string; rarity: Rarity; category: Cate
   return weights;
 }
 
+export interface ExactCounts {
+  common: number;
+  rare: number;
+  epic: number;
+  legendary: number;
+  shiny: number;
+}
+
+const NON_SHINY_RARITIES: Rarity[] = ["common", "rare", "epic", "legendary"];
+
+export function pickExactCards<T extends { id: string; rarity: Rarity }>(
+  catalog: T[],
+  counts: ExactCounts,
+  random: () => number = Math.random
+): T[] {
+  const picks: T[] = [];
+
+  for (const rarity of NON_SHINY_RARITIES) {
+    const count = counts[rarity];
+    if (count === 0) continue;
+    const pool = catalog.filter((card) => card.rarity === rarity && !isShinyCard(card.id));
+    if (pool.length === 0) throw new Error(`No hay cartas ${rarity} no-shiny en esta generación`);
+    for (let i = 0; i < count; i++) {
+      picks.push(pool[Math.floor(random() * pool.length)]);
+    }
+  }
+
+  if (counts.shiny > 0) {
+    const shinyPool = catalog.filter((card) => isShinyCard(card.id));
+    if (shinyPool.length === 0) throw new Error("No hay cartas shiny en esta generación");
+    for (let i = 0; i < counts.shiny; i++) {
+      picks.push(shinyPool[Math.floor(random() * shinyPool.length)]);
+    }
+  }
+
+  for (let i = picks.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [picks[i], picks[j]] = [picks[j], picks[i]];
+  }
+
+  return picks;
+}
+
 export function pickRandomCards<T extends { id: string; rarity: Rarity; category: Category }>(
   catalog: T[],
   count: number,
