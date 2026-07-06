@@ -12,18 +12,8 @@ let ownedCards: CardView[] = [];
 
 function renderOwnedGrid(): void {
   const grid = document.getElementById("owned-grid")!;
-  const placeholder = document.getElementById("gen-placeholder")!;
   const genValue = (document.getElementById("gen-filter") as HTMLSelectElement).value;
   const nameQuery = (document.getElementById("name-filter") as HTMLInputElement).value.trim().toLowerCase();
-
-  if (!genValue && !nameQuery) {
-    grid.innerHTML = "";
-    grid.hidden = true;
-    placeholder.hidden = false;
-    return;
-  }
-  placeholder.hidden = true;
-  grid.hidden = false;
 
   const generation = genValue ? Number(genValue) : null;
   const field = (document.getElementById("sort-field") as HTMLSelectElement).value as SortField;
