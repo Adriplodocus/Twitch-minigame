@@ -18,7 +18,7 @@ CREATE TABLE packs_new (
   user_id TEXT NOT NULL REFERENCES users(twitch_id),
   opened_at TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  source TEXT NOT NULL DEFAULT 'reward' CHECK (source IN ('reward', 'admin', 'bits', 'sub', 'gift_sub', 'daily')),
+  source TEXT NOT NULL DEFAULT 'reward' CHECK (source IN ('reward', 'admin', 'bits', 'sub', 'gift_sub', 'paypal', 'paypal_manual', 'daily')),
   tier TEXT NOT NULL DEFAULT 'gratis' CHECK (tier IN ('gratis', 'apoyo')),
   broadcast_at TEXT,
   granted_by TEXT,
