@@ -110,7 +110,8 @@ function renderGenFilterOptions(cards: CardView[]): void {
   const optionsHtml = GENERATIONS.map((g) => {
     const genCards = cards.filter((c) => c.generation === g.id);
     const genOwned = genCards.filter((c) => c.quantity > 0).length;
-    return `<option value="${g.id}">Gen ${g.id} · ${g.region} (${genOwned}/${genCards.length})</option>`;
+    const pct = genCards.length === 0 ? 0 : Math.round((genOwned / genCards.length) * 100);
+    return `<option value="${g.id}">Gen ${g.id} · ${g.region} (${genOwned}/${genCards.length} · ${pct}%)</option>`;
   }).join("");
   genFilter.innerHTML = `<option value="">Todas</option>${optionsHtml}`;
   genFilter.value = previousValue;
