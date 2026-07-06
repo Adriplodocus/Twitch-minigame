@@ -381,36 +381,38 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   gap: 0.6rem;
   flex-shrink: 0;
 }
-.info-popover-wrap {
-  position: relative;
-  flex-shrink: 0;
+.howto-fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 40;
 }
-.how-to-btn {
-  display: inline-flex;
+.howto-fab-btn {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: 100px;
+  justify-content: center;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  font-size: 0.8rem;
-  color: var(--text);
+  font-size: 1.1rem;
+  color: var(--text-em);
   background: var(--surface2);
   border: 1px solid var(--border);
+  box-shadow: 0 4px 14px rgba(120, 90, 60, 0.3);
   cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s;
+  transition: border-color 0.15s, transform 0.15s;
 }
-.how-to-btn:hover,
-.how-to-btn[aria-expanded="true"] {
-  color: var(--text-em);
+.howto-fab-btn:hover,
+.howto-fab-btn[aria-expanded="true"] {
   border-color: var(--pink);
+  transform: translateY(-2px);
 }
-.how-to-btn svg { flex-shrink: 0; }
 .info-popover {
   position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 0;
+  bottom: calc(100% + 0.6rem);
+  right: 0;
   z-index: 30;
   min-width: 260px;
   background: var(--surface);
@@ -434,7 +436,7 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .info-popover strong { color: var(--text-em); }
 .info-popover span { color: var(--muted); font-size: 0.7rem; }
 @media (max-width: 480px) {
-  .info-popover { left: auto; right: 0; min-width: 220px; }
+  .info-popover { min-width: 220px; }
 }
 .donate-btn {
   display: inline-flex;
