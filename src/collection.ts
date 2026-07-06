@@ -104,6 +104,18 @@ async function revealPack(packId: number, cards: CardView[]): Promise<void> {
   document.getElementById("owned-grid")!.dispatchEvent(new Event("reload-collection"));
 }
 
+function renderGenFilterOptions(cards: CardView[]): void {
+  const genFilter = document.getElementById("gen-filter") as HTMLSelectElement;
+  const previousValue = genFilter.value;
+  const optionsHtml = GENERATIONS.map((g) => {
+    const genCards = cards.filter((c) => c.generation === g.id);
+    const genOwned = genCards.filter((c) => c.quantity > 0).length;
+    return `<option value="${g.id}">Gen ${g.id} · ${g.region} (${genOwned}/${genCards.length})</option>`;
+  }).join("");
+  genFilter.innerHTML = `<option value="">Todas</option>${optionsHtml}`;
+  genFilter.value = previousValue;
+}
+
 async function load(): Promise<void> {
   const data = await getCollection();
   femaleVariantBaseNames = collectFemaleVariantBaseNames(data.cards);
@@ -112,6 +124,7 @@ async function load(): Promise<void> {
 
   document.getElementById("owned-heading")!.innerHTML =
     `Cromos obtenidos <span class="count">(${ownedCards.length}/${data.cards.length})</span>`;
+  renderGenFilterOptions(data.cards);
   renderOwnedGrid();
 
   renderPendingPacks(data.pendingPacks, async (packId, generation) => {
@@ -121,12 +134,7 @@ async function load(): Promise<void> {
   });
 }
 
-const genFilter = document.getElementById("gen-filter") as HTMLSelectElement;
-genFilter.insertAdjacentHTML(
-  "beforeend",
-  GENERATIONS.map((g) => `<option value="${g.id}">Gen ${g.id} · ${g.region}</option>`).join("")
-);
-genFilter.addEventListener("change", renderOwnedGrid);
+document.getElementById("gen-filter")!.addEventListener("change", renderOwnedGrid);
 
 const nameFilter = document.getElementById("name-filter") as HTMLInputElement;
 const nameFilterClear = document.getElementById("name-filter-clear") as HTMLButtonElement;

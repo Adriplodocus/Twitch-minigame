@@ -1,10 +1,30 @@
 import { getMe, getPendingOfferCount, getDailyPackStatus, claimDailyPack, logout } from "./api";
+import { isMuted, toggleMuted } from "./sound-pref";
 
 export function initUserHeader(): void {
   document.getElementById("logout-btn")!.addEventListener("click", async () => {
     await logout();
     window.location.href = "/";
   });
+
+  const headerUser = document.querySelector(".page-header-user");
+  if (headerUser) {
+    const muteBtn = document.createElement("button");
+    muteBtn.className = "icon-btn";
+    muteBtn.type = "button";
+    const render = () => {
+      const muted = isMuted();
+      muteBtn.textContent = muted ? "🔇" : "🔊";
+      muteBtn.title = muted ? "Sonido desactivado" : "Sonido activado";
+      muteBtn.setAttribute("aria-label", muteBtn.title);
+    };
+    render();
+    muteBtn.addEventListener("click", () => {
+      toggleMuted();
+      render();
+    });
+    headerUser.insertBefore(muteBtn, headerUser.firstChild);
+  }
 
   getMe().then((me) => {
     document.getElementById("user-name")!.textContent = me.username;
