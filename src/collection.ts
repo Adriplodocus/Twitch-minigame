@@ -14,8 +14,9 @@ function renderOwnedGrid(): void {
   const grid = document.getElementById("owned-grid")!;
   const placeholder = document.getElementById("gen-placeholder")!;
   const genValue = (document.getElementById("gen-filter") as HTMLSelectElement).value;
+  const nameQuery = (document.getElementById("name-filter") as HTMLInputElement).value.trim().toLowerCase();
 
-  if (!genValue) {
+  if (!genValue && !nameQuery) {
     grid.innerHTML = "";
     grid.hidden = true;
     placeholder.hidden = false;
@@ -24,12 +25,13 @@ function renderOwnedGrid(): void {
   placeholder.hidden = true;
   grid.hidden = false;
 
-  const generation = Number(genValue);
+  const generation = genValue ? Number(genValue) : null;
   const field = (document.getElementById("sort-field") as HTMLSelectElement).value as SortField;
   const direction = (document.getElementById("sort-direction") as HTMLSelectElement).value;
   const sign = direction === "desc" ? -1 : 1;
   const sorted = ownedCards
-    .filter((c) => c.generation === generation)
+    .filter((c) => (generation === null || c.generation === generation))
+    .filter((c) => (!nameQuery || c.name.toLowerCase().includes(nameQuery)))
     .sort((a, b) => compareCards(a, b, field) * sign);
   grid.innerHTML = sorted.map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels)).join("");
 }
@@ -135,6 +137,7 @@ genFilter.insertAdjacentHTML(
   GENERATIONS.map((g) => `<option value="${g.id}">Gen ${g.id} · ${g.region}</option>`).join("")
 );
 genFilter.addEventListener("change", renderOwnedGrid);
+document.getElementById("name-filter")!.addEventListener("input", renderOwnedGrid);
 document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
 
