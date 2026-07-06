@@ -230,8 +230,8 @@ admin.post("/test-pack", requireAdmin, async (c) => {
   const adminName = c.get("adminName");
 
   const packInsert = await c.env.DB.prepare(
-    `INSERT INTO packs (user_id, source, tier, granted_by, opened_at, broadcast_at, is_test)
-     VALUES (?, 'admin', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)`
+    `INSERT INTO packs (user_id, source, tier, granted_by, opened_at, is_test)
+     VALUES (?, 'admin', ?, ?, CURRENT_TIMESTAMP, 1)`
   )
     .bind(TEST_USER_ID, tier, adminName)
     .run();
@@ -242,6 +242,30 @@ admin.post("/test-pack", requireAdmin, async (c) => {
   );
   await c.env.DB.batch(statements);
 
+  const uniqueIds = [...new Set(picked.map((card) => card.id))];
+  const placeholders = uniqueIds.map(() => "?").join(",");
+  const cardDetails = await c.env.DB.prepare(
+    `SELECT id, name, rarity, image_path AS imagePath FROM cards WHERE id IN (${placeholders})`
+  )
+    .bind(...uniqueIds)
+    .all<{ id: string; name: string; rarity: Rarity; imagePath: string }>();
+
+  const detailsById = new Map(cardDetails.results.map((card) => [card.id, card]));
+  const cards = picked.map((card) => ({ ...detailsById.get(card.id)!, quantity: 1 }));
+
+  return c.json({ packId, cards });
+});
+
+admin.post("/test-pack/:id/broadcast", requireAdmin, async (c) => {
+  const packId = Number(c.req.param("id"));
+
+  const pack = await c.env.DB.prepare("SELECT id, opened_at, is_test FROM packs WHERE id = ?")
+    .bind(packId)
+    .first<{ id: number; opened_at: string | null; is_test: number }>();
+  if (!pack || pack.is_test !== 1) return c.json({ error: "Not found" }, 404);
+  if (!pack.opened_at) return c.json({ error: "Pack not opened yet" }, 409);
+
+  await c.env.DB.prepare("UPDATE packs SET broadcast_at = CURRENT_TIMESTAMP WHERE id = ?").bind(packId).run();
   return c.json({ ok: true });
 });
 

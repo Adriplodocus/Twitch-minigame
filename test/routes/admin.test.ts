@@ -455,3 +455,81 @@ it("rejects resolving a donation that was already granted", async () => {
   expect(res.status).toBe(409);
 });
 
+it("opens a test pack, leaving it opened but not broadcast", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  await env.DB.prepare(
+    "INSERT INTO cards (id, name, rarity, image_path, generation) VALUES (?, ?, ?, ?, ?)"
+  )
+    .bind("c1", "Common Card", "common", "/cards/c1.png", 1)
+    .run();
+
+  const res = await app.request(
+    "/api/admin/test-pack",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({ generation: 1, tier: "gratis" }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ packId: number; cards: { id: string }[] }>();
+  expect(json.cards).toHaveLength(10);
+
+  const pack = await env.DB.prepare("SELECT opened_at, broadcast_at, is_test FROM packs WHERE id = ?")
+    .bind(json.packId)
+    .first<{ opened_at: string | null; broadcast_at: string | null; is_test: number }>();
+  expect(pack!.opened_at).not.toBeNull();
+  expect(pack!.broadcast_at).toBeNull();
+  expect(pack!.is_test).toBe(1);
+});
+
+it("broadcasts a test pack that has been opened", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  await env.DB.prepare(
+    "INSERT INTO packs (user_id, source, tier, opened_at, is_test) VALUES ('__test__', 'admin', 'gratis', CURRENT_TIMESTAMP, 1)"
+  ).run();
+  const pack = await env.DB.prepare("SELECT id FROM packs WHERE is_test = 1").first<{ id: number }>();
+
+  const res = await app.request(
+    `/api/admin/test-pack/${pack!.id}/broadcast`,
+    { method: "POST", headers: { Cookie: await adminCookie() } },
+    env
+  );
+  expect(res.status).toBe(200);
+
+  const updated = await env.DB.prepare("SELECT broadcast_at FROM packs WHERE id = ?")
+    .bind(pack!.id)
+    .first<{ broadcast_at: string | null }>();
+  expect(updated!.broadcast_at).not.toBeNull();
+});
+
+it("rejects broadcasting a nonexistent or non-test pack", async () => {
+  await env.DB.prepare(
+    "INSERT INTO packs (user_id, source, tier, opened_at, is_test) VALUES ('1', 'reward', 'gratis', CURRENT_TIMESTAMP, 0)"
+  ).run();
+  const realPack = await env.DB.prepare("SELECT id FROM packs WHERE is_test = 0").first<{ id: number }>();
+
+  const res = await app.request(
+    `/api/admin/test-pack/${realPack!.id}/broadcast`,
+    { method: "POST", headers: { Cookie: await adminCookie() } },
+    env
+  );
+  expect(res.status).toBe(404);
+});
+
+it("rejects broadcasting a test pack that has not been opened", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  await env.DB.prepare(
+    "INSERT INTO packs (user_id, source, tier, is_test) VALUES ('__test__', 'admin', 'gratis', 1)"
+  ).run();
+  const pack = await env.DB.prepare("SELECT id FROM packs WHERE is_test = 1").first<{ id: number }>();
+
+  const res = await app.request(
+    `/api/admin/test-pack/${pack!.id}/broadcast`,
+    { method: "POST", headers: { Cookie: await adminCookie() } },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+

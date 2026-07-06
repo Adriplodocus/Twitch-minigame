@@ -1,9 +1,10 @@
 import { getCollection, openPack, broadcastPack, type CardView, type PendingPack } from "./api";
-import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, splitCardName, compareCards, type SortField } from "./card";
+import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, compareCards, type SortField } from "./card";
 import { attachTradeLinkButton } from "./trade-link";
 import { initUserHeader } from "./user-header";
 import { GENERATIONS } from "./generations";
 import { shouldShowFoil } from "./pack-tier-foil";
+import { showPackReveal } from "./pack-reveal";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
@@ -106,68 +107,9 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
   });
 }
 
-function preloadImage(src: string): Promise<void> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve();
-    img.onerror = () => resolve();
-    img.src = src;
-  });
-}
-
 async function revealPack(packId: number, cards: CardView[]): Promise<void> {
-  const grid = document.getElementById("owned-grid")!;
-  const overlay = document.createElement("div");
-  overlay.style.cssText =
-    "position: fixed; inset: 0; background: rgba(59,46,34,0.80); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; z-index: 10; padding: 1rem; overflow-y: auto;";
-  document.body.appendChild(overlay);
-
-  const cardsRow = document.createElement("div");
-  cardsRow.style.cssText = "display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem;";
-  overlay.appendChild(cardsRow);
-
-  const preloads = cards.map((c) => preloadImage(c.imagePath));
-
-  for (let i = 0; i < cards.length; i++) {
-    await preloads[i];
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = renderCardHtml(cards[i], "", femaleVariantBaseNames, formLabels);
-    const cardEl = wrapper.firstElementChild!;
-    cardEl.classList.add("card-reveal");
-    cardsRow.appendChild(cardEl);
-    if (splitCardName(cards[i].name).isShiny) {
-      new Audio("/shiny-sound.mp3").play().catch(() => {});
-    }
-    await new Promise((resolve) => setTimeout(resolve, 400));
-  }
-
-  const buttonsRow = document.createElement("div");
-  buttonsRow.style.cssText = "display: flex; gap: 0.75rem;";
-
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "btn";
-  closeBtn.textContent = "Cerrar";
-  closeBtn.addEventListener("click", () => overlay.remove());
-
-  const broadcastBtn = document.createElement("button");
-  broadcastBtn.className = "btn";
-  broadcastBtn.textContent = "Cerrar y mostrar en stream";
-  broadcastBtn.addEventListener("click", async () => {
-    broadcastBtn.disabled = true;
-    try {
-      await broadcastPack(packId);
-      overlay.remove();
-    } catch {
-      broadcastBtn.disabled = false;
-      broadcastBtn.textContent = "Error, reintentar";
-    }
-  });
-
-  buttonsRow.appendChild(closeBtn);
-  buttonsRow.appendChild(broadcastBtn);
-  overlay.appendChild(buttonsRow);
-
-  grid.dispatchEvent(new Event("reload-collection"));
+  await showPackReveal(cards, () => broadcastPack(packId), femaleVariantBaseNames, formLabels);
+  document.getElementById("owned-grid")!.dispatchEvent(new Event("reload-collection"));
 }
 
 async function load(): Promise<void> {

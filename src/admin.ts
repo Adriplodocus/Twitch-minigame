@@ -1,5 +1,7 @@
 import { GENERATIONS } from "./generations";
 import { sourceLabel } from "./pack-source-label";
+import { showPackReveal } from "./pack-reveal";
+import type { CardView } from "./api";
 
 interface AdminUser {
   twitchId: string;
@@ -256,7 +258,7 @@ async function openTestPack(): Promise<void> {
   const generation = Number((document.getElementById("test-pack-generation") as HTMLSelectElement).value);
   const tier = (document.getElementById("test-pack-tier") as HTMLSelectElement).value;
 
-  const result = await request<{ ok: true }>("/test-pack", {
+  const result = await request<{ packId: number; cards: CardView[] }>("/test-pack", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ generation, tier }),
@@ -271,7 +273,12 @@ async function openTestPack(): Promise<void> {
     return;
   }
 
-  messageEl.textContent = "Sobre de prueba enviado al overlay.";
+  messageEl.textContent = "";
+  const { packId, cards } = result.data;
+  await showPackReveal(cards, async () => {
+    const broadcastResult = await request(`/test-pack/${packId}/broadcast`, { method: "POST" });
+    if (!broadcastResult.ok) throw new Error("broadcast failed");
+  });
 }
 
 function renderPaypalDonations(donations: PaypalDonation[]): void {
