@@ -1201,3 +1201,15 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
   100% { transform: translate(var(--drift), 300px) rotate(calc(var(--spin) * 360deg)); opacity: 0; }
 }
+
+.site-footer {
+  text-align: center;
+  padding: 2rem 1rem 1.5rem;
+  color: var(--dim);
+  font-size: 0.75rem;
+}
+.site-footer a {
+  color: var(--muted);
+  font-weight: 700;
+}
+.site-footer a:hover { color: var(--pink); }
