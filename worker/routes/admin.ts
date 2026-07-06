@@ -261,10 +261,10 @@ admin.post("/test-pack", requireAdmin, async (c) => {
   const uniqueIds = [...new Set(picked.map((card) => card.id))];
   const placeholders = uniqueIds.map(() => "?").join(",");
   const cardDetails = await c.env.DB.prepare(
-    `SELECT id, name, rarity, image_path AS imagePath FROM cards WHERE id IN (${placeholders})`
+    `SELECT id, name, rarity, image_path AS imagePath, sort_order AS sortOrder FROM cards WHERE id IN (${placeholders})`
   )
     .bind(...uniqueIds)
-    .all<{ id: string; name: string; rarity: Rarity; imagePath: string }>();
+    .all<{ id: string; name: string; rarity: Rarity; imagePath: string; sortOrder: number }>();
 
   const detailsById = new Map(cardDetails.results.map((card) => [card.id, card]));
   const cards = picked.map((card) => ({ ...detailsById.get(card.id)!, quantity: 1 }));

@@ -34,6 +34,9 @@ export async function showPackReveal(
     const cardEl = wrapper.firstElementChild!;
     cardEl.classList.add("card-reveal");
     cardsRow.appendChild(cardEl);
+    if (cards[i].rarity === "legendary") {
+      new Audio(`/cries/${Math.floor((cards[i].sortOrder ?? 0) / 1_000_000)}.ogg`).play().catch(() => {});
+    }
     if (splitCardName(cards[i].name).isShiny) {
       new Audio("/shiny-sound.mp3").play().catch(() => {});
     }
