@@ -250,20 +250,20 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 @keyframes twinkle {
   0% { opacity: 0; top: var(--t1); left: var(--l1); transform: scale(0.2) rotate(0deg); }
-  6% { opacity: 1; transform: scale(1.5) rotate(20deg); }
-  16% { transform: scale(1) rotate(20deg); }
+  6% { opacity: 1; transform: scale(1.5) rotate(var(--r1)); }
+  16% { transform: scale(1) rotate(var(--r1)); }
   22% { opacity: 0; top: var(--t1); left: var(--l1); transform: scale(0.2) rotate(0deg); }
   23% { top: var(--t2); left: var(--l2); }
-  29% { opacity: 1; transform: scale(1.5) rotate(20deg); }
-  39% { transform: scale(1) rotate(20deg); }
+  29% { opacity: 1; transform: scale(1.5) rotate(var(--r2)); }
+  39% { transform: scale(1) rotate(var(--r2)); }
   45% { opacity: 0; top: var(--t2); left: var(--l2); transform: scale(0.2) rotate(0deg); }
   46% { top: var(--t3); left: var(--l3); }
-  52% { opacity: 1; transform: scale(1.5) rotate(20deg); }
-  62% { transform: scale(1) rotate(20deg); }
+  52% { opacity: 1; transform: scale(1.5) rotate(var(--r3)); }
+  62% { transform: scale(1) rotate(var(--r3)); }
   68% { opacity: 0; top: var(--t3); left: var(--l3); transform: scale(0.2) rotate(0deg); }
   69% { top: var(--t4); left: var(--l4); }
-  75% { opacity: 1; transform: scale(1.5) rotate(20deg); }
-  85% { transform: scale(1) rotate(20deg); }
+  75% { opacity: 1; transform: scale(1.5) rotate(var(--r4)); }
+  85% { transform: scale(1) rotate(var(--r4)); }
   91% { opacity: 0; top: var(--t4); left: var(--l4); transform: scale(0.2) rotate(0deg); }
   100% { opacity: 0; top: var(--t1); left: var(--l1); transform: scale(0.2) rotate(0deg); }
 }
@@ -333,14 +333,22 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   margin-top: 0.5rem;
   min-height: 1.1rem;
 }
+.card-footer-slot {
+  display: inline-flex;
+  align-items: center;
+}
 .card-footer-slot:empty { display: none; }
 .card-footer-slot:last-child { margin-left: auto; }
 .card-qty {
-  padding: 0.15rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 0.55rem;
   border-radius: 100px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.6rem;
   font-weight: 600;
+  line-height: 1;
   color: var(--text-em);
   background: var(--surface2);
   white-space: nowrap;
@@ -1159,6 +1167,10 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .overlay-cards.active {
   width: 140px;
+}
+.overlay-cards .card-qty,
+.overlay-cards .info-btn {
+  display: none;
 }
 
 .card-slot {

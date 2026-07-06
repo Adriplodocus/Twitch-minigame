@@ -134,7 +134,8 @@ function ensureInfoTooltipHandler(): void {
 
 function renderSparkleDot(): string {
   const pos = () => `${(8 + Math.random() * 80).toFixed(1)}%`;
-  const vars = [1, 2, 3, 4].map((i) => `--t${i}:${pos()};--l${i}:${pos()}`).join(";");
+  const rot = () => `${(Math.random() * 360).toFixed(0)}deg`;
+  const vars = [1, 2, 3, 4].map((i) => `--t${i}:${pos()};--l${i}:${pos()};--r${i}:${rot()}`).join(";");
   const duration = (2.4 + Math.random() * 1.6).toFixed(2);
   const delay = (Math.random() * parseFloat(duration)).toFixed(2);
   return `<span class="dot" style="${vars};animation-duration:${duration}s;animation-delay:-${delay}s;"></span>`;
