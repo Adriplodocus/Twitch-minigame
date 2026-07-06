@@ -1,5 +1,5 @@
 import type { CardView } from "./api";
-import { renderCardHtml } from "./card";
+import { renderCardHtml, splitCardName } from "./card";
 
 // Regional/Mega/Gmax forms keep the sortOrder of their base species' national
 // dex number (e.g. Tauros Paldea forms sort near #128) even though their
@@ -17,16 +17,37 @@ function albumSortKey(card: CardView): number {
 export const PAGE_SIZE = 16;
 const PAGES_PER_SPREAD = 2;
 
-export function pageCount(cardCount: number): number {
-  const contentPages = Math.max(1, Math.ceil(cardCount / PAGE_SIZE));
-  return contentPages % 2 === 0 ? contentPages : contentPages + 1;
-}
-
 export function cardsForPage<T>(cards: T[], pageIndex: number): (T | null)[] {
   const start = pageIndex * PAGE_SIZE;
   const slice: (T | null)[] = cards.slice(start, start + PAGE_SIZE);
   while (slice.length < PAGE_SIZE) slice.push(null);
   return slice;
+}
+
+function chunkIntoPages(cards: CardView[]): (CardView | null)[][] {
+  const count = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
+  return Array.from({ length: count }, (_, i) => cardsForPage(cards, i));
+}
+
+type BookPage = { kind: "cards"; slots: (CardView | null)[] } | { kind: "divider"; label: string };
+
+// Shinies are pulled out of dex order and shown after a "Shiny" divider page,
+// instead of interleaved next to their normal counterpart, so the main dex
+// order reads cleanly and shiny hunters get their own dedicated section.
+function buildPages(cards: CardView[]): BookPage[] {
+  const normal: CardView[] = [];
+  const shiny: CardView[] = [];
+  for (const card of cards) (splitCardName(card.name).isShiny ? shiny : normal).push(card);
+  normal.sort((a, b) => albumSortKey(a) - albumSortKey(b));
+  shiny.sort((a, b) => albumSortKey(a) - albumSortKey(b));
+
+  const pages: BookPage[] = chunkIntoPages(normal).map((slots) => ({ kind: "cards", slots }));
+  if (shiny.length > 0) {
+    pages.push({ kind: "divider", label: "Shiny" });
+    for (const slots of chunkIntoPages(shiny)) pages.push({ kind: "cards", slots });
+  }
+  if (pages.length % PAGES_PER_SPREAD !== 0) pages.push({ kind: "cards", slots: new Array(PAGE_SIZE).fill(null) });
+  return pages;
 }
 
 export interface BookDeps {
@@ -45,7 +66,7 @@ const FLIP_OUT_MS = 240;
 const FLIP_IN_MS = 260;
 
 export class AlbumBook {
-  private readonly cards: CardView[];
+  private readonly pages: BookPage[];
   private spreadIndex = 0;
   private readonly totalPages: number;
   private readonly totalSpreads: number;
@@ -54,8 +75,8 @@ export class AlbumBook {
     cards: CardView[],
     private readonly deps: BookDeps
   ) {
-    this.cards = [...cards].sort((a, b) => albumSortKey(a) - albumSortKey(b));
-    this.totalPages = pageCount(this.cards.length);
+    this.pages = buildPages(cards);
+    this.totalPages = this.pages.length;
     this.totalSpreads = this.totalPages / PAGES_PER_SPREAD;
     deps.firstBtn.addEventListener("click", () => this.jump(0));
     deps.prevBtn.addEventListener("click", () => this.go(-1));
@@ -65,8 +86,11 @@ export class AlbumBook {
   }
 
   private renderPageHtml(pageIndex: number): string {
-    const slots = cardsForPage(this.cards, pageIndex);
-    return `<div class="book-page">${slots
+    const page = this.pages[pageIndex];
+    if (page.kind === "divider") {
+      return `<div class="book-page book-page-divider"><span class="book-page-divider-label">${page.label}</span></div>`;
+    }
+    return `<div class="book-page">${page.slots
       .map((c) =>
         c
           ? renderCardHtml(c, "", this.deps.femaleVariantBaseNames, this.deps.formLabels)
