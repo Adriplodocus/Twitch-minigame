@@ -15,6 +15,30 @@ export function initUserHeader(): void {
     }
   });
 
+  const howToBtn = document.getElementById("how-to-btn");
+  const howToPanel = document.getElementById("how-to-panel");
+  if (howToBtn && howToPanel) {
+    const close = () => {
+      howToPanel.hidden = true;
+      howToBtn.setAttribute("aria-expanded", "false");
+    };
+    const open = () => {
+      howToPanel.hidden = false;
+      howToBtn.setAttribute("aria-expanded", "true");
+    };
+    howToBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (howToPanel.hidden) open();
+      else close();
+    });
+    document.addEventListener("click", (e) => {
+      if (!howToPanel.hidden && !howToPanel.contains(e.target as Node) && e.target !== howToBtn) close();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") close();
+    });
+  }
+
   const offersLink = document.querySelector<HTMLAnchorElement>('a[href="/offers.html"]');
   if (offersLink) {
     getPendingOfferCount().then(({ count }) => {
