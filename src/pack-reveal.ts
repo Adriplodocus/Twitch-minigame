@@ -69,4 +69,9 @@ export async function showPackReveal(
   buttonsRow.appendChild(closeBtn);
   buttonsRow.appendChild(broadcastBtn);
   overlay.appendChild(buttonsRow);
+
+  const broadcastHint = document.createElement("p");
+  broadcastHint.style.cssText = "color: var(--muted); font-size: 0.75rem; text-align: center; max-width: 320px;";
+  broadcastHint.textContent = "Envía una alerta en el stream de MrKlypp con las cartas obtenidas";
+  overlay.appendChild(broadcastHint);
 }
