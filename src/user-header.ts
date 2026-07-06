@@ -1,4 +1,4 @@
-import { getMe, getPendingOfferCount, logout } from "./api";
+import { getMe, getPendingOfferCount, getDailyPackStatus, claimDailyPack, logout } from "./api";
 
 export function initUserHeader(): void {
   document.getElementById("logout-btn")!.addEventListener("click", async () => {
@@ -36,6 +36,27 @@ export function initUserHeader(): void {
     });
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") close();
+    });
+  }
+
+  const dailyPackBtn = document.getElementById("daily-pack-btn") as HTMLButtonElement | null;
+  if (dailyPackBtn) {
+    const markClaimed = () => {
+      dailyPackBtn.disabled = true;
+      dailyPackBtn.textContent = "✅ Sobre reclamado hoy";
+    };
+
+    getDailyPackStatus().then(({ claimed }) => {
+      if (claimed) markClaimed();
+    });
+
+    dailyPackBtn.addEventListener("click", async () => {
+      try {
+        await claimDailyPack();
+        markClaimed();
+      } catch {
+        markClaimed();
+      }
     });
   }
 

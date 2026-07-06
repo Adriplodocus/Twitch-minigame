@@ -115,3 +115,11 @@ export function deleteOffer(id: number, side: "sent" | "received"): Promise<{ ok
 export function getPendingOfferCount(): Promise<{ count: number }> {
   return request("/trade/offers/pending-count");
 }
+
+export function getDailyPackStatus(): Promise<{ claimed: boolean }> {
+  return request("/daily-pack/status");
+}
+
+export function claimDailyPack(): Promise<{ ok: true }> {
+  return request("/daily-pack/claim", { method: "POST" });
+}
