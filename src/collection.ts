@@ -137,7 +137,19 @@ genFilter.insertAdjacentHTML(
   GENERATIONS.map((g) => `<option value="${g.id}">Gen ${g.id} · ${g.region}</option>`).join("")
 );
 genFilter.addEventListener("change", renderOwnedGrid);
-document.getElementById("name-filter")!.addEventListener("input", renderOwnedGrid);
+
+const nameFilter = document.getElementById("name-filter") as HTMLInputElement;
+const nameFilterClear = document.getElementById("name-filter-clear") as HTMLButtonElement;
+nameFilter.addEventListener("input", () => {
+  nameFilterClear.hidden = nameFilter.value.length === 0;
+  renderOwnedGrid();
+});
+nameFilterClear.addEventListener("click", () => {
+  nameFilter.value = "";
+  nameFilterClear.hidden = true;
+  renderOwnedGrid();
+});
+
 document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
 

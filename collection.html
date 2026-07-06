@@ -92,7 +92,10 @@
         <select id="gen-filter" class="input">
           <option value="">Generación</option>
         </select>
-        <input id="name-filter" class="input" type="text" placeholder="Buscar por nombre..." />
+        <span class="name-filter-wrap">
+          <input id="name-filter" class="input" type="text" placeholder="Buscar por nombre..." />
+          <button type="button" id="name-filter-clear" class="name-filter-clear" hidden aria-label="Limpiar búsqueda">×</button>
+        </span>
         <select id="sort-field" class="input">
           <option value="pokedex">Pokédex</option>
           <option value="recent">Recientes</option>

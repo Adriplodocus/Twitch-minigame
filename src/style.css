@@ -720,6 +720,23 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .input:focus { border-color: rgba(242, 115, 158, 0.5); }
 
+.name-filter-wrap { position: relative; display: inline-flex; }
+.name-filter-wrap .input { padding-right: 2rem; }
+.name-filter-clear {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.15rem 0.3rem;
+}
+.name-filter-clear:hover { color: var(--text); }
+
 @keyframes card-in {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
