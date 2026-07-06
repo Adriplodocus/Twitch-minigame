@@ -7,6 +7,7 @@ import collection from "./routes/collection";
 import trade from "./routes/trade";
 import admin from "./routes/admin";
 import overlay from "./routes/overlay";
+import dailyPack from "./routes/daily-pack";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -18,5 +19,6 @@ app.route("/api/collection", collection);
 app.route("/api/trade", trade);
 app.route("/api/admin", admin);
 app.route("/api/overlay", overlay);
+app.route("/api/daily-pack", dailyPack);
 
 export default app;
