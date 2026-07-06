@@ -89,22 +89,34 @@
 
       <h2 id="owned-heading" class="section-heading"></h2>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
-        <select id="gen-filter" class="input">
-          <option value="">Generación</option>
-        </select>
-        <span class="name-filter-wrap">
-          <input id="name-filter" class="input" type="text" placeholder="Buscar por nombre..." />
-          <button type="button" id="name-filter-clear" class="name-filter-clear" hidden aria-label="Limpiar búsqueda">×</button>
-        </span>
-        <select id="sort-field" class="input">
-          <option value="pokedex">Pokédex</option>
-          <option value="recent">Recientes</option>
-          <option value="quantity">Cantidad</option>
-        </select>
-        <select id="sort-direction" class="input">
-          <option value="asc">Ascendente</option>
-          <option value="desc">Descendente</option>
-        </select>
+        <div class="filter-field">
+          <label for="gen-filter">Generación</label>
+          <select id="gen-filter" class="input">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="name-filter">Nombre</label>
+          <span class="name-filter-wrap">
+            <input id="name-filter" class="input" type="text" placeholder="Buscar por nombre..." />
+            <button type="button" id="name-filter-clear" class="name-filter-clear" hidden aria-label="Limpiar búsqueda">×</button>
+          </span>
+        </div>
+        <div class="filter-field">
+          <label for="sort-field">Ordenar por</label>
+          <select id="sort-field" class="input">
+            <option value="pokedex">Pokédex</option>
+            <option value="recent">Recientes</option>
+            <option value="quantity">Cantidad</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="sort-direction">Dirección</label>
+          <select id="sort-direction" class="input">
+            <option value="asc">Ascendente</option>
+            <option value="desc">Descendente</option>
+          </select>
+        </div>
       </div>
       <p id="gen-placeholder" style="color: var(--muted); margin-top: 1.25rem;">
         Selecciona una generación o busca por nombre para ver tu colección
