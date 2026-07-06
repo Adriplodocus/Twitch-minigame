@@ -98,6 +98,13 @@ webhook.post("/eventsub", async (c) => {
     return c.json({ ok: true }, 200);
   }
 
+  const dedup = await c.env.DB.prepare("INSERT OR IGNORE INTO eventsub_messages (message_id) VALUES (?)")
+    .bind(messageId)
+    .run();
+  if (dedup.meta.changes === 0) {
+    return c.json({ ok: true }, 200);
+  }
+
   const subscriptionType = payload.subscription?.type ?? "";
   const config = await getPackGrantConfig(c.env.DB);
 
