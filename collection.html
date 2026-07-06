@@ -52,6 +52,9 @@
 
       <h2 id="owned-heading" class="section-heading"></h2>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
+        <select id="gen-filter" class="input">
+          <option value="">Generación</option>
+        </select>
         <select id="sort-field" class="input">
           <option value="pokedex">Pokédex</option>
           <option value="recent">Recientes</option>
@@ -62,6 +65,9 @@
           <option value="desc">Descendente</option>
         </select>
       </div>
+      <p id="gen-placeholder" style="color: var(--muted); margin-top: 1.25rem;">
+        Selecciona una generación para ver tu colección
+      </p>
       <div id="owned-grid" class="card-grid"></div>
     </div>
     <script type="module" src="/src/collection.ts"></script>

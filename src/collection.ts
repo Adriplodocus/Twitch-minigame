@@ -10,13 +10,27 @@ let formLabels = new Map<string, string>();
 let ownedCards: CardView[] = [];
 
 function renderOwnedGrid(): void {
+  const grid = document.getElementById("owned-grid")!;
+  const placeholder = document.getElementById("gen-placeholder")!;
+  const genValue = (document.getElementById("gen-filter") as HTMLSelectElement).value;
+
+  if (!genValue) {
+    grid.innerHTML = "";
+    grid.hidden = true;
+    placeholder.hidden = false;
+    return;
+  }
+  placeholder.hidden = true;
+  grid.hidden = false;
+
+  const generation = Number(genValue);
   const field = (document.getElementById("sort-field") as HTMLSelectElement).value as SortField;
   const direction = (document.getElementById("sort-direction") as HTMLSelectElement).value;
   const sign = direction === "desc" ? -1 : 1;
-  const sorted = [...ownedCards].sort((a, b) => compareCards(a, b, field) * sign);
-  document.getElementById("owned-grid")!.innerHTML = sorted
-    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels))
-    .join("");
+  const sorted = ownedCards
+    .filter((c) => c.generation === generation)
+    .sort((a, b) => compareCards(a, b, field) * sign);
+  grid.innerHTML = sorted.map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels)).join("");
 }
 
 function openAlbumPickerModal(): Promise<number | null> {
@@ -173,6 +187,12 @@ async function load(): Promise<void> {
   });
 }
 
+const genFilter = document.getElementById("gen-filter") as HTMLSelectElement;
+genFilter.insertAdjacentHTML(
+  "beforeend",
+  GENERATIONS.map((g) => `<option value="${g.id}">Gen ${g.id} · ${g.region}</option>`).join("")
+);
+genFilter.addEventListener("change", renderOwnedGrid);
 document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
 
