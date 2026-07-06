@@ -138,14 +138,7 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   animation: pack-idle 2.4s ease-in-out infinite;
 }
 .pack-open-img:hover {
-  animation-play-state: paused;
-  transform: translateY(-4px) scale(1.03);
   box-shadow: 0 10px 26px rgba(120, 90, 60, 0.18);
-}
-.pack-open-img:active {
-  animation-play-state: paused;
-  transform: scale(0.92);
-  transition: transform 0.12s;
 }
 .pack-open-img.opening {
   animation: none;
@@ -158,9 +151,9 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   50% { transform: translateY(-3px) rotate(-1.5deg); }
 }
 
-.pack-wrapper { position: relative; display: inline-block; }
-
 .pack-wrapper {
+  position: relative;
+  display: inline-block;
   animation: pack-idle 2.4s ease-in-out infinite;
 }
 .pack-wrapper:hover {
@@ -173,12 +166,34 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   animation: none;
 }
 
-.pack-wrapper.apoyo {
-  overflow: hidden;
+.pack-hover-scale {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.18s;
 }
+.pack-wrapper:hover .pack-hover-scale {
+  transform: translateY(-4px) scale(1.03);
+}
+.pack-wrapper:active .pack-hover-scale {
+  transform: scale(0.92);
+  transition: transform 0.12s;
+}
+
 .pack-wrapper.apoyo .pack-open-img {
   border: 2px solid var(--gold);
   border-radius: 14px;
+}
+
+.pack-apoyo-corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+  border-top-left-radius: 14px;
 }
 
 .pack-apoyo-ribbon {
@@ -193,8 +208,6 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   font-size: 0.8rem;
   transform: rotate(-45deg);
   box-shadow: 0 2px 6px rgba(120, 90, 60, 0.3);
-  pointer-events: none;
-  z-index: 2;
 }
 
 .pack-foil-shine {

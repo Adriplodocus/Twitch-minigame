@@ -90,16 +90,22 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
     const wrapper = document.createElement("div");
     wrapper.className = shouldShowFoil(pack.tier) ? "pack-wrapper apoyo" : "pack-wrapper";
     wrapper.style.animationDelay = idleDelay;
+    const hoverScale = document.createElement("div");
+    hoverScale.className = "pack-hover-scale";
     const shine = document.createElement("div");
     shine.className = "pack-foil-shine";
-    wrapper.appendChild(img);
-    wrapper.appendChild(shine);
+    hoverScale.appendChild(img);
+    hoverScale.appendChild(shine);
     if (shouldShowFoil(pack.tier)) {
+      const corner = document.createElement("div");
+      corner.className = "pack-apoyo-corner";
       const ribbon = document.createElement("div");
       ribbon.className = "pack-apoyo-ribbon";
       ribbon.textContent = "★";
-      wrapper.appendChild(ribbon);
+      corner.appendChild(ribbon);
+      hoverScale.appendChild(corner);
     }
+    wrapper.appendChild(hoverScale);
     row.appendChild(wrapper);
   });
 }
