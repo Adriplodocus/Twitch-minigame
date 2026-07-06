@@ -45,7 +45,7 @@ export async function showPackReveal(
   }
 
   const buttonsRow = document.createElement("div");
-  buttonsRow.style.cssText = "display: flex; gap: 0.75rem;";
+  buttonsRow.style.cssText = "display: flex; gap: 0.75rem; align-items: flex-start;";
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "btn";
@@ -66,12 +66,17 @@ export async function showPackReveal(
     }
   });
 
-  buttonsRow.appendChild(closeBtn);
-  buttonsRow.appendChild(broadcastBtn);
-  overlay.appendChild(buttonsRow);
+  const broadcastCol = document.createElement("div");
+  broadcastCol.style.cssText = "display: flex; flex-direction: column; align-items: center; gap: 0.4rem;";
 
   const broadcastHint = document.createElement("p");
-  broadcastHint.style.cssText = "color: var(--muted); font-size: 0.75rem; text-align: center; max-width: 320px;";
+  broadcastHint.style.cssText = "color: var(--muted); font-size: 0.75rem; text-align: center; max-width: 220px;";
   broadcastHint.textContent = "Envía una alerta en el stream de MrKlypp con las cartas obtenidas";
-  overlay.appendChild(broadcastHint);
+
+  broadcastCol.appendChild(broadcastBtn);
+  broadcastCol.appendChild(broadcastHint);
+
+  buttonsRow.appendChild(closeBtn);
+  buttonsRow.appendChild(broadcastCol);
+  overlay.appendChild(buttonsRow);
 }
