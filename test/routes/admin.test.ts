@@ -309,6 +309,8 @@ it("returns the default pack-grant-config", async () => {
       bitsQuantity: number;
       subQuantity: number;
       giftSubMultiplier: number;
+      paypalThreshold: number;
+      paypalQuantity: number;
     };
   }>();
   expect(config).toEqual({
@@ -317,6 +319,8 @@ it("returns the default pack-grant-config", async () => {
     bitsQuantity: 1,
     subQuantity: 1,
     giftSubMultiplier: 1,
+    paypalThreshold: 2,
+    paypalQuantity: 1,
   });
 });
 
@@ -333,6 +337,8 @@ it("persists a valid pack-grant-config update", async () => {
         bitsQuantity: 3,
         subQuantity: 4,
         giftSubMultiplier: 5,
+        paypalThreshold: 5,
+        paypalQuantity: 2,
       }),
     },
     env
@@ -347,6 +353,8 @@ it("persists a valid pack-grant-config update", async () => {
     bitsQuantity: 3,
     subQuantity: 4,
     giftSubMultiplier: 5,
+    paypalThreshold: 5,
+    paypalQuantity: 2,
   });
 });
 
@@ -363,6 +371,8 @@ it("rejects a pack-grant-config update with an out-of-range value", async () => 
         bitsQuantity: 1,
         subQuantity: 1,
         giftSubMultiplier: 1,
+        paypalThreshold: 2,
+        paypalQuantity: 1,
       }),
     },
     env
@@ -382,5 +392,66 @@ it("rejects a pack-grant-config update with a missing field", async () => {
     env
   );
   expect(res.status).toBe(400);
+});
+
+it("lists unmatched paypal donations", async () => {
+  await env.DB.prepare(
+    `INSERT INTO paypal_donations (txn_id, amount, currency, note_raw, status, packs_granted)
+     VALUES ('T1', 2, 'EUR', 'typo-user', 'unmatched', 0)`
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/paypal-donations?status=unmatched",
+    { headers: { Cookie: await adminCookie() } },
+    env
+  );
+
+  expect(res.status).toBe(200);
+  const body = await res.json<{ donations: { txnId: string; noteRaw: string }[] }>();
+  expect(body.donations).toEqual([expect.objectContaining({ txnId: "T1", noteRaw: "typo-user" })]);
+});
+
+it("resolves an unmatched donation by granting packs to the chosen user", async () => {
+  await env.DB.prepare(
+    `INSERT INTO paypal_donations (txn_id, amount, currency, note_raw, status, packs_granted)
+     VALUES ('T2', 2, 'EUR', 'typo-user', 'unmatched', 0)`
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/paypal-donations/T2/resolve",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({ twitchId: "1", quantity: 1 }),
+    },
+    env
+  );
+
+  expect(res.status).toBe(200);
+  const packs = await env.DB.prepare("SELECT source, tier FROM packs WHERE user_id = ?").bind("1").all();
+  expect(packs.results).toEqual([{ source: "paypal_manual", tier: "apoyo" }]);
+  const donation = await env.DB.prepare("SELECT status, matched_user_id FROM paypal_donations WHERE txn_id = ?")
+    .bind("T2")
+    .first();
+  expect(donation).toEqual({ status: "granted", matched_user_id: "1" });
+});
+
+it("rejects resolving a donation that was already granted", async () => {
+  await env.DB.prepare(
+    `INSERT INTO paypal_donations (txn_id, amount, currency, status, packs_granted)
+     VALUES ('T3', 2, 'EUR', 'granted', 1)`
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/paypal-donations/T3/resolve",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({ twitchId: "1", quantity: 1 }),
+    },
+    env
+  );
+
+  expect(res.status).toBe(409);
 });
 

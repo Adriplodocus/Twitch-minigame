@@ -4,6 +4,7 @@ import type { Category, Env, Rarity } from "../types";
 import { requireAdmin } from "../middleware/auth";
 import { signAdminSession } from "../lib/jwt";
 import { pickRandomCards } from "../lib/packs";
+import { grantPacks } from "../lib/grants";
 import * as twitch from "../lib/twitch";
 
 const TEST_USER_ID = "__test__";
@@ -114,12 +115,15 @@ interface PackGrantConfig {
   bitsQuantity: number;
   subQuantity: number;
   giftSubMultiplier: number;
+  paypalThreshold: number;
+  paypalQuantity: number;
 }
 
 admin.get("/pack-grant-config", requireAdmin, async (c) => {
   const row = await c.env.DB.prepare(
     `SELECT reward_quantity AS rewardQuantity, bits_threshold AS bitsThreshold, bits_quantity AS bitsQuantity,
-            sub_quantity AS subQuantity, gift_sub_multiplier AS giftSubMultiplier
+            sub_quantity AS subQuantity, gift_sub_multiplier AS giftSubMultiplier,
+            paypal_threshold AS paypalThreshold, paypal_quantity AS paypalQuantity
      FROM pack_grant_config WHERE id = 1`
   ).first<PackGrantConfig>();
   return c.json({ config: row });
@@ -127,7 +131,8 @@ admin.get("/pack-grant-config", requireAdmin, async (c) => {
 
 admin.put("/pack-grant-config", requireAdmin, async (c) => {
   const body = await c.req.json<Partial<PackGrantConfig>>().catch(() => ({}) as Partial<PackGrantConfig>);
-  const { rewardQuantity, bitsThreshold, bitsQuantity, subQuantity, giftSubMultiplier } = body;
+  const { rewardQuantity, bitsThreshold, bitsQuantity, subQuantity, giftSubMultiplier, paypalThreshold, paypalQuantity } =
+    body;
 
   const isValidCount = (n: unknown): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n <= 1000;
   const isValidThreshold = (n: unknown): n is number =>
@@ -138,17 +143,64 @@ admin.put("/pack-grant-config", requireAdmin, async (c) => {
     !isValidThreshold(bitsThreshold) ||
     !isValidCount(bitsQuantity) ||
     !isValidCount(subQuantity) ||
-    !isValidCount(giftSubMultiplier)
+    !isValidCount(giftSubMultiplier) ||
+    !isValidThreshold(paypalThreshold) ||
+    !isValidCount(paypalQuantity)
   ) {
     return c.json({ error: "Invalid config" }, 400);
   }
 
   await c.env.DB.prepare(
     `UPDATE pack_grant_config
-     SET reward_quantity = ?, bits_threshold = ?, bits_quantity = ?, sub_quantity = ?, gift_sub_multiplier = ?
+     SET reward_quantity = ?, bits_threshold = ?, bits_quantity = ?, sub_quantity = ?, gift_sub_multiplier = ?,
+         paypal_threshold = ?, paypal_quantity = ?
      WHERE id = 1`
   )
-    .bind(rewardQuantity, bitsThreshold, bitsQuantity, subQuantity, giftSubMultiplier)
+    .bind(rewardQuantity, bitsThreshold, bitsQuantity, subQuantity, giftSubMultiplier, paypalThreshold, paypalQuantity)
+    .run();
+
+  return c.json({ ok: true });
+});
+
+admin.get("/paypal-donations", requireAdmin, async (c) => {
+  const status = c.req.query("status") ?? "unmatched";
+  const donations = await c.env.DB.prepare(
+    `SELECT txn_id AS txnId, amount, currency, note_raw AS noteRaw, created_at AS createdAt
+     FROM paypal_donations WHERE status = ? ORDER BY created_at DESC LIMIT 50`
+  )
+    .bind(status)
+    .all<{ txnId: string; amount: number; currency: string; noteRaw: string | null; createdAt: string }>();
+  return c.json({ donations: donations.results });
+});
+
+admin.post("/paypal-donations/:txnId/resolve", requireAdmin, async (c) => {
+  const txnId = c.req.param("txnId");
+  const body = await c.req
+    .json<{ twitchId?: string; quantity?: number }>()
+    .catch(() => ({}) as { twitchId?: string; quantity?: number });
+  const { twitchId, quantity } = body;
+
+  if (!twitchId || typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1 || quantity > 50) {
+    return c.json({ error: "Invalid twitchId or quantity" }, 400);
+  }
+
+  const donation = await c.env.DB.prepare("SELECT status FROM paypal_donations WHERE txn_id = ?")
+    .bind(txnId)
+    .first<{ status: string }>();
+  if (!donation) return c.json({ error: "Donation not found" }, 404);
+  if (donation.status === "granted") return c.json({ error: "Already granted" }, 409);
+
+  const user = await c.env.DB.prepare("SELECT twitch_id, username FROM users WHERE twitch_id = ?")
+    .bind(twitchId)
+    .first<{ twitch_id: string; username: string }>();
+  if (!user) return c.json({ error: "User not found" }, 404);
+
+  await grantPacks(c.env.DB, twitchId, quantity, "paypal_manual", "apoyo");
+  await c.env.DB.prepare(
+    `UPDATE paypal_donations SET status = 'granted', matched_user_id = ?, matched_username = ?, packs_granted = ?
+     WHERE txn_id = ?`
+  )
+    .bind(twitchId, user.username, quantity, txnId)
     .run();
 
   return c.json({ ok: true });
