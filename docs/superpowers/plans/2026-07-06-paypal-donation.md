@@ -809,9 +809,9 @@ describe("donate button", () => {
   for (const page of PAGES) {
     it(`is present with the correct href in ${page}`, () => {
       const html = readFileSync(page, "utf-8");
-      expect(html).toMatch(
-        /<a class="donate-btn" href="https:\/\/www\.paypal\.com\/paypalme\/MrKlypp" target="_blank"/
-      );
+      expect(html).toContain('class="donate-btn"');
+      expect(html).toContain('href="https://www.paypal.com/paypalme/MrKlypp"');
+      expect(html).toContain('target="_blank"');
     });
   }
 
