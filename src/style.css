@@ -1183,6 +1183,13 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .card-slot .card {
   width: 100%;
 }
+/* Reserve 2 lines of name height so 1-line vs 2-line names don't change
+   .card-slot's offsetHeight — overlay.ts copies that height onto the
+   shared container, and a shifting height re-centers the flexbox column
+   above it (the username header), making it visibly jump between cards. */
+.card-slot .card-name {
+  min-height: 1.44rem;
+}
 
 /* Hype cards: legendary or shiny pulls get a punch entrance + color ring instead of the plain slide */
 .card-slot.hype.entering {
