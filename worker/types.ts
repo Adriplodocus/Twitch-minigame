@@ -10,6 +10,7 @@ export interface Env {
   TWITCH_REWARD_ID: string;
   JWT_SECRET: string;
   ADMIN_PASSWORD: string;
+  PAYPAL_RECEIVER_EMAIL: string;
 }
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
