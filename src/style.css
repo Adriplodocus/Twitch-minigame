@@ -720,6 +720,13 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .input:focus { border-color: rgba(242, 115, 158, 0.5); }
 
+#gen-filter {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .name-filter-wrap { position: relative; display: inline-flex; }
 .name-filter-wrap .input { padding-right: 2rem; }
 .name-filter-clear {
