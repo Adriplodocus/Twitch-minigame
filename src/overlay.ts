@@ -6,6 +6,7 @@ interface OverlayEventCard {
   name: string;
   rarity: CardView["rarity"];
   imagePath: string;
+  dexNumber: number;
 }
 
 interface OverlayEvent {
@@ -88,6 +89,12 @@ function playCardSequence(
       prev.addEventListener("transitionend", () => prev.remove(), { once: true });
     }
 
+    if (kind === "legendary") {
+      new Audio(`/cries/${card.dexNumber}.ogg`).play().catch(() => {});
+      if (splitCardName(card.name).isShiny) {
+        new Audio("/shiny-sound.mp3").play().catch(() => {});
+      }
+    }
     if (kind === "shiny") {
       new Audio("/shiny-sound.mp3").play().catch(() => {});
     }

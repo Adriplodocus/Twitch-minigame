@@ -10,11 +10,12 @@ beforeEach(async () => {
 
   await env.DB.batch([
     env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind("1", "viewer1"),
-    env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)").bind(
+    env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path, sort_order) VALUES (?, ?, ?, ?, ?)").bind(
       "c1",
       "Common Card",
       "common",
-      "/cards/c1.png"
+      "/cards/c1.png",
+      144000010
     ),
   ]);
 });
@@ -54,12 +55,13 @@ it("returns a broadcast pack's cards grouped under one event", async () => {
   const res = await app.request("/api/overlay/events?since=2000-01-01 00:00:00", {}, env);
   expect(res.status).toBe(200);
   const json = await res.json<{
-    events: { packId: number; username: string; cards: { id: string }[] }[];
+    events: { packId: number; username: string; cards: { id: string; dexNumber: number }[] }[];
     cursor: string;
   }>();
   expect(json.events).toHaveLength(1);
   expect(json.events[0].username).toBe("viewer1");
   expect(json.events[0].cards).toHaveLength(2);
+  expect(json.events[0].cards[0].dexNumber).toBe(144);
   expect(json.cursor).toBeTruthy();
 });
 

@@ -12,6 +12,7 @@ interface EventCardRow {
   name: string;
   rarity: Rarity;
   imagePath: string;
+  sortOrder: number;
 }
 
 interface OverlayEvent {
@@ -19,7 +20,7 @@ interface OverlayEvent {
   broadcastAt: string;
   username: string;
   avatarUrl: string | null;
-  cards: { id: string; name: string; rarity: Rarity; imagePath: string }[];
+  cards: { id: string; name: string; rarity: Rarity; imagePath: string; dexNumber: number }[];
 }
 
 overlay.get("/events", async (c) => {
@@ -32,7 +33,7 @@ overlay.get("/events", async (c) => {
 
   const rows = await c.env.DB.prepare(
     `SELECT p.id AS packId, p.broadcast_at AS broadcastAt, u.username, u.avatar_url AS avatarUrl,
-            pc.card_id AS cardId, ca.name, ca.rarity, ca.image_path AS imagePath
+            pc.card_id AS cardId, ca.name, ca.rarity, ca.image_path AS imagePath, ca.sort_order AS sortOrder
      FROM packs p
      JOIN users u ON u.twitch_id = p.user_id
      JOIN pack_cards pc ON pc.pack_id = p.id
@@ -51,7 +52,13 @@ overlay.get("/events", async (c) => {
       event = { packId: row.packId, broadcastAt: row.broadcastAt, username: row.username, avatarUrl: row.avatarUrl, cards: [] };
       eventsByPackId.set(row.packId, event);
     }
-    event.cards.push({ id: row.cardId, name: row.name, rarity: row.rarity, imagePath: row.imagePath });
+    event.cards.push({
+      id: row.cardId,
+      name: row.name,
+      rarity: row.rarity,
+      imagePath: row.imagePath,
+      dexNumber: Math.floor(row.sortOrder / 1_000_000),
+    });
   }
 
   const events = [...eventsByPackId.values()].slice(0, 20);
