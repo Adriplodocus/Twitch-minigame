@@ -88,35 +88,47 @@
 
           <div class="card span-2">
             <h2>Configuración de sobres automáticos</h2>
-            <div class="cfg-fields" style="margin-top: 0.75rem;">
-              <label>
-                Sobres por canje de puntos
-                <input class="input" id="cfg-reward-quantity" type="number" min="0" max="1000" />
-              </label>
-              <label>
-                Bits por sobre
-                <input class="input" id="cfg-bits-threshold" type="number" min="1" max="1000" />
-              </label>
-              <label>
-                Sobres por umbral de bits
-                <input class="input" id="cfg-bits-quantity" type="number" min="0" max="1000" />
-              </label>
-              <label>
-                Sobres por suscripción/renovación
-                <input class="input" id="cfg-sub-quantity" type="number" min="0" max="1000" />
-              </label>
-              <label>
-                Sobres por sub regalada
-                <input class="input" id="cfg-gift-sub-multiplier" type="number" min="0" max="1000" />
-              </label>
-              <label>
-                € por sobre (PayPal)
-                <input class="input" id="cfg-paypal-threshold" type="number" min="1" max="1000" />
-              </label>
-              <label>
-                Sobres por umbral de PayPal
-                <input class="input" id="cfg-paypal-quantity" type="number" min="0" max="1000" />
-              </label>
+            <div class="cfg-columns">
+              <div class="cfg-column">
+                <h3 class="cfg-column-title">Puntos</h3>
+                <label>
+                  <span class="cfg-label-text">Sobres por canje de puntos</span>
+                  <input class="input" id="cfg-reward-quantity" type="number" min="0" max="1000" />
+                </label>
+              </div>
+              <div class="cfg-column">
+                <h3 class="cfg-column-title">Bits</h3>
+                <label>
+                  <span class="cfg-label-text">Bits por sobre</span>
+                  <input class="input" id="cfg-bits-threshold" type="number" min="1" max="1000" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Sobres por umbral de bits</span>
+                  <input class="input" id="cfg-bits-quantity" type="number" min="0" max="1000" />
+                </label>
+              </div>
+              <div class="cfg-column">
+                <h3 class="cfg-column-title">Suscripción</h3>
+                <label>
+                  <span class="cfg-label-text">Sobres por suscripción/renovación</span>
+                  <input class="input" id="cfg-sub-quantity" type="number" min="0" max="1000" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Sobres por sub regalada</span>
+                  <input class="input" id="cfg-gift-sub-multiplier" type="number" min="0" max="1000" />
+                </label>
+              </div>
+              <div class="cfg-column">
+                <h3 class="cfg-column-title">Paypal</h3>
+                <label>
+                  <span class="cfg-label-text">€ por sobre (PayPal)</span>
+                  <input class="input" id="cfg-paypal-threshold" type="number" min="1" max="1000" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Sobres por umbral de PayPal</span>
+                  <input class="input" id="cfg-paypal-quantity" type="number" min="0" max="1000" />
+                </label>
+              </div>
             </div>
             <button class="btn" id="cfg-save-btn" style="margin-top: 0.75rem;">Guardar configuración</button>
             <p id="cfg-message" style="margin-top: 0.5rem;"></p>

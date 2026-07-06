@@ -65,17 +65,42 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   grid-column: 1 / -1;
 }
 
-.cfg-fields {
+.cfg-columns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+@media (max-width: 900px) {
+  .cfg-columns { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .cfg-columns { grid-template-columns: 1fr; }
+}
+.cfg-column {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.75rem;
 }
-.cfg-fields label {
+.cfg-column-title {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cfg-column label {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.85rem;
-  flex: 1 1 160px;
+}
+.cfg-label-text {
+  display: flex;
+  align-items: flex-end;
+  min-height: 2.1rem;
+  line-height: 1.2;
 }
 
 .card {
@@ -414,7 +439,8 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   bottom: calc(100% + 0.6rem);
   right: 0;
   z-index: 30;
-  min-width: 260px;
+  min-width: 340px;
+  max-width: min(90vw, 380px);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -427,6 +453,16 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   color: var(--text-em);
   margin-bottom: 0.6rem;
 }
+.info-popover-subtitle {
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: var(--pink);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.4rem;
+}
+.info-popover-subtitle:not(:first-of-type) { margin-top: 0.75rem; }
+.info-popover-subtitle span { color: var(--muted); text-transform: none; letter-spacing: normal; font-weight: 400; }
 .info-popover ul {
   list-style: none;
   display: flex;
@@ -1079,13 +1115,14 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   height: 0;
 }
 .overlay-cards.active {
-  width: 180px;
-  height: 252px;
+  width: 140px;
 }
 
 .card-slot {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
   transition: transform 0.35s ease, opacity 0.35s ease;
 }
 .card-slot.entering {
@@ -1102,7 +1139,6 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 .card-slot .card {
   width: 100%;
-  height: 100%;
 }
 
 /* Hype cards: legendary or shiny pulls get a punch entrance + color ring instead of the plain slide */

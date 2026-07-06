@@ -77,6 +77,7 @@ function playCardSequence(
     slot.className = kind ? `card-slot entering hype hype-${kind}` : "card-slot entering";
     slot.innerHTML = renderCardHtml(toCardView(card));
     container.appendChild(slot);
+    container.style.height = `${slot.offsetHeight}px`;
     void slot.offsetWidth;
     slot.classList.remove("entering");
     slot.classList.add("current");
