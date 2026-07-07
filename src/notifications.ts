@@ -46,9 +46,12 @@ export function initNotifications(headerUser: Element): void {
   panel.className = "notif-panel";
   panel.hidden = true;
 
-  const userName = headerUser.querySelector("#user-name");
-  headerUser.insertBefore(bellBtn, userName);
-  headerUser.insertBefore(panel, userName);
+  const avatar = headerUser.querySelector("#user-avatar");
+  const sep = document.createElement("span");
+  sep.className = "header-sep";
+  headerUser.insertBefore(sep, avatar);
+  headerUser.insertBefore(bellBtn, avatar);
+  headerUser.insertBefore(panel, avatar);
 
   const close = () => {
     panel.hidden = true;
