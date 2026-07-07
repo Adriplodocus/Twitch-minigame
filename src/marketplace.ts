@@ -350,7 +350,8 @@ function openCreateWizard(): void {
   }
 
   function renderOfferResults(): void {
-    const filtered = filterCardsByName(allCards, offerSearch.value).filter((c) => c.quantity > 0);
+    const query = offerSearch.value.trim();
+    const filtered = query ? filterCardsByName(allCards, query).filter((c) => c.quantity > 0) : [];
     offerResults.innerHTML = filtered
       .map((c) => {
         const value = wizardOfferQuantities.get(c.id) ?? 0;
