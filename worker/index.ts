@@ -8,6 +8,7 @@ import trade from "./routes/trade";
 import admin from "./routes/admin";
 import overlay from "./routes/overlay";
 import dailyPack from "./routes/daily-pack";
+import notifications from "./routes/notifications";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -20,5 +21,6 @@ app.route("/api/trade", trade);
 app.route("/api/admin", admin);
 app.route("/api/overlay", overlay);
 app.route("/api/daily-pack", dailyPack);
+app.route("/api/notifications", notifications);
 
 export default app;
