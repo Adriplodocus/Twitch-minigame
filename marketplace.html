@@ -11,7 +11,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/src/style.css" />
-    <title>Ofertas</title>
+    <title>Marketplace</title>
   </head>
   <body>
     <header class="page-header">
@@ -23,7 +23,6 @@
           </svg>
           Volver a Colección
         </a>
-        <a class="btn" href="/marketplace.html">Marketplace</a>
       </div>
       <div class="page-header-user">
         <a
@@ -49,39 +48,35 @@
         </button>
       </div>
     </header>
-    <div class="daily-pack-fab">
-      <button class="daily-pack-img-btn" id="daily-pack-btn" type="button" aria-label="Reclama tu sobre diario">
-        <img src="/Freepack.png" alt="" />
-        <span class="daily-pack-check" aria-hidden="true">✔</span>
-        <span class="daily-pack-tooltip">Reclama tu sobre diario</span>
-      </button>
-    </div>
-    <div class="howto-fab">
-      <button class="howto-fab-btn" id="how-to-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="¿Cómo conseguir sobres?">?</button>
-      <div class="info-popover" id="how-to-panel" hidden>
-        <p class="info-popover-title">Consigue sobres de las siguientes formas:</p>
-        <p class="info-popover-subtitle">Sobres normales</p>
-        <ul>
-          <li><strong>Canjea tu sobre gratis diario</strong></li>
-          <li><strong>Canjea la recompensa del canal mientras estoy en directo</strong><span>Puedes canjearla 2 veces por directo</span></li>
-        </ul>
-        <p class="info-popover-subtitle">Sobres especiales <span>(más % de drop)</span></p>
-        <ul>
-          <li><strong><a href="https://www.twitch.tv/subs/MrKlypp" target="_blank" rel="noopener">Suscríbete</a></strong><span>x1 sobre con tu sub</span></li>
-          <li><strong><a href="https://www.twitch.tv/subs/MrKlypp" target="_blank" rel="noopener">Regala suscripciones</a></strong><span>x1 sobre por cada sub</span></li>
-          <li><strong>Dona bits</strong><span>x1 sobre por cada 200 bits</span></li>
-          <li><strong><a href="https://www.paypal.com/paypalme/MrKlypp" target="_blank" rel="noopener">Donación en PayPal</a></strong><span>x1 sobre por cada 2€</span></li>
-        </ul>
-      </div>
-    </div>
     <div class="container" style="padding: 2rem 1rem;">
-      <h1>Ofertas</h1>
+      <h1>Marketplace</h1>
 
-      <div id="offers-list" class="offers-columns"></div>
+      <div class="mp-tabs">
+        <button class="btn" id="mp-tab-public" type="button">Marketplace</button>
+        <button class="btn" id="mp-tab-mine" type="button">Mis ofertas</button>
+      </div>
+
+      <div id="mp-public-view">
+        <div class="mp-filters">
+          <input class="input" id="mp-demand-filter" placeholder="Filtrar por demanda..." />
+          <input class="input" id="mp-offer-filter" placeholder="Filtrar por oferta..." />
+        </div>
+        <div id="mp-public-grid" class="mp-grid mp-grid-offers"></div>
+        <div class="mp-pagination">
+          <button class="btn" id="mp-prev-page" type="button">Anterior</button>
+          <span id="mp-page-label"></span>
+          <button class="btn" id="mp-next-page" type="button">Siguiente</button>
+        </div>
+      </div>
+
+      <div id="mp-mine-view" hidden>
+        <button class="btn" id="mp-create-btn" type="button">Crear oferta</button>
+        <div id="mp-mine-grid" class="mp-grid mp-grid-offers mp-grid-mine"></div>
+      </div>
     </div>
     <footer class="site-footer">
       Creado por <a href="https://mrklypp.com/" target="_blank" rel="noopener">MrKlypp</a> · © 2026
     </footer>
-    <script type="module" src="/src/offers.ts"></script>
+    <script type="module" src="/src/marketplace.ts"></script>
   </body>
 </html>
