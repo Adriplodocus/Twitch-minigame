@@ -329,11 +329,17 @@ it("only releases the reservation once when the expiry sweep races on the same o
   const offer = await env.DB.prepare("SELECT id FROM marketplace_offers WHERE id = ?").bind(id).first();
   expect(offer).toBeNull();
 
+  const items = await env.DB.prepare("SELECT * FROM marketplace_offer_items WHERE offer_id = ?").bind(id).all();
+  expect(items.results).toHaveLength(0);
+
   const reserved = await env.DB.prepare("SELECT reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
     .bind("1", "c1")
     .first<{ reserved: number }>();
-  // Started at 2 after the offer reserved it; a single release should bring it back to 0.
-  // A double release (the race) would drive it to -2.
+  // Correctness invariants that hold regardless of interleaving (unlike a plain "equals 0", which a
+  // lucky interleaving could satisfy even with a subtly broken release): reserved must never go
+  // negative (a double release), the offer row must be fully gone, and its items must be cleaned up.
+  // Started at 2 after the offer reserved it, so a single release lands exactly at 0 here.
+  expect(reserved?.reserved).toBeGreaterThanOrEqual(0);
   expect(reserved?.reserved).toBe(0);
 });
 

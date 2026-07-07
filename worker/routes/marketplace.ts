@@ -74,30 +74,32 @@ marketplace.post("/offers", requireAuth, async (c) => {
 });
 
 async function releaseReservationAndDeleteOffer(env: Env, offerId: number, creatorId: string): Promise<void> {
-  const items = await env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
+  // Atomic claim: DELETE ... RETURNING is a single write statement, and SQLite/D1 serializes writes,
+  // so exactly one concurrent caller can ever see a non-empty result for the same offerId here.
+  // Combining the "read what needs releasing" and "delete the items" steps into one statement closes
+  // the old race window where a caller could read a stale (already-deleted-by-someone-else) snapshot,
+  // or read a live snapshot that a faster caller then deleted out from under it before either reached
+  // the offer-row claim. Whichever caller's delete actually removes rows owns the release below; a
+  // caller that loses the race finds the rows already gone, gets an empty list, and returns untouched.
+  // Deleting the items (children) before the offer (parent) also satisfies the FK from
+  // marketplace_offer_items to marketplace_offers.
+  const items = await env.DB.prepare(
+    "DELETE FROM marketplace_offer_items WHERE offer_id = ? RETURNING card_id, quantity"
+  )
     .bind(offerId)
     .all<{ card_id: string; quantity: number }>();
+  if (items.results.length === 0) return;
 
-  // marketplace_offer_items has a FK on marketplace_offers, so children must be deleted before the
-  // parent row. This delete is unconditional and idempotent — a no-op if a concurrent caller (another
-  // sweep, or a sweep racing a cancel) already removed these rows for the same offer.
-  await env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(offerId).run();
-
-  // Atomic claim: only the caller whose DELETE actually removes the offer row (returned here) owns
-  // the reservation release. A concurrent caller racing on the same offer finds the row already
-  // gone, gets null, and skips the release below — so `reserved` is only ever decremented once.
-  const claimed = await env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ? RETURNING id")
-    .bind(offerId)
-    .first<{ id: number }>();
-  if (!claimed || items.results.length === 0) return;
-
-  const statements = items.results.map((item) =>
-    env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
-      item.quantity,
-      creatorId,
-      item.card_id
-    )
-  );
+  const statements = [
+    env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(offerId),
+    ...items.results.map((item) =>
+      env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
+        item.quantity,
+        creatorId,
+        item.card_id
+      )
+    ),
+  ];
   await env.DB.batch(statements);
 }
 
@@ -123,15 +125,12 @@ async function sweepExpiredOffers(env: Env): Promise<void> {
     .bind(`-${OFFER_LIFETIME_DAYS} days`)
     .all<{ id: number }>();
   for (const { id } of expiredAccepted.results) {
-    // Same delete-children-then-parent order and atomic-claim shape as releaseReservationAndDeleteOffer:
-    // no reservation to release on this branch, but the guarded parent delete keeps a concurrent
-    // sweep from reprocessing an already-gone offer — harmless here today, but kept consistent so
-    // both branches are correct under concurrency for the same underlying reason.
+    // Unlike releaseReservationAndDeleteOffer, this branch has no reserved units to release, so
+    // there's nothing that depends on "winning" a race — deleting the (possibly already-gone)
+    // children then the (possibly already-gone) parent is safe to run unconditionally: a concurrent
+    // sweep that already removed these rows just makes these statements harmless no-ops.
     await env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id).run();
-    const claimed = await env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ? RETURNING id")
-      .bind(id)
-      .first<{ id: number }>();
-    if (!claimed) continue; // already claimed/deleted by a concurrent sweep
+    await env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(id).run();
   }
 }
 
