@@ -372,3 +372,146 @@ it("expires and deletes an active offer that has zero items (e.g. an interrupted
   const row = await env.DB.prepare("SELECT id FROM marketplace_offers WHERE id = ?").bind(offer!.id).first();
   expect(row).toBeNull();
 });
+
+it("excludes the viewer's own offers from the public listing", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  await app.request(
+    "/api/marketplace/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ demandCardId: "p1", offerItems: [{ cardId: "c1", quantity: 1 }] }),
+    },
+    env
+  );
+  const res = await app.request("/api/marketplace/offers", { headers: { Cookie: cookie } }, env);
+  const json = await res.json<{ offers: unknown[] }>();
+  expect(json.offers).toHaveLength(0);
+});
+
+it("shows another user's active offer with the viewer's owned quantity", async () => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES ('2', 'c1', 5)").run();
+  const cookieCreator = await sessionCookie("2", "viewer2");
+  await app.request(
+    "/api/marketplace/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieCreator, "Content-Type": "application/json" },
+      body: JSON.stringify({ demandCardId: "p1", offerItems: [{ cardId: "c1", quantity: 2 }] }),
+    },
+    env
+  );
+
+  const cookieViewer = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/marketplace/offers", { headers: { Cookie: cookieViewer } }, env);
+  const json = await res.json<{
+    offers: {
+      creatorUsername: string;
+      demand: { viewerQuantity: number };
+      offerItems: { cardId: string; viewerQuantity: number }[];
+    }[];
+  }>();
+  expect(json.offers).toHaveLength(1);
+  expect(json.offers[0].creatorUsername).toBe("viewer2");
+  expect(json.offers[0].demand.viewerQuantity).toBe(0); // viewer1 has 0 of p1
+  expect(json.offers[0].offerItems[0].viewerQuantity).toBe(3); // viewer1 owns 3 of c1
+});
+
+it("filters the public listing by demand card name", async () => {
+  const cookieCreator = await sessionCookie("2", "viewer2");
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES ('2', 'c1', 5)").run();
+  await app.request(
+    "/api/marketplace/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieCreator, "Content-Type": "application/json" },
+      body: JSON.stringify({ demandCardId: "p1", offerItems: [{ cardId: "c1", quantity: 1 }] }),
+    },
+    env
+  );
+
+  const cookieViewer = await sessionCookie("1", "viewer1");
+  const matchRes = await app.request(
+    "/api/marketplace/offers?demandQuery=pika",
+    { headers: { Cookie: cookieViewer } },
+    env
+  );
+  expect((await matchRes.json<{ offers: unknown[] }>()).offers).toHaveLength(1);
+
+  const noMatchRes = await app.request(
+    "/api/marketplace/offers?demandQuery=zzz",
+    { headers: { Cookie: cookieViewer } },
+    env
+  );
+  expect((await noMatchRes.json<{ offers: unknown[] }>()).offers).toHaveLength(0);
+});
+
+it("filters the public listing by offered card name", async () => {
+  const cookieCreator = await sessionCookie("2", "viewer2");
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES ('2', 'c1', 5)").run();
+  await app.request(
+    "/api/marketplace/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieCreator, "Content-Type": "application/json" },
+      body: JSON.stringify({ demandCardId: "p1", offerItems: [{ cardId: "c1", quantity: 1 }] }),
+    },
+    env
+  );
+
+  const cookieViewer = await sessionCookie("1", "viewer1");
+  const matchRes = await app.request(
+    "/api/marketplace/offers?offerQuery=char",
+    { headers: { Cookie: cookieViewer } },
+    env
+  );
+  expect((await matchRes.json<{ offers: unknown[] }>()).offers).toHaveLength(1);
+
+  const noMatchRes = await app.request(
+    "/api/marketplace/offers?offerQuery=zzz",
+    { headers: { Cookie: cookieViewer } },
+    env
+  );
+  expect((await noMatchRes.json<{ offers: unknown[] }>()).offers).toHaveLength(0);
+});
+
+it("paginates the public listing 6 per page, newest first", async () => {
+  const userStatements = [];
+  for (let i = 0; i < 8; i++) {
+    userStatements.push(
+      env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES (?, ?)").bind(`page-user-${i}`, `pageuser${i}`)
+    );
+  }
+  await env.DB.batch(userStatements);
+
+  // Direct inserts (bypassing the create route) sidestep the 4-offers-per-creator cap and let each
+  // offer get a distinct creator, which is what a real paginated marketplace would look like anyway.
+  const offerStatements = [];
+  for (let i = 0; i < 8; i++) {
+    offerStatements.push(
+      env.DB.prepare(
+        "INSERT INTO marketplace_offers (creator_id, demand_card_id, status, created_at) VALUES (?, 'p1', 'active', datetime('now', ?))"
+      ).bind(`page-user-${i}`, `-${i} minutes`)
+    );
+  }
+  await env.DB.batch(offerStatements);
+
+  const cookieViewer = await sessionCookie("1", "viewer1");
+  const page1Res = await app.request("/api/marketplace/offers?page=1", { headers: { Cookie: cookieViewer } }, env);
+  const page1 = await page1Res.json<{
+    offers: { creatorUsername: string }[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
+  }>();
+  expect(page1.pageSize).toBe(6);
+  expect(page1.totalCount).toBe(8);
+  expect(page1.offers).toHaveLength(6);
+  // "-0 minutes" (pageuser0) is newest, so it must lead page 1.
+  expect(page1.offers[0].creatorUsername).toBe("pageuser0");
+
+  const page2Res = await app.request("/api/marketplace/offers?page=2", { headers: { Cookie: cookieViewer } }, env);
+  const page2 = await page2Res.json<{ offers: { creatorUsername: string }[] }>();
+  expect(page2.offers).toHaveLength(2);
+  expect(page2.offers[1].creatorUsername).toBe("pageuser7");
+});

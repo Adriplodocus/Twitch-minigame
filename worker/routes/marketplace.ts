@@ -250,4 +250,95 @@ marketplace.delete("/offers/:id", requireAuth, async (c) => {
   return c.json({ ok: true });
 });
 
+const PAGE_SIZE = 6;
+
+async function viewerQuantitiesByCardIds(env: Env, userId: string, cardIds: string[]): Promise<Map<string, number>> {
+  const result = new Map<string, number>();
+  if (cardIds.length === 0) return result;
+  const placeholders = cardIds.map(() => "?").join(", ");
+  const rows = await env.DB.prepare(
+    `SELECT card_id, quantity - reserved AS available FROM user_cards WHERE user_id = ? AND card_id IN (${placeholders})`
+  )
+    .bind(userId, ...cardIds)
+    .all<{ card_id: string; available: number }>();
+  for (const row of rows.results) result.set(row.card_id, row.available);
+  return result;
+}
+
+interface PublicOfferRow {
+  id: number;
+  creatorUsername: string;
+  demandCardId: string;
+  createdAt: string;
+  demandName: string;
+  demandRarity: string;
+  demandImagePath: string;
+  demandViewerQty: number;
+}
+
+marketplace.get("/offers", requireAuth, async (c) => {
+  const user = c.get("user");
+  await sweepExpiredOffers(c.env);
+
+  const page = Math.max(1, Number(c.req.query("page") ?? "1"));
+  const demandQuery = c.req.query("demandQuery") ?? "";
+  const offerQuery = c.req.query("offerQuery") ?? "";
+  const offset = (page - 1) * PAGE_SIZE;
+
+  const whereClause = `
+    o.status = 'active' AND o.creator_id != ?
+    AND (? = '' OR dc.name LIKE '%' || ? || '%')
+    AND (? = '' OR EXISTS (
+      SELECT 1 FROM marketplace_offer_items oi2 JOIN cards oc2 ON oc2.id = oi2.card_id
+      WHERE oi2.offer_id = o.id AND oc2.name LIKE '%' || ? || '%'
+    ))
+  `;
+  const filterParams = [user.twitchId, demandQuery, demandQuery, offerQuery, offerQuery];
+
+  const countRow = await c.env.DB.prepare(
+    `SELECT COUNT(*) AS count FROM marketplace_offers o JOIN cards dc ON dc.id = o.demand_card_id WHERE ${whereClause}`
+  )
+    .bind(...filterParams)
+    .first<{ count: number }>();
+
+  const rows = await c.env.DB.prepare(
+    `SELECT o.id, u.username AS creatorUsername, o.demand_card_id AS demandCardId, o.created_at AS createdAt,
+            dc.name AS demandName, dc.rarity AS demandRarity, dc.image_path AS demandImagePath,
+            COALESCE(v.quantity, 0) - COALESCE(v.reserved, 0) AS demandViewerQty
+     FROM marketplace_offers o
+     JOIN users u ON u.twitch_id = o.creator_id
+     JOIN cards dc ON dc.id = o.demand_card_id
+     LEFT JOIN user_cards v ON v.card_id = o.demand_card_id AND v.user_id = ?
+     WHERE ${whereClause}
+     ORDER BY o.created_at DESC, o.id DESC
+     LIMIT ? OFFSET ?`
+  )
+    .bind(user.twitchId, ...filterParams, PAGE_SIZE, offset)
+    .all<PublicOfferRow>();
+
+  const offerIds = rows.results.map((r) => r.id);
+  const items = await itemsByOfferIds(c.env, offerIds);
+  const allItemCardIds = Array.from(new Set(Array.from(items.values()).flat().map((i) => i.cardId)));
+  const viewerQuantities = await viewerQuantitiesByCardIds(c.env, user.twitchId, allItemCardIds);
+
+  return c.json({
+    offers: rows.results.map((r) => ({
+      id: r.id,
+      creatorUsername: r.creatorUsername,
+      createdAt: r.createdAt,
+      demand: {
+        cardId: r.demandCardId,
+        name: r.demandName,
+        rarity: r.demandRarity,
+        imagePath: r.demandImagePath,
+        viewerQuantity: r.demandViewerQty,
+      },
+      offerItems: (items.get(r.id) ?? []).map((i) => ({ ...i, viewerQuantity: viewerQuantities.get(i.cardId) ?? 0 })),
+    })),
+    totalCount: countRow?.count ?? 0,
+    page,
+    pageSize: PAGE_SIZE,
+  });
+});
+
 export default marketplace;
