@@ -34,7 +34,7 @@ describe("renderNotificationList", () => {
       {
         id: 3,
         message: `<script>alert('xss')</script>`,
-        link: `"><img src=x onerror=alert(1)>`,
+        link: `/redirect?next="><img src=x onerror=alert(1)>`,
         read: false,
         createdAt: "2026-01-01",
       },
@@ -43,5 +43,21 @@ describe("renderNotificationList", () => {
     expect(html).toContain("&lt;script&gt;");
     expect(html).not.toContain(`"><img`);
     expect(html).toContain("&quot;&gt;&lt;img");
+  });
+
+  it("renders a notification with a non-relative link (e.g. javascript:) as a non-clickable div", () => {
+    const html = renderNotificationList([
+      {
+        id: 4,
+        message: "Malicioso",
+        link: "javascript:alert(1)",
+        read: false,
+        createdAt: "2026-01-01",
+      },
+    ]);
+    expect(html).toContain("<div");
+    expect(html).not.toContain("<a");
+    expect(html).not.toContain("javascript:");
+    expect(html).toContain("Malicioso");
   });
 });

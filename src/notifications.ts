@@ -9,12 +9,20 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
+function isSafeNotificationLink(link: string): boolean {
+  // Only allow same-origin/relative paths. Absolute URLs (including
+  // javascript:, data:, http:, etc.) are rejected outright — no scheme
+  // allow-listing, just "starts with /".
+  return link.startsWith("/");
+}
+
 export function renderNotificationList(items: NotificationView[]): string {
   if (items.length === 0) return `<p class="notif-empty">Sin notificaciones</p>`;
   return items
     .map((n) => {
-      const tag = n.link ? "a" : "div";
-      const href = n.link ? ` href="${escapeHtml(n.link)}"` : "";
+      const safeLink = n.link && isSafeNotificationLink(n.link) ? n.link : null;
+      const tag = safeLink ? "a" : "div";
+      const href = safeLink ? ` href="${escapeHtml(safeLink)}"` : "";
       return `<${tag} class="notif-item"${href} data-id="${n.id}">${escapeHtml(n.message)}</${tag}>`;
     })
     .join("");
