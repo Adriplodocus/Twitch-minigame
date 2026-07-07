@@ -335,8 +335,14 @@ function openCreateWizard(): void {
         // inside it, which is invalid HTML — browsers silently reparent the
         // inner button out of the outer one, breaking both its position and
         // its click handling. Use a div with button semantics instead.
+        //
+        // Unlike renderWizardPickCard, this shows the card's REAL quantity
+        // (badge + greyed-out "unowned" styling when 0), matching every
+        // other page — so the user can see at a glance if they already own
+        // the card they're about to demand, instead of accidentally asking
+        // for something they already have.
         (c) =>
-          `<div class="mp-pick-btn${wizardDemand?.id === c.id ? " selected" : ""}" role="button" tabindex="0" data-card-id="${c.id}">${renderWizardPickCard(c)}</div>`
+          `<div class="mp-pick-btn${wizardDemand?.id === c.id ? " selected" : ""}" role="button" tabindex="0" data-card-id="${c.id}">${renderCardHtml(c, "", femaleVariantBaseNames, formLabels)}</div>`
       )
       .join("");
     nextBtn.disabled = wizardDemand === null;
