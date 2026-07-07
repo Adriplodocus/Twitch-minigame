@@ -73,6 +73,34 @@ marketplace.post("/offers", requireAuth, async (c) => {
   return c.json({ id: offerId, status: "active" }, 201);
 });
 
+async function releaseReservationAndDeleteOffer(env: Env, offerId: number, creatorId: string): Promise<void> {
+  const items = await env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
+    .bind(offerId)
+    .all<{ card_id: string; quantity: number }>();
+
+  // marketplace_offer_items has a FK on marketplace_offers, so children must be deleted before the
+  // parent row. This delete is unconditional and idempotent — a no-op if a concurrent caller (another
+  // sweep, or a sweep racing a cancel) already removed these rows for the same offer.
+  await env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(offerId).run();
+
+  // Atomic claim: only the caller whose DELETE actually removes the offer row (returned here) owns
+  // the reservation release. A concurrent caller racing on the same offer finds the row already
+  // gone, gets null, and skips the release below — so `reserved` is only ever decremented once.
+  const claimed = await env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ? RETURNING id")
+    .bind(offerId)
+    .first<{ id: number }>();
+  if (!claimed || items.results.length === 0) return;
+
+  const statements = items.results.map((item) =>
+    env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
+      item.quantity,
+      creatorId,
+      item.card_id
+    )
+  );
+  await env.DB.batch(statements);
+}
+
 async function sweepExpiredOffers(env: Env): Promise<void> {
   const expiredActive = await env.DB.prepare(
     "SELECT id FROM marketplace_offers WHERE status = 'active' AND created_at <= datetime('now', ?)"
@@ -84,21 +112,9 @@ async function sweepExpiredOffers(env: Env): Promise<void> {
     const offer = await env.DB.prepare("SELECT creator_id FROM marketplace_offers WHERE id = ?")
       .bind(id)
       .first<{ creator_id: string }>();
-    if (!offer) continue;
-    const items = await env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
-      .bind(id)
-      .all<{ card_id: string; quantity: number }>();
+    if (!offer) continue; // already claimed and deleted by a concurrent sweep
 
-    const statements = items.results.map((item) =>
-      env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
-        item.quantity,
-        offer.creator_id,
-        item.card_id
-      )
-    );
-    statements.push(env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id));
-    statements.push(env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(id));
-    await env.DB.batch(statements);
+    await releaseReservationAndDeleteOffer(env, id, offer.creator_id);
   }
 
   const expiredAccepted = await env.DB.prepare(
@@ -107,10 +123,15 @@ async function sweepExpiredOffers(env: Env): Promise<void> {
     .bind(`-${OFFER_LIFETIME_DAYS} days`)
     .all<{ id: number }>();
   for (const { id } of expiredAccepted.results) {
-    await env.DB.batch([
-      env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id),
-      env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(id),
-    ]);
+    // Same delete-children-then-parent order and atomic-claim shape as releaseReservationAndDeleteOffer:
+    // no reservation to release on this branch, but the guarded parent delete keeps a concurrent
+    // sweep from reprocessing an already-gone offer — harmless here today, but kept consistent so
+    // both branches are correct under concurrency for the same underlying reason.
+    await env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id).run();
+    const claimed = await env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ? RETURNING id")
+      .bind(id)
+      .first<{ id: number }>();
+    if (!claimed) continue; // already claimed/deleted by a concurrent sweep
   }
 }
 
@@ -197,20 +218,7 @@ marketplace.post("/offers/:id/cancel", requireAuth, async (c) => {
   if (!offer || offer.creator_id !== user.twitchId) return c.json({ error: "Not found" }, 404);
   if (offer.status !== "active") return c.json({ error: "La oferta no está activa" }, 409);
 
-  const items = await c.env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
-    .bind(offerId)
-    .all<{ card_id: string; quantity: number }>();
-
-  const statements = items.results.map((item) =>
-    c.env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
-      item.quantity,
-      user.twitchId,
-      item.card_id
-    )
-  );
-  statements.push(c.env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(offerId));
-  statements.push(c.env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(offerId));
-  await c.env.DB.batch(statements);
+  await releaseReservationAndDeleteOffer(c.env, offerId, user.twitchId);
 
   return c.json({ ok: true });
 });

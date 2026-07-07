@@ -302,6 +302,41 @@ it("does not expire an active offer younger than 7 days", async () => {
   expect(json.offers.find((o) => o.id === id)).toBeDefined();
 });
 
+it("only releases the reservation once when the expiry sweep races on the same offer", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const createRes = await app.request(
+    "/api/marketplace/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ demandCardId: "p1", offerItems: [{ cardId: "c1", quantity: 2 }] }),
+    },
+    env
+  );
+  const { id } = await createRes.json<{ id: number }>();
+  await env.DB.prepare("UPDATE marketplace_offers SET created_at = datetime('now', '-8 days') WHERE id = ?")
+    .bind(id)
+    .run();
+
+  // Simulate two concurrent pollers both triggering the expiry sweep for the same offer.
+  const [res1, res2] = await Promise.all([
+    app.request("/api/marketplace/offers/mine", { headers: { Cookie: cookie } }, env),
+    app.request("/api/marketplace/offers/mine", { headers: { Cookie: cookie } }, env),
+  ]);
+  expect(res1.status).toBe(200);
+  expect(res2.status).toBe(200);
+
+  const offer = await env.DB.prepare("SELECT id FROM marketplace_offers WHERE id = ?").bind(id).first();
+  expect(offer).toBeNull();
+
+  const reserved = await env.DB.prepare("SELECT reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ reserved: number }>();
+  // Started at 2 after the offer reserved it; a single release should bring it back to 0.
+  // A double release (the race) would drive it to -2.
+  expect(reserved?.reserved).toBe(0);
+});
+
 it("silently expires an accepted offer older than 7 days without touching card quantities", async () => {
   await env.DB.prepare(
     "INSERT INTO marketplace_offers (creator_id, demand_card_id, status, accepted_at) VALUES ('1', 'p1', 'accepted', datetime('now', '-8 days'))"
