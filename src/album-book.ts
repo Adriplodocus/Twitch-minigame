@@ -65,11 +65,18 @@ export interface BookDeps {
 const FLIP_OUT_MS = 240;
 const FLIP_IN_MS = 260;
 
+// Below this width the two-page spread doesn't fit (see .book-spread's
+// 700px breakpoint in style.css), so the book falls back to one page at a
+// time instead of shrinking cards past readability.
+const MOBILE_QUERY = "(max-width: 700px)";
+
 export class AlbumBook {
   private readonly pages: BookPage[];
   private spreadIndex = 0;
   private readonly totalPages: number;
-  private readonly totalSpreads: number;
+  private pagesPerSpread: number;
+  private totalSpreads: number;
+  private readonly mobileQuery = window.matchMedia(MOBILE_QUERY);
 
   constructor(
     cards: CardView[],
@@ -77,11 +84,21 @@ export class AlbumBook {
   ) {
     this.pages = buildPages(cards);
     this.totalPages = this.pages.length;
-    this.totalSpreads = this.totalPages / PAGES_PER_SPREAD;
+    this.pagesPerSpread = this.mobileQuery.matches ? 1 : PAGES_PER_SPREAD;
+    this.totalSpreads = this.totalPages / this.pagesPerSpread;
     deps.firstBtn.addEventListener("click", () => this.jump(0));
     deps.prevBtn.addEventListener("click", () => this.go(-1));
     deps.nextBtn.addEventListener("click", () => this.go(1));
     deps.lastBtn.addEventListener("click", () => this.jump(this.totalSpreads - 1));
+    this.mobileQuery.addEventListener("change", () => this.handleModeChange());
+    this.render();
+  }
+
+  private handleModeChange(): void {
+    const currentPage = this.spreadIndex * this.pagesPerSpread;
+    this.pagesPerSpread = this.mobileQuery.matches ? 1 : PAGES_PER_SPREAD;
+    this.totalSpreads = this.totalPages / this.pagesPerSpread;
+    this.spreadIndex = Math.min(Math.floor(currentPage / this.pagesPerSpread), this.totalSpreads - 1);
     this.render();
   }
 
@@ -100,14 +117,19 @@ export class AlbumBook {
   }
 
   private render(): void {
-    const left = this.spreadIndex * PAGES_PER_SPREAD;
-    const right = left + 1;
-    this.deps.spreadEl.innerHTML = this.renderPageHtml(left) + this.renderPageHtml(right);
+    const left = this.spreadIndex * this.pagesPerSpread;
+    const right = left + this.pagesPerSpread - 1;
+    this.deps.spreadEl.innerHTML = Array.from({ length: this.pagesPerSpread }, (_, i) =>
+      this.renderPageHtml(left + i)
+    ).join("");
     this.deps.firstBtn.disabled = this.spreadIndex === 0;
     this.deps.prevBtn.disabled = this.spreadIndex === 0;
     this.deps.nextBtn.disabled = this.spreadIndex === this.totalSpreads - 1;
     this.deps.lastBtn.disabled = this.spreadIndex === this.totalSpreads - 1;
-    this.deps.indicatorEl.textContent = `Páginas ${left + 1}–${right + 1} de ${this.totalPages}`;
+    this.deps.indicatorEl.textContent =
+      this.pagesPerSpread === 1
+        ? `Página ${left + 1} de ${this.totalPages}`
+        : `Páginas ${left + 1}–${right + 1} de ${this.totalPages}`;
   }
 
   private go(direction: -1 | 1): void {

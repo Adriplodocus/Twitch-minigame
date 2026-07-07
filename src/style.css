@@ -986,6 +986,14 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   text-shadow: 0 0 20px rgba(255, 86, 180, 0.5), 0 0 40px rgba(0, 204, 255, 0.2);
 }
 
+@media (max-width: 700px) {
+  .book-spread { grid-template-columns: 1fr; padding: 0.85rem; gap: 0; }
+  .book-page { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; }
+  .book-page:first-child { border-right: none; padding-right: 0; }
+  .book-page:last-child { padding-left: 0; }
+  .book-nav { width: 36px; height: 36px; font-size: 1.15rem; }
+}
+
 .book-page-flip-out-next { animation: book-flip-out-next 0.24s ease-in forwards; }
 .book-page-flip-in-next { animation: book-flip-in-next 0.26s ease-out forwards; }
 .book-page-flip-out-prev { animation: book-flip-out-prev 0.24s ease-in forwards; }
@@ -1419,6 +1427,9 @@ a.notif-item:hover {
   gap: 0.6rem;
   margin-bottom: 1rem;
 }
+#mp-create-btn {
+  margin-bottom: 1rem;
+}
 .mp-filters {
   display: flex;
   gap: 0.6rem;
@@ -1442,6 +1453,10 @@ a.notif-item:hover {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
+}
+.mp-accept-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 .mp-offer-card-header {
   display: flex;
