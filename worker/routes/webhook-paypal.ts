@@ -17,6 +17,27 @@ async function getPaypalConfig(db: D1Database): Promise<PaypalConfig> {
   return row!;
 }
 
+async function triggerDonationAlert(env: Env, fields: paypalIpn.ParsedIpn): Promise<void> {
+  if (!env.WEB_ALERTS_URL || !env.WEB_ALERTS_ADMIN_TOKEN) return;
+  try {
+    await fetch(`${env.WEB_ALERTS_URL}/admin/trigger`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.WEB_ALERTS_ADMIN_TOKEN}`,
+      },
+      body: JSON.stringify({
+        event_type: "donation",
+        user_login: fields.note || "Alguien",
+        amount: fields.amount,
+        currency: fields.currency,
+      }),
+    });
+  } catch {
+    // best-effort: a failed alert must not block pack granting
+  }
+}
+
 async function recordDonation(
   db: D1Database,
   txnId: string,
@@ -53,6 +74,10 @@ webhookPaypal.post("/paypal-ipn", async (c) => {
     .bind(fields.txnId)
     .first();
   if (existing) return c.json({ ok: true }, 200);
+
+  if (c.env.WEB_ALERTS_URL && c.env.WEB_ALERTS_ADMIN_TOKEN) {
+    c.executionCtx.waitUntil(triggerDonationAlert(c.env, fields));
+  }
 
   const config = await getPaypalConfig(c.env.DB);
 

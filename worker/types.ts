@@ -11,6 +11,8 @@ export interface Env {
   JWT_SECRET: string;
   ADMIN_PASSWORD: string;
   PAYPAL_RECEIVER_EMAIL: string;
+  WEB_ALERTS_URL: string;
+  WEB_ALERTS_ADMIN_TOKEN: string;
 }
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
