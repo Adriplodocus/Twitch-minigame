@@ -36,6 +36,9 @@ marketplace.post("/offers", requireAuth, async (c) => {
 
   if (offerItems.length === 0) return c.json({ error: "Debes ofrecer al menos una carta" }, 400);
 
+  const demandCard = await c.env.DB.prepare("SELECT 1 FROM cards WHERE id = ?").bind(body.demandCardId).first();
+  if (!demandCard) return c.json({ error: "Carta demandada no existe" }, 400);
+
   const countRow = await c.env.DB.prepare(
     "SELECT COUNT(*) AS count FROM marketplace_offers WHERE creator_id = ? AND status IN ('active', 'accepted')"
   )

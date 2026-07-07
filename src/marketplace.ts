@@ -132,16 +132,25 @@ function openAcceptModal(offerId: number): void {
   overlay.innerHTML = `
     <div class="modal">
       <p>¿Seguro que quieres aceptar esta oferta? El intercambio se realiza inmediatamente.</p>
+      <p class="mp-wizard-error" id="mp-accept-error" hidden></p>
       <button type="button" class="btn" id="mp-accept-confirm">Aceptar</button>
       <button type="button" class="btn modal-cancel-btn" id="mp-accept-cancel">Cancelar</button>
     </div>
   `;
   document.body.appendChild(overlay);
+  const errorEl = overlay.querySelector<HTMLElement>("#mp-accept-error")!;
   overlay.querySelector("#mp-accept-cancel")!.addEventListener("click", () => overlay.remove());
   overlay.querySelector("#mp-accept-confirm")!.addEventListener("click", async () => {
-    await acceptMarketplaceOffer(offerId);
-    overlay.remove();
-    loadPublicView();
+    errorEl.hidden = true;
+    try {
+      await acceptMarketplaceOffer(offerId);
+      overlay.remove();
+      loadPublicView();
+    } catch (err) {
+      errorEl.textContent = err instanceof Error ? err.message : "Error al aceptar la oferta";
+      errorEl.hidden = false;
+      loadPublicView();
+    }
   });
 }
 
@@ -174,12 +183,27 @@ function wireStaticEvents(): void {
   document.getElementById("mp-mine-grid")!.addEventListener("click", async (e) => {
     const cancelBtn = (e.target as HTMLElement).closest<HTMLButtonElement>(".mp-cancel-btn");
     const deleteBtn = (e.target as HTMLElement).closest<HTMLButtonElement>(".mp-delete-btn");
+    const mineError = document.getElementById("mp-mine-error")!;
     if (cancelBtn) {
-      await cancelMarketplaceOffer(Number(cancelBtn.dataset.id));
-      loadMineView();
+      try {
+        await cancelMarketplaceOffer(Number(cancelBtn.dataset.id));
+        mineError.hidden = true;
+      } catch (err) {
+        mineError.textContent = err instanceof Error ? err.message : "Error al cancelar la oferta";
+        mineError.hidden = false;
+      } finally {
+        loadMineView();
+      }
     } else if (deleteBtn) {
-      await deleteMarketplaceOffer(Number(deleteBtn.dataset.id));
-      loadMineView();
+      try {
+        await deleteMarketplaceOffer(Number(deleteBtn.dataset.id));
+        mineError.hidden = true;
+      } catch (err) {
+        mineError.textContent = err instanceof Error ? err.message : "Error al eliminar la oferta";
+        mineError.hidden = false;
+      } finally {
+        loadMineView();
+      }
     }
   });
   document.getElementById("mp-create-btn")!.addEventListener("click", openCreateWizard);

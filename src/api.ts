@@ -30,7 +30,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     window.location.href = "/";
     throw new Error("Unauthorized");
   }
-  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  if (!res.ok) {
+    let message = `Request failed: ${res.status}`;
+    try {
+      const body = (await res.json()) as { error?: string };
+      if (body && typeof body.error === "string" && body.error) message = body.error;
+    } catch {
+      // Response body wasn't JSON (or was empty) — fall back to the generic status message.
+    }
+    throw new Error(message);
+  }
   return res.json() as Promise<T>;
 }
 

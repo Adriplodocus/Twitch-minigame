@@ -136,6 +136,28 @@ it("merges duplicate cardId entries in offerItems before validating", async () =
   expect(res.status).toBe(409); // 4 total > 3 available
 });
 
+it("rejects creating an offer whose demand card does not exist", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/marketplace/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ demandCardId: "does-not-exist", offerItems: [{ cardId: "c1", quantity: 1 }] }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+
+  const offers = await env.DB.prepare("SELECT id FROM marketplace_offers").all();
+  expect(offers.results).toHaveLength(0);
+
+  const reserved = await env.DB.prepare("SELECT reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ reserved: number }>();
+  expect(reserved?.reserved).toBe(0);
+});
+
 it("rejects unauthenticated requests", async () => {
   const res = await app.request(
     "/api/marketplace/offers",
