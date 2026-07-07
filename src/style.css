@@ -1511,7 +1511,9 @@ a.notif-item:hover {
 }
 .mp-wizard-offer-columns {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  /* 3fr:2fr (not 2fr:1fr) gives the "Ofreces" preview enough room for 2
+     columns of fixed-140px cards instead of being squeezed to 1. */
+  grid-template-columns: 3fr 2fr;
   gap: 1rem;
 }
 .mp-wizard-grid {
