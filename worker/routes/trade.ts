@@ -29,10 +29,11 @@ trade.get("/users/:username", requireAuth, async (c) => {
 });
 
 async function ownedQuantity(env: Env, userId: string, cardId: string): Promise<number> {
-  const row = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+  const row = await env.DB.prepare("SELECT quantity, reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
     .bind(userId, cardId)
-    .first<{ quantity: number }>();
-  return row?.quantity ?? 0;
+    .first<{ quantity: number; reserved: number }>();
+  if (!row) return 0;
+  return row.quantity - row.reserved;
 }
 
 function mergeByCardId(items: TradeCardInput[]): TradeCardInput[] {

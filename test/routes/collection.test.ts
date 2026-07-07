@@ -38,6 +38,21 @@ it("requires auth", async () => {
   expect(res.status).toBe(401);
 });
 
+it("shows quantity minus reserved as the available amount", async () => {
+  await env.DB.batch([
+    env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity, reserved) VALUES (?, ?, ?, ?)").bind(
+      "1",
+      "c1",
+      3,
+      1
+    ),
+  ]);
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/collection", { headers: { Cookie: cookie } }, env);
+  const json = await res.json<{ cards: { id: string; quantity: number }[] }>();
+  expect(json.cards.find((c) => c.id === "c1")?.quantity).toBe(2);
+});
+
 it("lists all catalog cards with owned quantities and pending packs", async () => {
   await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)")
     .bind("1", "c1", 2)

@@ -82,6 +82,21 @@ it("rejects an offer for more cards than the sender owns", async () => {
   expect(res.status).toBe(409);
 });
 
+it("treats reserved cards as unavailable when validating an offer", async () => {
+  await env.DB.prepare("UPDATE user_cards SET reserved = 3 WHERE user_id = ? AND card_id = ?").bind("1", "c1").run();
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+
 it("rejects an offer when duplicate cardId entries combine to exceed owned quantity", async () => {
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request(
