@@ -139,3 +139,67 @@ export function getUnreadNotifications(): Promise<{ unread: boolean }> {
 export function listNotifications(): Promise<{ notifications: NotificationView[] }> {
   return request("/notifications");
 }
+
+export interface MarketplaceCardView {
+  cardId: string;
+  name: string;
+  rarity: Rarity;
+  imagePath: string;
+  quantity: number;
+  viewerQuantity: number;
+}
+
+export interface MarketplaceOfferSummary {
+  id: number;
+  creatorUsername: string;
+  createdAt: string;
+  demand: { cardId: string; name: string; rarity: Rarity; imagePath: string; viewerQuantity: number };
+  offerItems: MarketplaceCardView[];
+}
+
+export interface MyMarketplaceOffer {
+  id: number;
+  status: "active" | "accepted";
+  createdAt: string;
+  acceptedAt: string | null;
+  demand: { cardId: string; name: string; rarity: Rarity; imagePath: string };
+  offerItems: { cardId: string; name: string; rarity: Rarity; imagePath: string; quantity: number }[];
+}
+
+export function listMarketplaceOffers(params: {
+  page: number;
+  demandQuery?: string;
+  offerQuery?: string;
+}): Promise<{ offers: MarketplaceOfferSummary[]; totalCount: number; page: number; pageSize: number }> {
+  const q = new URLSearchParams({ page: String(params.page) });
+  if (params.demandQuery) q.set("demandQuery", params.demandQuery);
+  if (params.offerQuery) q.set("offerQuery", params.offerQuery);
+  return request(`/marketplace/offers?${q.toString()}`);
+}
+
+export function listMyMarketplaceOffers(): Promise<{ offers: MyMarketplaceOffer[] }> {
+  return request("/marketplace/offers/mine");
+}
+
+export function createMarketplaceOffer(input: {
+  demandCardId: string;
+  offerItems: { cardId: string; quantity: number }[];
+}): Promise<{ id: number; status: string }> {
+  return request("/marketplace/offers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export function acceptMarketplaceOffer(id: number): Promise<{ status: string }> {
+  return request(`/marketplace/offers/${id}/accept`, { method: "POST" });
+}
+
+export function cancelMarketplaceOffer(id: number): Promise<{ ok: boolean }> {
+  return request(`/marketplace/offers/${id}/cancel`, { method: "POST" });
+}
+
+export function deleteMarketplaceOffer(id: number): Promise<{ ok: boolean }> {
+  return request(`/marketplace/offers/${id}`, { method: "DELETE" });
+}
