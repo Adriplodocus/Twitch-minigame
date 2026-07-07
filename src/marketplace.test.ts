@@ -45,6 +45,13 @@ describe("renderPublicOfferCard", () => {
     const html = renderPublicOfferCard(offer);
     expect(html).not.toContain("card-qty");
   });
+
+  it("renders the badge inside the card footer, not appended below the card", () => {
+    const html = renderPublicOfferCard(offer);
+    // The demand card renders first; its badge ("Tienes 0") must land before
+    // that same card's own info button, not after it.
+    expect(html.indexOf("Tienes 0")).toBeLessThan(html.indexOf("info-btn"));
+  });
 });
 
 describe("renderMyOfferCard", () => {

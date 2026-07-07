@@ -52,6 +52,13 @@ it("unowned rare card gets no foil/tiltable/glare even though rarity qualifies",
   expect(html).toContain("unowned");
 });
 
+it("footerBadgeHtml replaces the auto quantity badge and lands inside the footer, before the info button", () => {
+  const html = renderCardHtml(card(), "", undefined, undefined, true, '<span class="mp-have">Tienes 3</span>');
+  expect(html).not.toContain("card-qty");
+  expect(html).toContain("Tienes 3");
+  expect(html.indexOf("Tienes 3")).toBeLessThan(html.indexOf("info-btn"));
+});
+
 it("unowned shiny card gets no foil/shiny/sparkle/tiltable either", () => {
   const html = renderCardHtml(card({ name: "Bulbasaur Shiny", quantity: 0 }));
   expect(html).not.toMatch(/class="card [^"]*\bfoil\b/);

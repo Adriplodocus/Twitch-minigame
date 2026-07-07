@@ -146,7 +146,8 @@ export function renderCardHtml(
   innerExtra = "",
   femaleVariantBaseNames?: Set<string>,
   formLabels?: Map<string, string>,
-  showQtyBadge = true
+  showQtyBadge = true,
+  footerBadgeHtml?: string
 ): string {
   ensureInfoTooltipHandler();
   ensureCardTiltHandler();
@@ -171,7 +172,17 @@ export function renderCardHtml(
       ? `<span class="gender-icon gender-male">♂</span>`
       : "";
   const shinyIcon = isShiny ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
-  const qtyBadge = showQtyBadge && card.quantity > 0 ? `<span class="card-qty">x${card.quantity}</span>` : "";
+  // footerBadgeHtml, when passed (even as ""), replaces the auto x-quantity
+  // badge in the footer's first slot — used by callers that show their own
+  // status badge (e.g. marketplace's "Tienes N") integrated into the same
+  // row as the info button, instead of appending it below the card and
+  // growing its height.
+  const qtyBadge =
+    footerBadgeHtml !== undefined
+      ? footerBadgeHtml
+      : showQtyBadge && card.quantity > 0
+        ? `<span class="card-qty">x${card.quantity}</span>`
+        : "";
 
   const hasFoil = isOwned && (card.rarity !== "common" || isShiny);
   const hasSparkle = isOwned && isShiny;

@@ -1462,10 +1462,18 @@ a.notif-item:hover {
 }
 .mp-have,
 .mp-qty {
-  display: block;
-  font-size: 0.7rem;
-  color: var(--muted);
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 0.55rem;
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-em);
+  background: var(--surface2);
+  white-space: nowrap;
 }
 .mp-pagination {
   display: flex;
@@ -1494,6 +1502,23 @@ a.notif-item:hover {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 1rem;
+}
+.mp-wizard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+.mp-offer-card-preview {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  text-align: center;
+}
+.mp-offer-card-preview .mp-label { text-align: center; }
+.mp-offer-card-preview .mp-grid {
+  grid-template-columns: repeat(auto-fit, 140px);
+  justify-content: center;
 }
 .mp-pick-btn {
   background: none;

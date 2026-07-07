@@ -34,11 +34,11 @@ export function renderMarketplaceCard(
     generation: 0,
   };
   // quantity: 1 above keeps foil/shiny/tiltable VFX active (these cards
-  // represent trade items, not the viewer's "unowned" state) — but that
-  // also makes renderCardHtml's own quantity>0 auto-badge fire. Suppress
-  // just that badge via showQtyBadge so only the caller-supplied
-  // badgeHtml (e.g. "Tienes N") is shown, avoiding a duplicate/contradictory "x1".
-  return renderCardHtml(displayCard, badgeHtml, undefined, undefined, false);
+  // represent trade items, not the viewer's "unowned" state). badgeHtml is
+  // passed as footerBadgeHtml so it renders inside the card's own footer
+  // row (alongside the info button) instead of appended below the card,
+  // which used to add a full extra line of height to every card.
+  return renderCardHtml(displayCard, "", undefined, undefined, false, badgeHtml);
 }
 
 export function renderPublicOfferCard(offer: MarketplaceOfferSummary): string {
@@ -237,13 +237,13 @@ function openCreateWizard(): void {
       </div>
       <div class="mp-wizard-panel" data-panel="1">
         <input class="input" id="mp-demand-search" placeholder="Buscar Pokémon..." />
-        <div id="mp-demand-results" class="mp-grid"></div>
+        <div id="mp-demand-results" class="mp-wizard-grid"></div>
       </div>
       <div class="mp-wizard-panel" data-panel="2" hidden>
         <div class="mp-wizard-offer-columns">
           <div>
             <input class="input" id="mp-offer-search" placeholder="Buscar en tu colección..." />
-            <div id="mp-offer-results" class="mp-grid"></div>
+            <div id="mp-offer-results" class="mp-wizard-grid"></div>
           </div>
           <div>
             <p class="mp-label">Ofreces</p>
@@ -287,7 +287,8 @@ function openCreateWizard(): void {
   const errorEl = overlay.querySelector<HTMLElement>("#mp-wizard-error")!;
 
   function renderDemandResults(): void {
-    const filtered = filterCardsByName(allCards, demandSearch.value).slice(0, 30);
+    const query = demandSearch.value.trim();
+    const filtered = query ? filterCardsByName(allCards, query).slice(0, 30) : [];
     demandResults.innerHTML = filtered
       .map(
         (c) =>
