@@ -153,6 +153,8 @@ async function loadMineView(): Promise<void> {
 function showTab(tab: "public" | "mine"): void {
   document.getElementById("mp-public-view")!.hidden = tab !== "public";
   document.getElementById("mp-mine-view")!.hidden = tab !== "mine";
+  document.getElementById("mp-tab-mine")!.hidden = tab === "mine";
+  document.getElementById("mp-tab-public")!.hidden = tab === "public";
   if (tab === "public") loadPublicView();
   else loadMineView();
 }
