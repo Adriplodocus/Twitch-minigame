@@ -185,6 +185,15 @@ function wireStaticEvents(): void {
   document.getElementById("mp-create-btn")!.addEventListener("click", openCreateWizard);
 }
 
+export function renderWizardPickCard(card: CardView): string {
+  // quantity: 1 keeps foil/shiny/tiltable VFX active (the wizard's demand
+  // picker and step-3 confirm panel show cards as items to pick, not the
+  // viewer's owned-quantity state) — but that also makes renderCardHtml's
+  // own quantity>0 auto-badge fire. Suppress just that badge via
+  // showQtyBadge, same fix as renderMarketplaceCard above.
+  return renderCardHtml({ ...card, quantity: 1 }, "", undefined, undefined, false);
+}
+
 let wizardDemand: CardView | null = null;
 const wizardOfferQuantities = new Map<string, number>();
 
@@ -258,7 +267,7 @@ function openCreateWizard(): void {
     demandResults.innerHTML = filtered
       .map(
         (c) =>
-          `<button type="button" class="mp-pick-btn${wizardDemand?.id === c.id ? " selected" : ""}" data-card-id="${c.id}">${renderCardHtml({ ...c, quantity: 1 })}</button>`
+          `<button type="button" class="mp-pick-btn${wizardDemand?.id === c.id ? " selected" : ""}" data-card-id="${c.id}">${renderWizardPickCard(c)}</button>`
       )
       .join("");
     nextBtn.disabled = wizardDemand === null;
@@ -320,7 +329,7 @@ function openCreateWizard(): void {
       nextBtn.disabled = wizardOfferQuantities.size === 0;
     }
     if (n === 3) {
-      confirmDemand.innerHTML = renderCardHtml({ ...wizardDemand!, quantity: 1 });
+      confirmDemand.innerHTML = renderWizardPickCard(wizardDemand!);
       confirmOffer.innerHTML = offerPreviewHtml();
     }
   }

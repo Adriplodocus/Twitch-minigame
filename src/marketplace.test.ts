@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatDate, renderPublicOfferCard, renderMyOfferCard } from "./marketplace";
+import { formatDate, renderPublicOfferCard, renderMyOfferCard, renderWizardPickCard } from "./marketplace";
 
 describe("formatDate", () => {
   it("formats a SQLite timestamp as dd/mm/aaaa", () => {
@@ -77,5 +77,19 @@ describe("renderMyOfferCard", () => {
   it("does not render a spurious auto quantity badge alongside the caller-supplied badge", () => {
     const html = renderMyOfferCard(activeOffer);
     expect(html).not.toContain("card-qty");
+  });
+});
+
+describe("renderWizardPickCard", () => {
+  const card = { id: "p1", name: "Pikachu", rarity: "common" as const, imagePath: "/p1.png", quantity: 0, generation: 1 };
+
+  it("does not render an auto quantity badge, even for a demand card the viewer owns 0 of", () => {
+    const html = renderWizardPickCard(card);
+    expect(html).not.toContain("card-qty");
+  });
+
+  it("still forces quantity to 1 so VFX (foil/shiny/tiltable) stay active", () => {
+    const html = renderWizardPickCard(card);
+    expect(html).not.toContain("unowned");
   });
 });
