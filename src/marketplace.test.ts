@@ -52,6 +52,11 @@ describe("renderPublicOfferCard", () => {
     // that same card's own info button, not after it.
     expect(html.indexOf("Tienes 0")).toBeLessThan(html.indexOf("info-btn"));
   });
+
+  it("wraps the demand card in .mp-grid so it sizes the same as offered cards", () => {
+    const html = renderPublicOfferCard(offer);
+    expect(html).toMatch(/Demanda<\/p>\s*<div class="mp-grid">/);
+  });
 });
 
 describe("renderMyOfferCard", () => {

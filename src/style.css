@@ -740,6 +740,11 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
 }
+/* Author-stylesheet `.btn` beats the browser's UA `[hidden]{display:none}`
+   rule regardless of selector specificity (origin, not specificity, decides
+   that tie) — without this, toggling the `hidden` property on a `.btn`
+   element (e.g. the wizard's step buttons) has no visual effect. */
+.btn[hidden] { display: none; }
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(194, 71, 127, 0.45);
@@ -1446,7 +1451,10 @@ a.notif-item:hover {
 }
 .mp-offer-card-body {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  /* auto sizes the demand column to its fixed-size card (see .mp-grid);
+     a static fr ratio would either starve or over-stretch it depending on
+     how many cards happen to be offered. */
+  grid-template-columns: auto 1fr;
   gap: 1rem;
 }
 .mp-label {
@@ -1457,7 +1465,10 @@ a.notif-item:hover {
 }
 .mp-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  /* Fixed track width (no 1fr) so a single card doesn't stretch to fill
+     leftover row space — cards stay the same size as collection.html's
+     regardless of how many items are in a given offer. */
+  grid-template-columns: repeat(auto-fill, 140px);
   gap: 0.5rem;
 }
 .mp-have,
@@ -1483,7 +1494,7 @@ a.notif-item:hover {
   margin-top: 1rem;
 }
 .mp-wizard {
-  min-width: min(90vw, 640px);
+  min-width: min(92vw, 860px);
   max-height: 85vh;
   overflow-y: auto;
 }
@@ -1505,7 +1516,9 @@ a.notif-item:hover {
 }
 .mp-wizard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  /* Fixed track width, same reasoning as .mp-grid: keeps cards at their
+     collection.html size instead of stretching when a search has few hits. */
+  grid-template-columns: repeat(auto-fill, 140px);
   gap: 0.75rem;
   margin-top: 0.75rem;
 }
@@ -1516,10 +1529,7 @@ a.notif-item:hover {
   text-align: center;
 }
 .mp-offer-card-preview .mp-label { text-align: center; }
-.mp-offer-card-preview .mp-grid {
-  grid-template-columns: repeat(auto-fit, 140px);
-  justify-content: center;
-}
+.mp-offer-card-preview .mp-grid { justify-content: center; }
 .mp-pick-btn {
   background: none;
   border: none;

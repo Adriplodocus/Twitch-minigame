@@ -52,7 +52,9 @@ export function renderPublicOfferCard(offer: MarketplaceOfferSummary): string {
       <div class="mp-offer-card-body">
         <div>
           <p class="mp-label">Demanda</p>
-          ${renderMarketplaceCard(offer.demand, `<span class="mp-have">Tienes ${offer.demand.viewerQuantity}</span>`)}
+          <div class="mp-grid">
+            ${renderMarketplaceCard(offer.demand, `<span class="mp-have">Tienes ${offer.demand.viewerQuantity}</span>`)}
+          </div>
         </div>
         <div>
           <p class="mp-label">Ofrece</p>
@@ -82,7 +84,9 @@ export function renderMyOfferCard(offer: MyMarketplaceOffer): string {
       <div class="mp-offer-card-body">
         <div>
           <p class="mp-label">Demanda</p>
-          ${renderMarketplaceCard(offer.demand, "")}
+          <div class="mp-grid">
+            ${renderMarketplaceCard(offer.demand, "")}
+          </div>
         </div>
         <div>
           <p class="mp-label">Ofrece</p>
@@ -291,8 +295,12 @@ function openCreateWizard(): void {
     const filtered = query ? filterCardsByName(allCards, query).slice(0, 30) : [];
     demandResults.innerHTML = filtered
       .map(
+        // A <button> wrapper here would nest the card's own .info-btn <button>
+        // inside it, which is invalid HTML — browsers silently reparent the
+        // inner button out of the outer one, breaking both its position and
+        // its click handling. Use a div with button semantics instead.
         (c) =>
-          `<button type="button" class="mp-pick-btn${wizardDemand?.id === c.id ? " selected" : ""}" data-card-id="${c.id}">${renderWizardPickCard(c)}</button>`
+          `<div class="mp-pick-btn${wizardDemand?.id === c.id ? " selected" : ""}" role="button" tabindex="0" data-card-id="${c.id}">${renderWizardPickCard(c)}</div>`
       )
       .join("");
     nextBtn.disabled = wizardDemand === null;
@@ -317,12 +325,25 @@ function openCreateWizard(): void {
     offerPreview.innerHTML = offerPreviewHtml();
   }
 
+  function pickDemand(cardId: string): void {
+    wizardDemand = allCards.find((c) => c.id === cardId) ?? null;
+    renderDemandResults();
+  }
+
   demandSearch.addEventListener("input", renderDemandResults);
   demandResults.addEventListener("click", (e) => {
-    const btn = (e.target as HTMLElement).closest<HTMLElement>(".mp-pick-btn");
+    const target = e.target as HTMLElement;
+    if (target.closest(".info-btn")) return; // let the info tooltip toggle without also picking the card
+    const btn = target.closest<HTMLElement>(".mp-pick-btn");
     if (!btn) return;
-    wizardDemand = allCards.find((c) => c.id === btn.dataset.cardId) ?? null;
-    renderDemandResults();
+    pickDemand(btn.dataset.cardId!);
+  });
+  demandResults.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const target = e.target as HTMLElement;
+    if (!target.classList.contains("mp-pick-btn")) return;
+    e.preventDefault();
+    pickDemand(target.dataset.cardId!);
   });
 
   offerSearch.addEventListener("input", renderOfferResults);
