@@ -73,4 +73,163 @@ marketplace.post("/offers", requireAuth, async (c) => {
   return c.json({ id: offerId, status: "active" }, 201);
 });
 
+async function sweepExpiredOffers(env: Env): Promise<void> {
+  const expiredActive = await env.DB.prepare(
+    "SELECT id FROM marketplace_offers WHERE status = 'active' AND created_at <= datetime('now', ?)"
+  )
+    .bind(`-${OFFER_LIFETIME_DAYS} days`)
+    .all<{ id: number }>();
+
+  for (const { id } of expiredActive.results) {
+    const offer = await env.DB.prepare("SELECT creator_id FROM marketplace_offers WHERE id = ?")
+      .bind(id)
+      .first<{ creator_id: string }>();
+    if (!offer) continue;
+    const items = await env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
+      .bind(id)
+      .all<{ card_id: string; quantity: number }>();
+
+    const statements = items.results.map((item) =>
+      env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
+        item.quantity,
+        offer.creator_id,
+        item.card_id
+      )
+    );
+    statements.push(env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id));
+    statements.push(env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(id));
+    await env.DB.batch(statements);
+  }
+
+  const expiredAccepted = await env.DB.prepare(
+    "SELECT id FROM marketplace_offers WHERE status = 'accepted' AND accepted_at <= datetime('now', ?)"
+  )
+    .bind(`-${OFFER_LIFETIME_DAYS} days`)
+    .all<{ id: number }>();
+  for (const { id } of expiredAccepted.results) {
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id),
+      env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(id),
+    ]);
+  }
+}
+
+interface MarketplaceItemRow {
+  offer_id: number;
+  cardId: string;
+  name: string;
+  rarity: string;
+  imagePath: string;
+  quantity: number;
+}
+
+async function itemsByOfferIds(
+  env: Env,
+  offerIds: number[]
+): Promise<Map<number, { cardId: string; name: string; rarity: string; imagePath: string; quantity: number }[]>> {
+  const byOfferId = new Map<
+    number,
+    { cardId: string; name: string; rarity: string; imagePath: string; quantity: number }[]
+  >();
+  if (offerIds.length === 0) return byOfferId;
+
+  const placeholders = offerIds.map(() => "?").join(", ");
+  const rows = await env.DB.prepare(
+    `SELECT oi.offer_id, c.id AS cardId, c.name, c.rarity, c.image_path AS imagePath, oi.quantity
+     FROM marketplace_offer_items oi JOIN cards c ON c.id = oi.card_id
+     WHERE oi.offer_id IN (${placeholders})`
+  )
+    .bind(...offerIds)
+    .all<MarketplaceItemRow>();
+
+  for (const row of rows.results) {
+    const list = byOfferId.get(row.offer_id) ?? [];
+    list.push({ cardId: row.cardId, name: row.name, rarity: row.rarity, imagePath: row.imagePath, quantity: row.quantity });
+    byOfferId.set(row.offer_id, list);
+  }
+  return byOfferId;
+}
+
+interface MineOfferRow {
+  id: number;
+  demandCardId: string;
+  status: string;
+  createdAt: string;
+  acceptedAt: string | null;
+  demandName: string;
+  demandRarity: string;
+  demandImagePath: string;
+}
+
+marketplace.get("/offers/mine", requireAuth, async (c) => {
+  const user = c.get("user");
+  await sweepExpiredOffers(c.env);
+
+  const offers = await c.env.DB.prepare(
+    `SELECT o.id, o.demand_card_id AS demandCardId, o.status, o.created_at AS createdAt, o.accepted_at AS acceptedAt,
+            dc.name AS demandName, dc.rarity AS demandRarity, dc.image_path AS demandImagePath
+     FROM marketplace_offers o JOIN cards dc ON dc.id = o.demand_card_id
+     WHERE o.creator_id = ? ORDER BY o.created_at DESC`
+  )
+    .bind(user.twitchId)
+    .all<MineOfferRow>();
+
+  const items = await itemsByOfferIds(c.env, offers.results.map((o) => o.id));
+
+  return c.json({
+    offers: offers.results.map((o) => ({
+      id: o.id,
+      status: o.status,
+      createdAt: o.createdAt,
+      acceptedAt: o.acceptedAt,
+      demand: { cardId: o.demandCardId, name: o.demandName, rarity: o.demandRarity, imagePath: o.demandImagePath },
+      offerItems: items.get(o.id) ?? [],
+    })),
+  });
+});
+
+marketplace.post("/offers/:id/cancel", requireAuth, async (c) => {
+  const user = c.get("user");
+  const offerId = Number(c.req.param("id"));
+  const offer = await c.env.DB.prepare("SELECT creator_id, status FROM marketplace_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ creator_id: string; status: string }>();
+  if (!offer || offer.creator_id !== user.twitchId) return c.json({ error: "Not found" }, 404);
+  if (offer.status !== "active") return c.json({ error: "La oferta no está activa" }, 409);
+
+  const items = await c.env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
+    .bind(offerId)
+    .all<{ card_id: string; quantity: number }>();
+
+  const statements = items.results.map((item) =>
+    c.env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
+      item.quantity,
+      user.twitchId,
+      item.card_id
+    )
+  );
+  statements.push(c.env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(offerId));
+  statements.push(c.env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(offerId));
+  await c.env.DB.batch(statements);
+
+  return c.json({ ok: true });
+});
+
+marketplace.delete("/offers/:id", requireAuth, async (c) => {
+  const user = c.get("user");
+  const offerId = Number(c.req.param("id"));
+  const offer = await c.env.DB.prepare("SELECT creator_id, status FROM marketplace_offers WHERE id = ?")
+    .bind(offerId)
+    .first<{ creator_id: string; status: string }>();
+  if (!offer || offer.creator_id !== user.twitchId) return c.json({ error: "Not found" }, 404);
+  if (offer.status !== "accepted") return c.json({ error: "Solo se pueden eliminar ofertas aceptadas" }, 409);
+
+  await c.env.DB.batch([
+    c.env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(offerId),
+    c.env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(offerId),
+  ]);
+
+  return c.json({ ok: true });
+});
+
 export default marketplace;
