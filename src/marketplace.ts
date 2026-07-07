@@ -10,7 +10,7 @@ import {
   type MarketplaceOfferSummary,
   type MyMarketplaceOffer,
 } from "./api";
-import { renderCardHtml, filterCardsByName } from "./card";
+import { renderCardHtml, filterCardsByName, collectFemaleVariantBaseNames, computeFormLabels } from "./card";
 import { initUserHeader } from "./user-header";
 
 export function formatDate(sqliteTimestamp: string): string {
@@ -21,9 +21,21 @@ export function formatDate(sqliteTimestamp: string): string {
   return `${dd}/${mm}/${d.getFullYear()}`;
 }
 
+// Populated once collection data loads (see init()); read here via closure
+// rather than threaded through as parameters, matching collection.ts's
+// pattern. Empty by default so direct unit tests of the render functions
+// below don't need to seed them.
+let femaleVariantBaseNames = new Set<string>();
+let formLabels = new Map<string, string>();
+
 export function renderMarketplaceCard(
   item: { cardId: string; name: string; rarity: CardView["rarity"]; imagePath: string },
-  badgeHtml: string
+  badgeHtml: string,
+  // Optional overrides so this can be unit-tested with explicit fixtures
+  // without needing init() to have populated the module-level maps below
+  // (which only happens once real DOM/collection data exists).
+  femaleVariantBaseNamesOverride?: Set<string>,
+  formLabelsOverride?: Map<string, string>
 ): string {
   const displayCard: CardView = {
     id: item.cardId,
@@ -38,7 +50,18 @@ export function renderMarketplaceCard(
   // passed as footerBadgeHtml so it renders inside the card's own footer
   // row (alongside the info button) instead of appended below the card,
   // which used to add a full extra line of height to every card.
-  return renderCardHtml(displayCard, "", undefined, undefined, false, badgeHtml);
+  // femaleVariantBaseNames/formLabels move variant words (e.g. "Mega X",
+  // "Mega Y") out of the visible name into the info tooltip's "Variante"
+  // line, same as every other page — without them, a name like "Mewtwo
+  // Mega X" stays whole and wraps to multiple lines, breaking the grid.
+  return renderCardHtml(
+    displayCard,
+    "",
+    femaleVariantBaseNamesOverride ?? femaleVariantBaseNames,
+    formLabelsOverride ?? formLabels,
+    false,
+    badgeHtml
+  );
 }
 
 export function renderPublicOfferCard(offer: MarketplaceOfferSummary): string {
@@ -213,13 +236,26 @@ function wireStaticEvents(): void {
   document.getElementById("mp-create-btn")!.addEventListener("click", openCreateWizard);
 }
 
-export function renderWizardPickCard(card: CardView): string {
+export function renderWizardPickCard(
+  card: CardView,
+  femaleVariantBaseNamesOverride?: Set<string>,
+  formLabelsOverride?: Map<string, string>
+): string {
   // quantity: 1 keeps foil/shiny/tiltable VFX active (the wizard's demand
   // picker and step-3 confirm panel show cards as items to pick, not the
   // viewer's owned-quantity state) — but that also makes renderCardHtml's
   // own quantity>0 auto-badge fire. Suppress just that badge via
-  // showQtyBadge, same fix as renderMarketplaceCard above.
-  return renderCardHtml({ ...card, quantity: 1 }, "", undefined, undefined, false);
+  // showQtyBadge, same fix as renderMarketplaceCard above. femaleVariantBaseNames/
+  // formLabels strip variant words (e.g. "Mega X") out of the visible name,
+  // same reasoning as renderMarketplaceCard; overrides exist for direct
+  // unit testing, same as there.
+  return renderCardHtml(
+    { ...card, quantity: 1 },
+    "",
+    femaleVariantBaseNamesOverride ?? femaleVariantBaseNames,
+    formLabelsOverride ?? formLabels,
+    false
+  );
 }
 
 let wizardDemand: CardView | null = null;
@@ -309,7 +345,7 @@ function openCreateWizard(): void {
   function offerPreviewHtml(): string {
     return Array.from(wizardOfferQuantities, ([cardId, quantity]) => {
       const card = allCards.find((c) => c.id === cardId)!;
-      return renderCardHtml({ ...card, quantity });
+      return renderCardHtml({ ...card, quantity }, "", femaleVariantBaseNames, formLabels);
     }).join("");
   }
 
@@ -319,7 +355,7 @@ function openCreateWizard(): void {
       .map((c) => {
         const value = wizardOfferQuantities.get(c.id) ?? 0;
         const input = `<input type="number" class="input mp-offer-qty-input" data-card-id="${c.id}" min="0" max="${c.quantity}" value="${value}" style="margin-top:0.5rem;width:100%;" />`;
-        return renderCardHtml(c, input);
+        return renderCardHtml(c, input, femaleVariantBaseNames, formLabels);
       })
       .join("");
     offerPreview.innerHTML = offerPreviewHtml();
@@ -409,6 +445,8 @@ async function init(): Promise<void> {
   wireStaticEvents();
   const collection = await getCollection();
   allCards = collection.cards;
+  femaleVariantBaseNames = collectFemaleVariantBaseNames(allCards);
+  formLabels = computeFormLabels(allCards);
   const params = new URLSearchParams(window.location.search);
   showTab(params.get("tab") === "mine" ? "mine" : "public");
 }
