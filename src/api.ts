@@ -123,3 +123,19 @@ export function getDailyPackStatus(): Promise<{ claimed: boolean }> {
 export function claimDailyPack(): Promise<{ ok: true }> {
   return request("/daily-pack/claim", { method: "POST" });
 }
+
+export interface NotificationView {
+  id: number;
+  message: string;
+  link: string | null;
+  read: boolean;
+  createdAt: string;
+}
+
+export function getUnreadNotifications(): Promise<{ unread: boolean }> {
+  return request("/notifications/unread");
+}
+
+export function listNotifications(): Promise<{ notifications: NotificationView[] }> {
+  return request("/notifications");
+}
