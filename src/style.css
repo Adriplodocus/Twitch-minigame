@@ -1174,6 +1174,48 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+.notif-bell {
+  position: relative;
+}
+/* position: fixed (not absolute) — .page-header sets overflow-x: auto, which per
+   spec forces overflow-y to compute to auto too, so an absolutely-positioned
+   dropdown anchored inside .page-header-user would get clipped/scrolled inside
+   the header instead of floating over the page. .howto-fab sidesteps the same
+   issue by also using position: fixed. */
+.notif-panel {
+  position: fixed;
+  top: 3.6rem;
+  right: 1rem;
+  z-index: 45;
+  min-width: 260px;
+  max-width: min(90vw, 340px);
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: 0 6px 20px rgba(120, 90, 60, 0.25);
+}
+.notif-item {
+  display: block;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+}
+.notif-item:last-child {
+  border-bottom: none;
+}
+a.notif-item:hover {
+  color: var(--text-em);
+}
+.notif-empty {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
 
 /* Overlay alerts (OBS Browser Source) */
 .overlay-body { background: transparent; }

@@ -1,5 +1,6 @@
 import { getMe, getPendingOfferCount, getDailyPackStatus, claimDailyPack, logout } from "./api";
 import { isMuted, toggleMuted } from "./sound-pref";
+import { initNotifications } from "./notifications";
 
 export function initUserHeader(): void {
   document.getElementById("logout-btn")!.addEventListener("click", async () => {
@@ -24,6 +25,8 @@ export function initUserHeader(): void {
       render();
     });
     headerUser.insertBefore(muteBtn, headerUser.firstChild);
+
+    initNotifications(headerUser);
   }
 
   getMe().then((me) => {
