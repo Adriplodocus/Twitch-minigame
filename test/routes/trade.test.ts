@@ -39,6 +39,18 @@ it("looks up another user's public collection", async () => {
   expect(json.cards.find((c) => c.id === "c1")?.quantity).toBe(1);
 });
 
+it("subtracts reserved quantity from another user's public collection", async () => {
+  await env.DB.prepare("UPDATE user_cards SET reserved = ? WHERE user_id = ? AND card_id = ?")
+    .bind(1, "2", "c1")
+    .run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/trade/users/viewer2", { headers: { Cookie: cookie } }, env);
+  expect(res.status).toBe(200);
+  const json = await res.json<{ username: string; cards: { id: string; quantity: number }[] }>();
+  expect(json.cards.find((c) => c.id === "c1")?.quantity).toBe(0);
+});
+
 it("creates a pending trade offer", async () => {
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request(

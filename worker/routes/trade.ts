@@ -17,7 +17,7 @@ trade.get("/users/:username", requireAuth, async (c) => {
   if (!targetUser) return c.json({ error: "Not found" }, 404);
 
   const cards = await c.env.DB.prepare(
-    `SELECT c.id, c.name, c.rarity, c.image_path AS imagePath, c.sort_order AS sortOrder, COALESCE(uc.quantity, 0) AS quantity
+    `SELECT c.id, c.name, c.rarity, c.image_path AS imagePath, c.sort_order AS sortOrder, COALESCE(uc.quantity, 0) - COALESCE(uc.reserved, 0) AS quantity
      FROM cards c
      LEFT JOIN user_cards uc ON uc.card_id = c.id AND uc.user_id = ?
      ORDER BY c.sort_order, c.id`
