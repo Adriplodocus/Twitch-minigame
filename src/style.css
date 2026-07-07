@@ -1424,13 +1424,10 @@ a.notif-item:hover {
   flex: 1;
   min-width: 200px;
 }
-.mp-grid-offers {
+.mp-offers-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-}
-.mp-grid-mine {
-  grid-template-columns: repeat(2, 1fr);
 }
 .mp-offer-card {
   background: var(--surface);

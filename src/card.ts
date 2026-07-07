@@ -145,7 +145,8 @@ export function renderCardHtml(
   card: CardView,
   innerExtra = "",
   femaleVariantBaseNames?: Set<string>,
-  formLabels?: Map<string, string>
+  formLabels?: Map<string, string>,
+  showQtyBadge = true
 ): string {
   ensureInfoTooltipHandler();
   ensureCardTiltHandler();
@@ -170,7 +171,7 @@ export function renderCardHtml(
       ? `<span class="gender-icon gender-male">♂</span>`
       : "";
   const shinyIcon = isShiny ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
-  const qtyBadge = card.quantity > 0 ? `<span class="card-qty">x${card.quantity}</span>` : "";
+  const qtyBadge = showQtyBadge && card.quantity > 0 ? `<span class="card-qty">x${card.quantity}</span>` : "";
 
   const hasFoil = isOwned && (card.rarity !== "common" || isShiny);
   const hasSparkle = isOwned && isShiny;

@@ -33,7 +33,12 @@ export function renderMarketplaceCard(
     quantity: 1,
     generation: 0,
   };
-  return renderCardHtml(displayCard, badgeHtml);
+  // quantity: 1 above keeps foil/shiny/tiltable VFX active (these cards
+  // represent trade items, not the viewer's "unowned" state) — but that
+  // also makes renderCardHtml's own quantity>0 auto-badge fire. Suppress
+  // just that badge via showQtyBadge so only the caller-supplied
+  // badgeHtml (e.g. "Tienes N") is shown, avoiding a duplicate/contradictory "x1".
+  return renderCardHtml(displayCard, badgeHtml, undefined, undefined, false);
 }
 
 export function renderPublicOfferCard(offer: MarketplaceOfferSummary): string {

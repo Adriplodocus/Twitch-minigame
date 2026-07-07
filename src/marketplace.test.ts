@@ -40,6 +40,11 @@ describe("renderPublicOfferCard", () => {
     const html = renderPublicOfferCard(offer);
     expect(html).toContain("Tienes 1");
   });
+
+  it("does not render a spurious auto quantity badge alongside the caller-supplied badge", () => {
+    const html = renderPublicOfferCard(offer);
+    expect(html).not.toContain("card-qty");
+  });
 });
 
 describe("renderMyOfferCard", () => {
@@ -67,5 +72,10 @@ describe("renderMyOfferCard", () => {
   it("shows the offered quantity as a badge", () => {
     const html = renderMyOfferCard(activeOffer);
     expect(html).toContain("x3");
+  });
+
+  it("does not render a spurious auto quantity badge alongside the caller-supplied badge", () => {
+    const html = renderMyOfferCard(activeOffer);
+    expect(html).not.toContain("card-qty");
   });
 });
