@@ -1408,3 +1408,72 @@ a.notif-item:hover {
   font-weight: 700;
 }
 .site-footer a:hover { color: var(--pink); }
+
+.mp-tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.mp-filters {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.mp-filters .input {
+  flex: 1;
+  min-width: 200px;
+}
+.mp-grid-offers {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.mp-grid-mine {
+  grid-template-columns: repeat(2, 1fr);
+}
+.mp-offer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.mp-offer-card-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.mp-offer-card-body {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+}
+.mp-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-em);
+  margin-bottom: 0.4rem;
+}
+.mp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.5rem;
+}
+.mp-have,
+.mp-qty {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+}
+.mp-pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
