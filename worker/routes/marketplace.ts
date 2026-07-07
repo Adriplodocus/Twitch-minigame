@@ -74,33 +74,39 @@ marketplace.post("/offers", requireAuth, async (c) => {
 });
 
 async function releaseReservationAndDeleteOffer(env: Env, offerId: number, creatorId: string): Promise<void> {
-  // Atomic claim: DELETE ... RETURNING is a single write statement, and SQLite/D1 serializes writes,
-  // so exactly one concurrent caller can ever see a non-empty result for the same offerId here.
-  // Combining the "read what needs releasing" and "delete the items" steps into one statement closes
-  // the old race window where a caller could read a stale (already-deleted-by-someone-else) snapshot,
-  // or read a live snapshot that a faster caller then deleted out from under it before either reached
-  // the offer-row claim. Whichever caller's delete actually removes rows owns the release below; a
-  // caller that loses the race finds the rows already gone, gets an empty list, and returns untouched.
-  // Deleting the items (children) before the offer (parent) also satisfies the FK from
-  // marketplace_offer_items to marketplace_offers.
-  const items = await env.DB.prepare(
-    "DELETE FROM marketplace_offer_items WHERE offer_id = ? RETURNING card_id, quantity"
-  )
+  // Snapshot items BEFORE the claim — this is just data gathering, not part of the atomicity guarantee.
+  // A concurrent caller may delete these out from under us after we read them; that's fine, see below.
+  const items = await env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
     .bind(offerId)
     .all<{ card_id: string; quantity: number }>();
-  if (items.results.length === 0) return;
 
-  const statements = [
-    env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(offerId),
-    ...items.results.map((item) =>
+  // Atomic claim: delete items then the offer row in ONE batch. D1 serializes writes, so exactly one
+  // concurrent caller's batch executes first as a whole unit. The offer-row RETURNING is the sole
+  // winner signal — it's independent of how many items existed, so an offer with zero items (reachable
+  // if POST /offers is ever interrupted between inserting the offer row and batching its items) is
+  // still claimed and deleted exactly once instead of being mistaken for "already claimed by someone
+  // else". Deleting items (children) before the offer (parent) satisfies the FK from
+  // marketplace_offer_items to marketplace_offers within this same batch.
+  const claimStatements = [
+    env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(offerId),
+    env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ? RETURNING id").bind(offerId),
+  ];
+  const results = await env.DB.batch<{ id: number }>(claimStatements);
+  const offerDeleteResult = results[results.length - 1];
+  if (offerDeleteResult.results.length === 0) return; // someone else already claimed this offer — no-op
+
+  // We won the claim: release reserved using OUR snapshot (accurate real quantities; empty if the
+  // offer legitimately had zero items — the loop below then just does nothing).
+  if (items.results.length > 0) {
+    const releaseStatements = items.results.map((item) =>
       env.DB.prepare("UPDATE user_cards SET reserved = reserved - ? WHERE user_id = ? AND card_id = ?").bind(
         item.quantity,
         creatorId,
         item.card_id
       )
-    ),
-  ];
-  await env.DB.batch(statements);
+    );
+    await env.DB.batch(releaseStatements);
+  }
 }
 
 async function sweepExpiredOffers(env: Env): Promise<void> {
@@ -125,12 +131,17 @@ async function sweepExpiredOffers(env: Env): Promise<void> {
     .bind(`-${OFFER_LIFETIME_DAYS} days`)
     .all<{ id: number }>();
   for (const { id } of expiredAccepted.results) {
-    // Unlike releaseReservationAndDeleteOffer, this branch has no reserved units to release, so
-    // there's nothing that depends on "winning" a race — deleting the (possibly already-gone)
-    // children then the (possibly already-gone) parent is safe to run unconditionally: a concurrent
-    // sweep that already removed these rows just makes these statements harmless no-ops.
-    await env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id).run();
-    await env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(id).run();
+    // Unlike releaseReservationAndDeleteOffer, this branch has no reserved units to release, so there's
+    // nothing that depends on "winning" the claim. Still delete items + offer in the same shape (one
+    // batch, offer-row RETURNING as the signal) for consistency and so a racing sweep that already
+    // deleted these rows is a harmless detected no-op rather than a second redundant delete.
+    const claimStatements = [
+      env.DB.prepare("DELETE FROM marketplace_offer_items WHERE offer_id = ?").bind(id),
+      env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ? RETURNING id").bind(id),
+    ];
+    const results = await env.DB.batch<{ id: number }>(claimStatements);
+    const offerDeleteResult = results[results.length - 1];
+    if (offerDeleteResult.results.length === 0) continue; // already deleted by a concurrent sweep — no-op
   }
 }
 

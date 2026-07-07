@@ -354,3 +354,21 @@ it("silently expires an accepted offer older than 7 days without touching card q
   const json = await res.json<{ offers: { id: number }[] }>();
   expect(json.offers.find((o) => o.id === offer!.id)).toBeUndefined();
 });
+
+it("expires and deletes an active offer that has zero items (e.g. an interrupted create)", async () => {
+  // Bypass the normal create-offer route (which always requires >=1 item) to reproduce the state
+  // reachable if POST /offers is interrupted between inserting the offer row and batching its items.
+  await env.DB.prepare(
+    "INSERT INTO marketplace_offers (creator_id, demand_card_id, status, created_at) VALUES ('1', 'p1', 'active', datetime('now', '-8 days'))"
+  ).run();
+  const offer = await env.DB.prepare("SELECT id FROM marketplace_offers WHERE creator_id = '1'").first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/marketplace/offers/mine", { headers: { Cookie: cookie } }, env);
+  expect(res.status).toBe(200);
+  const json = await res.json<{ offers: { id: number }[] }>();
+  expect(json.offers.find((o) => o.id === offer!.id)).toBeUndefined();
+
+  const row = await env.DB.prepare("SELECT id FROM marketplace_offers WHERE id = ?").bind(offer!.id).first();
+  expect(row).toBeNull();
+});
