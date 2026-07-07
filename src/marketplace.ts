@@ -31,6 +31,12 @@ let formLabels = new Map<string, string>();
 export function renderMarketplaceCard(
   item: { cardId: string; name: string; rarity: CardView["rarity"]; imagePath: string },
   badgeHtml: string,
+  // Defaults to 1 (owned-looking, VFX active) for callers with no ownership
+  // concept of their own — e.g. "Mis ofertas", where every card shown is
+  // the creator's own escrowed card. Public-listing callers pass the
+  // viewer's real quantity instead, so a card the viewer owns 0 of renders
+  // grey/unowned like every other page.
+  quantity = 1,
   // Optional overrides so this can be unit-tested with explicit fixtures
   // without needing init() to have populated the module-level maps below
   // (which only happens once real DOM/collection data exists).
@@ -42,14 +48,12 @@ export function renderMarketplaceCard(
     name: item.name,
     rarity: item.rarity,
     imagePath: item.imagePath,
-    quantity: 1,
+    quantity,
     generation: 0,
   };
-  // quantity: 1 above keeps foil/shiny/tiltable VFX active (these cards
-  // represent trade items, not the viewer's "unowned" state). badgeHtml is
-  // passed as footerBadgeHtml so it renders inside the card's own footer
-  // row (alongside the info button) instead of appended below the card,
-  // which used to add a full extra line of height to every card.
+  // badgeHtml is passed as footerBadgeHtml so it renders inside the card's
+  // own footer row (alongside the info button) instead of appended below
+  // the card, which used to add a full extra line of height to every card.
   // femaleVariantBaseNames/formLabels move variant words (e.g. "Mega X",
   // "Mega Y") out of the visible name into the info tooltip's "Variante"
   // line, same as every other page — without them, a name like "Mewtwo
@@ -76,14 +80,14 @@ export function renderPublicOfferCard(offer: MarketplaceOfferSummary): string {
         <div>
           <p class="mp-label">Demanda</p>
           <div class="mp-grid">
-            ${renderMarketplaceCard(offer.demand, `<span class="mp-have">Tienes ${offer.demand.viewerQuantity}</span>`)}
+            ${renderMarketplaceCard(offer.demand, `<span class="mp-have">Tienes ${offer.demand.viewerQuantity}</span>`, offer.demand.viewerQuantity)}
           </div>
         </div>
         <div>
           <p class="mp-label">Ofrece</p>
           <div class="mp-grid">
             ${offer.offerItems
-              .map((i) => renderMarketplaceCard(i, `<span class="mp-have">Tienes ${i.viewerQuantity}</span>`))
+              .map((i) => renderMarketplaceCard(i, `<span class="mp-have">Tienes ${i.viewerQuantity}</span>`, i.viewerQuantity))
               .join("")}
           </div>
         </div>

@@ -58,6 +58,15 @@ describe("renderPublicOfferCard", () => {
     const html = renderPublicOfferCard(offer);
     expect(html).toMatch(/Demanda<\/p>\s*<div class="mp-grid">/);
   });
+
+  it("greys out a card the viewer owns 0 of, and doesn't grey out one they own", () => {
+    const html = renderPublicOfferCard(offer);
+    // demand: viewerQuantity 0 -> unowned; offered card: viewerQuantity 1 -> not unowned.
+    const demandCard = html.slice(html.indexOf("Demanda"), html.indexOf("Ofrece"));
+    const offerCard = html.slice(html.indexOf("Ofrece"));
+    expect(demandCard).toContain("unowned");
+    expect(offerCard).not.toContain("unowned");
+  });
 });
 
 describe("renderMyOfferCard", () => {
