@@ -1474,3 +1474,45 @@ a.notif-item:hover {
   justify-content: center;
   margin-top: 1rem;
 }
+.mp-wizard {
+  min-width: min(90vw, 640px);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.mp-wizard-progress {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.mp-wizard-step.active {
+  color: var(--text-em);
+  font-weight: 700;
+}
+.mp-wizard-offer-columns {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+.mp-pick-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.mp-pick-btn.selected {
+  outline: 2px solid var(--pink);
+}
+.mp-wizard-error {
+  color: var(--pink);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+.mp-wizard-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
