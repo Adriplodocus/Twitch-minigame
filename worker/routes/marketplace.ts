@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Env, SessionUser } from "../types";
 import { requireAuth } from "../middleware/auth";
+import { notify } from "../lib/notifications";
 
 const marketplace = new Hono<{ Bindings: Env; Variables: { user: SessionUser } }>();
 
@@ -339,6 +340,68 @@ marketplace.get("/offers", requireAuth, async (c) => {
     page,
     pageSize: PAGE_SIZE,
   });
+});
+
+marketplace.post("/offers/:id/accept", requireAuth, async (c) => {
+  const user = c.get("user");
+  const offerId = Number(c.req.param("id"));
+  await sweepExpiredOffers(c.env);
+
+  const offer = await c.env.DB.prepare(
+    "SELECT creator_id, demand_card_id AS demandCardId, status FROM marketplace_offers WHERE id = ?"
+  )
+    .bind(offerId)
+    .first<{ creator_id: string; demandCardId: string; status: string }>();
+  if (!offer) return c.json({ error: "Not found" }, 404);
+  if (offer.creator_id === user.twitchId) return c.json({ error: "No puedes aceptar tu propia oferta" }, 400);
+
+  const guardResult = await c.env.DB.prepare(
+    "UPDATE marketplace_offers SET status = 'accepted', acceptor_id = ?, accepted_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'active'"
+  )
+    .bind(user.twitchId, offerId)
+    .run();
+  if (guardResult.meta.changes === 0) return c.json({ error: "Oferta ya no disponible" }, 409);
+
+  const acceptorAvailable = await availableQuantity(c.env, user.twitchId, offer.demandCardId);
+  if (acceptorAvailable < 1) {
+    await c.env.DB.prepare(
+      "UPDATE marketplace_offers SET status = 'active', acceptor_id = NULL, accepted_at = NULL WHERE id = ?"
+    )
+      .bind(offerId)
+      .run();
+    return c.json({ error: "No tienes el cromo demandado" }, 409);
+  }
+
+  const items = await c.env.DB.prepare("SELECT card_id, quantity FROM marketplace_offer_items WHERE offer_id = ?")
+    .bind(offerId)
+    .all<{ card_id: string; quantity: number }>();
+
+  const statements = items.results.flatMap((item) => [
+    c.env.DB.prepare(
+      "UPDATE user_cards SET quantity = quantity - ?, reserved = reserved - ? WHERE user_id = ? AND card_id = ?"
+    ).bind(item.quantity, item.quantity, offer.creator_id, item.card_id),
+    c.env.DB.prepare(
+      `INSERT INTO user_cards (user_id, card_id, quantity, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+       ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + ?, updated_at = CURRENT_TIMESTAMP`
+    ).bind(user.twitchId, item.card_id, item.quantity, item.quantity),
+  ]);
+  statements.push(
+    c.env.DB.prepare("UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ?").bind(
+      user.twitchId,
+      offer.demandCardId
+    )
+  );
+  statements.push(
+    c.env.DB.prepare(
+      `INSERT INTO user_cards (user_id, card_id, quantity, updated_at) VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+       ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + 1, updated_at = CURRENT_TIMESTAMP`
+    ).bind(offer.creator_id, offer.demandCardId)
+  );
+  await c.env.DB.batch(statements);
+
+  await notify(c.env, offer.creator_id, "Una oferta tuya ha sido aceptada", "/marketplace.html?tab=mine");
+
+  return c.json({ status: "accepted" });
 });
 
 export default marketplace;
