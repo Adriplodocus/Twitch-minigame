@@ -1,12 +1,21 @@
 import { getUnreadNotifications, listNotifications, type NotificationView } from "./api";
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function renderNotificationList(items: NotificationView[]): string {
   if (items.length === 0) return `<p class="notif-empty">Sin notificaciones</p>`;
   return items
     .map((n) => {
       const tag = n.link ? "a" : "div";
-      const href = n.link ? ` href="${n.link}"` : "";
-      return `<${tag} class="notif-item"${href} data-id="${n.id}">${n.message}</${tag}>`;
+      const href = n.link ? ` href="${escapeHtml(n.link)}"` : "";
+      return `<${tag} class="notif-item"${href} data-id="${n.id}">${escapeHtml(n.message)}</${tag}>`;
     })
     .join("");
 }
@@ -41,8 +50,13 @@ export function initNotifications(headerUser: Element): void {
     panel.hidden = false;
     bellBtn.setAttribute("aria-expanded", "true");
     dot.hidden = true;
-    const { notifications } = await listNotifications();
-    panel.innerHTML = renderNotificationList(notifications);
+    try {
+      const { notifications } = await listNotifications();
+      panel.innerHTML = renderNotificationList(notifications);
+    } catch (err) {
+      console.error("Failed to load notifications", err);
+      panel.innerHTML = `<p class="notif-empty">Error al cargar notificaciones</p>`;
+    }
   };
 
   bellBtn.addEventListener("click", (e) => {

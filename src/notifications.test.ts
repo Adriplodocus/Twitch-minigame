@@ -28,4 +28,20 @@ describe("renderNotificationList", () => {
     expect(html).toContain('<a class="notif-item" href="/marketplace.html?tab=mine"');
     expect(html).toContain("Oferta aceptada");
   });
+
+  it("escapes HTML in message and link to prevent XSS", () => {
+    const html = renderNotificationList([
+      {
+        id: 3,
+        message: `<script>alert('xss')</script>`,
+        link: `"><img src=x onerror=alert(1)>`,
+        read: false,
+        createdAt: "2026-01-01",
+      },
+    ]);
+    expect(html).not.toContain("<script>");
+    expect(html).toContain("&lt;script&gt;");
+    expect(html).not.toContain(`"><img`);
+    expect(html).toContain("&quot;&gt;&lt;img");
+  });
 });
