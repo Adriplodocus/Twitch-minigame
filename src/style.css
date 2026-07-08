@@ -1469,7 +1469,8 @@ a.notif-item:hover {
   flex-direction: column;
   gap: 0.7rem;
 }
-.mp-accept-btn:disabled {
+.mp-accept-btn:disabled,
+#mp-create-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }

@@ -145,9 +145,16 @@ async function loadPublicView(): Promise<void> {
   (document.getElementById("mp-next-page") as HTMLButtonElement).disabled = currentPage >= totalPages;
 }
 
+// Mirrors backend's MAX_OFFERS_PER_USER (worker/routes/marketplace.ts) — kept
+// in sync manually since frontend and worker aren't sharing a module here.
+const MAX_OFFERS_PER_USER = 4;
+
 async function loadMineView(): Promise<void> {
   const { offers } = await listMyMarketplaceOffers();
   document.getElementById("mp-mine-grid")!.innerHTML = offers.map(renderMyOfferCard).join("");
+  const createBtn = document.getElementById("mp-create-btn") as HTMLButtonElement;
+  createBtn.disabled = offers.length >= MAX_OFFERS_PER_USER;
+  createBtn.title = createBtn.disabled ? "Tienes el máximo de ofertas, elimina alguna antes de crear otra" : "";
 }
 
 function showTab(tab: "public" | "mine"): void {
