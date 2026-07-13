@@ -17,6 +17,7 @@ interface HistoryRow {
   source: string;
   grantedBy: string | null;
   createdAt: string;
+  openedAt: string | null;
 }
 
 interface PackGrantConfig {
@@ -79,13 +80,38 @@ function renderHistory(history: HistoryRow[]): void {
     const tdCreatedAt = document.createElement("td");
     tdCreatedAt.style.padding = "0.4rem";
     tdCreatedAt.textContent = h.createdAt;
+    const tdActions = document.createElement("td");
+    tdActions.style.padding = "0.4rem";
+    if (h.openedAt === null) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "btn";
+      deleteBtn.textContent = "Eliminar";
+      deleteBtn.addEventListener("click", () => deletePack(h.id, h.username));
+      tdActions.appendChild(deleteBtn);
+    }
     tr.appendChild(tdUsername);
     tr.appendChild(tdTier);
     tr.appendChild(tdSource);
     tr.appendChild(tdCreatedAt);
+    tr.appendChild(tdActions);
     return tr;
   });
   container.replaceChildren(...rows);
+}
+
+async function deletePack(packId: number, username: string): Promise<void> {
+  const confirmed = await showConfirmModal(`¿Eliminar el sobre sin abrir de ${username}?`);
+  if (!confirmed) return;
+
+  const result = await request<{ ok: true }>(`/packs/${packId}`, { method: "DELETE" });
+  if (!result.ok) {
+    if (result.status === 401) {
+      showLoginView();
+      return;
+    }
+    return;
+  }
+  await loadHistory();
 }
 
 function renderSearchResults(users: AdminUser[], query: string): void {
@@ -164,7 +190,7 @@ async function runSearch(query: string): Promise<void> {
   renderSearchResults(result.data.users, query);
 }
 
-function showConfirmModal(quantity: number, username: string): Promise<boolean> {
+function showConfirmModal(message: string): Promise<boolean> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.style.cssText =
@@ -174,7 +200,7 @@ function showConfirmModal(quantity: number, username: string): Promise<boolean> 
     box.style.cssText = "max-width: 320px; text-align: center;";
     const p = document.createElement("p");
     p.style.marginBottom = "1rem";
-    p.textContent = `¿Dar ${quantity} blíster(s) a ${username}?`;
+    p.textContent = message;
     box.appendChild(p);
 
     const confirmBtn = document.createElement("button");
@@ -213,7 +239,7 @@ async function loadHistory(): Promise<void> {
 async function performGrant(twitchId: string, quantity: number, tier: string, username: string): Promise<boolean> {
   const messageEl = document.getElementById("grant-message")!;
 
-  const confirmed = await showConfirmModal(quantity, username);
+  const confirmed = await showConfirmModal(`¿Dar ${quantity} blíster(s) a ${username}?`);
   if (!confirmed) return false;
 
   const result = await request<{ ok: true }>("/grant-packs", {

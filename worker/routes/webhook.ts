@@ -60,6 +60,7 @@ interface SubscribeEvent {
 interface SubscriptionMessageEvent {
   user_id: string;
   user_login: string;
+  cumulative_months: number;
 }
 interface SubscriptionGiftEvent {
   user_id?: string;
@@ -139,6 +140,9 @@ webhook.post("/eventsub", async (c) => {
     }
     case "channel.subscription.message": {
       const event = payload.event as unknown as SubscriptionMessageEvent;
+      // New subs (cumulative_months === 1) sharing a resub message also fire
+      // channel.subscribe, which already grants the pack — skip to avoid double grant.
+      if (event.cumulative_months === 1) break;
       await upsertUser(c.env.DB, event.user_id, event.user_login);
       await grantPacks(c.env.DB, event.user_id, config.sub_quantity, "sub", "apoyo");
       break;

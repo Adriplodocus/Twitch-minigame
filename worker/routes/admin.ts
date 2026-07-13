@@ -288,7 +288,7 @@ admin.post("/test-pack/:id/broadcast", requireAdmin, async (c) => {
 admin.get("/history", requireAdmin, async (c) => {
   const history = await c.env.DB.prepare(
     `SELECT p.id, p.user_id AS userId, u.username, p.tier AS tier, p.source AS source,
-            p.granted_by AS grantedBy, p.created_at AS createdAt
+            p.granted_by AS grantedBy, p.created_at AS createdAt, p.opened_at AS openedAt
      FROM packs p JOIN users u ON u.twitch_id = p.user_id
      WHERE p.is_test = 0
      ORDER BY p.created_at DESC LIMIT 25`
@@ -300,8 +300,22 @@ admin.get("/history", requireAdmin, async (c) => {
     source: string;
     grantedBy: string | null;
     createdAt: string;
+    openedAt: string | null;
   }>();
   return c.json({ history: history.results });
+});
+
+admin.delete("/packs/:id", requireAdmin, async (c) => {
+  const packId = Number(c.req.param("id"));
+
+  const pack = await c.env.DB.prepare("SELECT opened_at, is_test FROM packs WHERE id = ?")
+    .bind(packId)
+    .first<{ opened_at: string | null; is_test: number }>();
+  if (!pack) return c.json({ error: "Not found" }, 404);
+  if (pack.opened_at || pack.is_test === 1) return c.json({ error: "Pack already opened" }, 409);
+
+  await c.env.DB.prepare("DELETE FROM packs WHERE id = ?").bind(packId).run();
+  return c.json({ ok: true });
 });
 
 export default admin;

@@ -590,6 +590,80 @@ it("rejects a test pack with counts that don't sum to 10", async () => {
   expect(res.status).toBe(400);
 });
 
+it("deletes an unopened, non-test pack", async () => {
+  const insert = await env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES ('1', 'sub', 'apoyo')").run();
+  const packId = insert.meta.last_row_id;
+
+  const res = await app.request(
+    `/api/admin/packs/${packId}`,
+    { method: "DELETE", headers: { Cookie: await adminCookie() } },
+    env
+  );
+  expect(res.status).toBe(200);
+
+  const row = await env.DB.prepare("SELECT id FROM packs WHERE id = ?").bind(packId).first();
+  expect(row).toBeNull();
+});
+
+it("rejects deleting a pack that has already been opened", async () => {
+  const insert = await env.DB.prepare(
+    "INSERT INTO packs (user_id, source, tier, opened_at) VALUES ('1', 'sub', 'apoyo', CURRENT_TIMESTAMP)"
+  ).run();
+  const packId = insert.meta.last_row_id;
+
+  const res = await app.request(
+    `/api/admin/packs/${packId}`,
+    { method: "DELETE", headers: { Cookie: await adminCookie() } },
+    env
+  );
+  expect(res.status).toBe(409);
+
+  const row = await env.DB.prepare("SELECT id FROM packs WHERE id = ?").bind(packId).first();
+  expect(row).not.toBeNull();
+});
+
+it("rejects deleting a test pack", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  const insert = await env.DB.prepare(
+    "INSERT INTO packs (user_id, source, tier, is_test) VALUES ('__test__', 'admin', 'gratis', 1)"
+  ).run();
+  const packId = insert.meta.last_row_id;
+
+  const res = await app.request(
+    `/api/admin/packs/${packId}`,
+    { method: "DELETE", headers: { Cookie: await adminCookie() } },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+
+it("rejects deleting a nonexistent pack", async () => {
+  const res = await app.request(
+    "/api/admin/packs/999999",
+    { method: "DELETE", headers: { Cookie: await adminCookie() } },
+    env
+  );
+  expect(res.status).toBe(404);
+});
+
+it("rejects pack deletion without an admin session", async () => {
+  const insert = await env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES ('1', 'sub', 'apoyo')").run();
+  const packId = insert.meta.last_row_id;
+
+  const res = await app.request(`/api/admin/packs/${packId}`, { method: "DELETE" }, env);
+  expect(res.status).toBe(401);
+});
+
+it("includes openedAt in history rows", async () => {
+  await env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES ('1', 'sub', 'apoyo')").run();
+  const cookie = await adminCookie();
+  const historyRes = await app.request("/api/admin/history", { headers: { Cookie: cookie } }, env);
+  const { history } = await historyRes.json<{ history: { username: string; openedAt: string | null }[] }>();
+  const row = history.find((h) => h.username === "viewer1");
+  expect(row).toBeDefined();
+  expect(row!.openedAt).toBeNull();
+});
+
 it("rejects forced counts requesting a rarity with no cards in that generation", async () => {
   await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
   await env.DB.prepare(
