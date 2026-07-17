@@ -35,6 +35,7 @@ interface PaypalDonation {
   amount: number;
   currency: string;
   noteRaw: string | null;
+  payerName: string | null;
   createdAt: string;
 }
 
@@ -53,6 +54,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<RequestResu
 
 let selectedUser: AdminUser | null = null;
 let searchDebounce: ReturnType<typeof setTimeout> | undefined;
+let packGrantConfig: PackGrantConfig | null = null;
 
 function showLoginView(): void {
   document.getElementById("login-view")!.style.display = "block";
@@ -323,6 +325,11 @@ async function openTestPack(): Promise<void> {
   });
 }
 
+function computeDefaultQuantity(d: PaypalDonation): number {
+  if (!packGrantConfig || d.currency !== "EUR" || d.amount < packGrantConfig.paypalThreshold) return 1;
+  return Math.floor(d.amount / packGrantConfig.paypalThreshold) * packGrantConfig.paypalQuantity;
+}
+
 function renderPaypalDonations(donations: PaypalDonation[]): void {
   const container = document.getElementById("paypal-donations-list")!;
   if (donations.length === 0) {
@@ -331,41 +338,38 @@ function renderPaypalDonations(donations: PaypalDonation[]): void {
   }
   const rows = donations.map((d) => {
     const row = document.createElement("div");
-    row.style.cssText = "display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;";
+    row.style.cssText = "display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; width: 100%;";
 
     const info = document.createElement("span");
-    info.textContent = `${d.amount} ${d.currency} · nota: "${d.noteRaw ?? "(vacía)"}" · ${d.createdAt}`;
+    const quantity = computeDefaultQuantity(d);
+    info.textContent = `${d.amount} ${d.currency} · de: ${d.payerName ?? "(desconocido)"} · nota: "${d.noteRaw ?? "(vacía)"}" · ${d.createdAt} · ${quantity} sobre(s)`;
+
+    const actions = document.createElement("div");
+    actions.style.cssText = "display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; width: 100%;";
 
     const usernameInput = document.createElement("input");
     usernameInput.className = "input";
     usernameInput.placeholder = "Twitch username";
     usernameInput.style.width = "160px";
 
-    const quantityInput = document.createElement("input");
-    quantityInput.className = "input";
-    quantityInput.type = "number";
-    quantityInput.min = "1";
-    quantityInput.max = "50";
-    quantityInput.value = "1";
-    quantityInput.style.width = "70px";
-
     const resolveBtn = document.createElement("button");
     resolveBtn.className = "btn";
     resolveBtn.textContent = "Asignar";
-    resolveBtn.addEventListener("click", () => resolveDonation(d.txnId, usernameInput, quantityInput, row));
+    resolveBtn.addEventListener("click", () => resolveDonation(d.txnId, usernameInput, row));
 
-    row.append(info, usernameInput, quantityInput, resolveBtn);
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "btn";
+    cancelBtn.textContent = "Cancelar";
+    cancelBtn.addEventListener("click", () => cancelDonation(d.txnId, row));
+
+    actions.append(usernameInput, resolveBtn, cancelBtn);
+    row.append(info, actions);
     return row;
   });
   container.replaceChildren(...rows);
 }
 
-async function resolveDonation(
-  txnId: string,
-  usernameInput: HTMLInputElement,
-  quantityInput: HTMLInputElement,
-  row: HTMLElement
-): Promise<void> {
+async function resolveDonation(txnId: string, usernameInput: HTMLInputElement, row: HTMLElement): Promise<void> {
   const username = usernameInput.value.trim();
   if (!username) return;
 
@@ -379,12 +383,20 @@ async function resolveDonation(
     return;
   }
 
-  const quantity = Number(quantityInput.value);
   const result = await request<{ ok: true }>(`/paypal-donations/${txnId}/resolve`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ twitchId: lookup.data.user.twitchId, quantity }),
+    body: JSON.stringify({ twitchId: lookup.data.user.twitchId }),
   });
+  if (!result.ok) {
+    if (result.status === 401) showLoginView();
+    return;
+  }
+  row.remove();
+}
+
+async function cancelDonation(txnId: string, row: HTMLElement): Promise<void> {
+  const result = await request<{ ok: true }>(`/paypal-donations/${txnId}/cancel`, { method: "POST" });
   if (!result.ok) {
     if (result.status === 401) showLoginView();
     return;
@@ -408,6 +420,7 @@ async function loadPackGrantConfig(): Promise<void> {
     return;
   }
   const { config } = result.data;
+  packGrantConfig = config;
   (document.getElementById("cfg-reward-quantity") as HTMLInputElement).value = String(config.rewardQuantity);
   (document.getElementById("cfg-bits-threshold") as HTMLInputElement).value = String(config.bitsThreshold);
   (document.getElementById("cfg-bits-quantity") as HTMLInputElement).value = String(config.bitsQuantity);

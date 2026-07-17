@@ -165,28 +165,31 @@ admin.put("/pack-grant-config", requireAdmin, async (c) => {
 admin.get("/paypal-donations", requireAdmin, async (c) => {
   const status = c.req.query("status") ?? "unmatched";
   const donations = await c.env.DB.prepare(
-    `SELECT txn_id AS txnId, amount, currency, note_raw AS noteRaw, created_at AS createdAt
+    `SELECT txn_id AS txnId, amount, currency, note_raw AS noteRaw, payer_name AS payerName, created_at AS createdAt
      FROM paypal_donations WHERE status = ? ORDER BY created_at DESC LIMIT 50`
   )
     .bind(status)
-    .all<{ txnId: string; amount: number; currency: string; noteRaw: string | null; createdAt: string }>();
+    .all<{
+      txnId: string;
+      amount: number;
+      currency: string;
+      noteRaw: string | null;
+      payerName: string | null;
+      createdAt: string;
+    }>();
   return c.json({ donations: donations.results });
 });
 
 admin.post("/paypal-donations/:txnId/resolve", requireAdmin, async (c) => {
   const txnId = c.req.param("txnId");
-  const body = await c.req
-    .json<{ twitchId?: string; quantity?: number }>()
-    .catch(() => ({}) as { twitchId?: string; quantity?: number });
-  const { twitchId, quantity } = body;
+  const body = await c.req.json<{ twitchId?: string }>().catch(() => ({}) as { twitchId?: string });
+  const { twitchId } = body;
 
-  if (!twitchId || typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1 || quantity > 50) {
-    return c.json({ error: "Invalid twitchId or quantity" }, 400);
-  }
+  if (!twitchId) return c.json({ error: "Invalid twitchId" }, 400);
 
-  const donation = await c.env.DB.prepare("SELECT status FROM paypal_donations WHERE txn_id = ?")
+  const donation = await c.env.DB.prepare("SELECT status, amount FROM paypal_donations WHERE txn_id = ?")
     .bind(txnId)
-    .first<{ status: string }>();
+    .first<{ status: string; amount: number }>();
   if (!donation) return c.json({ error: "Donation not found" }, 404);
   if (donation.status === "granted") return c.json({ error: "Already granted" }, 409);
 
@@ -195,6 +198,12 @@ admin.post("/paypal-donations/:txnId/resolve", requireAdmin, async (c) => {
     .first<{ twitch_id: string; username: string }>();
   if (!user) return c.json({ error: "User not found" }, 404);
 
+  const packConfig = await c.env.DB.prepare(
+    "SELECT paypal_threshold AS threshold, paypal_quantity AS perThreshold FROM pack_grant_config WHERE id = 1"
+  ).first<{ threshold: number; perThreshold: number }>();
+  const quantity = Math.floor(donation.amount / packConfig!.threshold) * packConfig!.perThreshold;
+  if (quantity < 1) return c.json({ error: "Amount below threshold" }, 400);
+
   await grantPacks(c.env.DB, twitchId, quantity, "paypal_manual", "apoyo");
   await c.env.DB.prepare(
     `UPDATE paypal_donations SET status = 'granted', matched_user_id = ?, matched_username = ?, packs_granted = ?
@@ -202,6 +211,20 @@ admin.post("/paypal-donations/:txnId/resolve", requireAdmin, async (c) => {
   )
     .bind(twitchId, user.username, quantity, txnId)
     .run();
+
+  return c.json({ ok: true });
+});
+
+admin.post("/paypal-donations/:txnId/cancel", requireAdmin, async (c) => {
+  const txnId = c.req.param("txnId");
+
+  const donation = await c.env.DB.prepare("SELECT status FROM paypal_donations WHERE txn_id = ?")
+    .bind(txnId)
+    .first<{ status: string }>();
+  if (!donation) return c.json({ error: "Donation not found" }, 404);
+  if (donation.status !== "unmatched") return c.json({ error: "Cannot cancel" }, 409);
+
+  await c.env.DB.prepare("UPDATE paypal_donations SET status = 'ignored' WHERE txn_id = ?").bind(txnId).run();
 
   return c.json({ ok: true });
 });

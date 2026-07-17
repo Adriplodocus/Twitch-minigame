@@ -5,6 +5,7 @@ export interface ParsedIpn {
   paymentStatus: string;
   receiverEmail: string;
   note: string | null;
+  payerName: string | null;
 }
 
 const NOTE_FIELDS = ["memo", "note", "item_name"];
@@ -19,6 +20,7 @@ export function parseIpnFields(rawBody: string): ParsedIpn {
       break;
     }
   }
+  const payerName = `${params.get("first_name") ?? ""} ${params.get("last_name") ?? ""}`.trim() || null;
   return {
     txnId: params.get("txn_id") ?? "",
     amount: Number(params.get("mc_gross") ?? "0"),
@@ -26,6 +28,7 @@ export function parseIpnFields(rawBody: string): ParsedIpn {
     paymentStatus: params.get("payment_status") ?? "",
     receiverEmail: params.get("receiver_email") ?? "",
     note,
+    payerName,
   };
 }
 

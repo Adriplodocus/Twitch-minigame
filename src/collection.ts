@@ -165,4 +165,5 @@ document.getElementById("sort-direction")!.addEventListener("change", renderOwne
 
 attachTradeLinkButton("trade-link-btn");
 initUserHeader();
+document.addEventListener("daily-pack-claimed", load);
 load();

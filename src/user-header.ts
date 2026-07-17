@@ -77,6 +77,7 @@ export function initUserHeader(): void {
       try {
         await claimDailyPack();
         markClaimed();
+        document.dispatchEvent(new Event("daily-pack-claimed"));
       } catch {
         markClaimed();
       }

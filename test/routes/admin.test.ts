@@ -114,7 +114,7 @@ it("rejects grant-packs with a missing or invalid tier", async () => {
     {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: cookie },
-      body: JSON.stringify({ twitchId: "1", quantity: 1 }),
+      body: JSON.stringify({ twitchId: "1" }),
     },
     env
   );
@@ -414,6 +414,7 @@ it("lists unmatched paypal donations", async () => {
 });
 
 it("resolves an unmatched donation by granting packs to the chosen user", async () => {
+  await env.DB.prepare("UPDATE pack_grant_config SET paypal_threshold = 2, paypal_quantity = 1 WHERE id = 1").run();
   await env.DB.prepare(
     `INSERT INTO paypal_donations (txn_id, amount, currency, note_raw, status, packs_granted)
      VALUES ('T2', 2, 'EUR', 'typo-user', 'unmatched', 0)`
@@ -424,7 +425,7 @@ it("resolves an unmatched donation by granting packs to the chosen user", async 
     {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
-      body: JSON.stringify({ twitchId: "1", quantity: 1 }),
+      body: JSON.stringify({ twitchId: "1" }),
     },
     env
   );
@@ -438,6 +439,30 @@ it("resolves an unmatched donation by granting packs to the chosen user", async 
   expect(donation).toEqual({ status: "granted", matched_user_id: "1" });
 });
 
+it("computes quantity from the paypal threshold config, ignoring any client-supplied quantity", async () => {
+  await env.DB.prepare("UPDATE pack_grant_config SET paypal_threshold = 2, paypal_quantity = 1 WHERE id = 1").run();
+  await env.DB.prepare(
+    `INSERT INTO paypal_donations (txn_id, amount, currency, note_raw, status, packs_granted)
+     VALUES ('T2b', 6, 'EUR', 'typo-user', 'unmatched', 0)`
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/paypal-donations/T2b/resolve",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({ twitchId: "1", quantity: 50 }),
+    },
+    env
+  );
+
+  expect(res.status).toBe(200);
+  const donation = await env.DB.prepare("SELECT packs_granted FROM paypal_donations WHERE txn_id = ?")
+    .bind("T2b")
+    .first();
+  expect(donation).toEqual({ packs_granted: 3 });
+});
+
 it("rejects resolving a donation that was already granted", async () => {
   await env.DB.prepare(
     `INSERT INTO paypal_donations (txn_id, amount, currency, status, packs_granted)
@@ -449,8 +474,42 @@ it("rejects resolving a donation that was already granted", async () => {
     {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
-      body: JSON.stringify({ twitchId: "1", quantity: 1 }),
+      body: JSON.stringify({ twitchId: "1" }),
     },
+    env
+  );
+
+  expect(res.status).toBe(409);
+});
+
+it("cancels an unmatched donation without granting packs", async () => {
+  await env.DB.prepare(
+    `INSERT INTO paypal_donations (txn_id, amount, currency, note_raw, status, packs_granted)
+     VALUES ('T4', 2, 'EUR', 'typo-user', 'unmatched', 0)`
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/paypal-donations/T4/cancel",
+    { method: "POST", headers: { Cookie: await adminCookie() } },
+    env
+  );
+
+  expect(res.status).toBe(200);
+  const donation = await env.DB.prepare("SELECT status FROM paypal_donations WHERE txn_id = ?").bind("T4").first();
+  expect(donation).toEqual({ status: "ignored" });
+  const packs = await env.DB.prepare("SELECT * FROM packs WHERE user_id = ?").bind("1").all();
+  expect(packs.results).toEqual([]);
+});
+
+it("rejects cancelling a donation that was already granted", async () => {
+  await env.DB.prepare(
+    `INSERT INTO paypal_donations (txn_id, amount, currency, status, packs_granted)
+     VALUES ('T5', 2, 'EUR', 'granted', 1)`
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/paypal-donations/T5/cancel",
+    { method: "POST", headers: { Cookie: await adminCookie() } },
     env
   );
 

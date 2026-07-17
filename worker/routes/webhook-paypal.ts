@@ -20,7 +20,7 @@ async function getPaypalConfig(db: D1Database): Promise<PaypalConfig> {
 async function triggerDonationAlert(env: Env, fields: paypalIpn.ParsedIpn): Promise<void> {
   if (!env.WEB_ALERTS_URL || !env.WEB_ALERTS_ADMIN_TOKEN) return;
   try {
-    await fetch(`${env.WEB_ALERTS_URL}/admin/trigger`, {
+    const res = await fetch(`${env.WEB_ALERTS_URL}/admin/trigger`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,8 +33,11 @@ async function triggerDonationAlert(env: Env, fields: paypalIpn.ParsedIpn): Prom
         currency: fields.currency,
       }),
     });
-  } catch {
-    // best-effort: a failed alert must not block pack granting
+    if (!res.ok) {
+      console.error(`donation alert trigger failed: ${res.status} ${await res.text()}`);
+    }
+  } catch (err) {
+    console.error("donation alert trigger threw:", err);
   }
 }
 
@@ -44,6 +47,7 @@ async function recordDonation(
   amount: number,
   currency: string,
   note: string | null,
+  payerName: string | null,
   status: "granted" | "unmatched" | "ignored",
   matchedUsername: string | null,
   matchedUserId: string | null,
@@ -52,10 +56,10 @@ async function recordDonation(
   await db
     .prepare(
       `INSERT INTO paypal_donations
-        (txn_id, amount, currency, note_raw, matched_username, matched_user_id, status, packs_granted)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        (txn_id, amount, currency, note_raw, payer_name, matched_username, matched_user_id, status, packs_granted)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .bind(txnId, amount, currency, note, matchedUsername, matchedUserId, status, packsGranted)
+    .bind(txnId, amount, currency, note, payerName, matchedUsername, matchedUserId, status, packsGranted)
     .run();
 }
 
@@ -88,6 +92,7 @@ webhookPaypal.post("/paypal-ipn", async (c) => {
       fields.amount,
       fields.currency,
       fields.note,
+      fields.payerName,
       "unmatched",
       null,
       null,
@@ -102,6 +107,7 @@ webhookPaypal.post("/paypal-ipn", async (c) => {
       fields.amount,
       fields.currency,
       fields.note,
+      fields.payerName,
       "ignored",
       null,
       null,
@@ -123,6 +129,7 @@ webhookPaypal.post("/paypal-ipn", async (c) => {
       fields.amount,
       fields.currency,
       fields.note,
+      fields.payerName,
       "unmatched",
       fields.note,
       null,
@@ -139,6 +146,7 @@ webhookPaypal.post("/paypal-ipn", async (c) => {
     fields.amount,
     fields.currency,
     fields.note,
+    fields.payerName,
     "granted",
     user.username,
     user.twitch_id,

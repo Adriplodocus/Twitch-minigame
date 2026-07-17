@@ -12,7 +12,14 @@ describe("parseIpnFields", () => {
       paymentStatus: "Completed",
       receiverEmail: "mrklypp@example.com",
       note: null,
+      payerName: null,
     });
+  });
+
+  it("extracts the payer's name from first_name and last_name", () => {
+    const body =
+      "txn_id=T1&mc_gross=6.00&mc_currency=EUR&payment_status=Completed&receiver_email=a%40b.com&first_name=Ada&last_name=Lovelace";
+    expect(parseIpnFields(body).payerName).toBe("Ada Lovelace");
   });
 
   it("picks memo as the note when present", () => {
