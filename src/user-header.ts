@@ -93,8 +93,8 @@ export function initUserHeader(): void {
       }).join("");
 
       const message = milestone
-        ? "¡Racha de 7 días completada! Sobre apoyo extra 🎁"
-        : "Vuelve mañana para seguir tu racha";
+        ? "¡Enhorabuena! Has recibido un sobre de apoyo por reclamar el sobre diario 7 días seguidos."
+        : "¡Enhorabuena! Has recibido un sobre. Vuelve mañana para continuar tu racha.";
 
       const overlay = document.createElement("div");
       overlay.className = "modal-overlay streak-overlay";
