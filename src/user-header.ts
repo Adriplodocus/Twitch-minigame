@@ -76,25 +76,33 @@ export function initUserHeader(): void {
 
     const streakInWeek = (streak: number) => (streak === 0 ? 0 : ((streak - 1) % 7) + 1);
 
-    const openStreakModal = (streak: number, milestone: boolean) => {
+    const openStreakModal = (streak: number, justClaimed: boolean) => {
       const inWeek = streakInWeek(streak);
+      const isMilestoneDay = inWeek === 7;
+      const justEarnedMilestone = justClaimed && isMilestoneDay;
       const pips = Array.from({ length: 7 }, (_, i) => {
         const day = i + 1;
         const filled = day <= inWeek;
         const isGoal = day === 7;
         const ribbon = isGoal ? '<div class="streak-pip-corner"><div class="streak-pip-ribbon">★</div></div>' : "";
         const check = filled ? '<span class="streak-pip-check">✔</span>' : "";
-        return `<div class="streak-pip${filled ? " filled" : ""}${isGoal ? " goal" : ""}">
+        const shimmer = isGoal && justEarnedMilestone ? '<div class="streak-pip-shimmer"></div>' : "";
+        return `<div class="streak-pip${filled ? " filled" : ""}${isGoal ? " goal" : ""}" style="animation-delay: ${i * 70}ms">
           <img src="/pack.webp" alt="" />
           ${ribbon}
+          ${shimmer}
           ${check}
           <span class="streak-pip-day">${day}</span>
         </div>`;
       }).join("");
 
-      const message = milestone
-        ? "¡Enhorabuena! Has recibido un sobre de apoyo por reclamar el sobre diario 7 días seguidos."
-        : "¡Enhorabuena! Has recibido un sobre. Vuelve mañana para continuar tu racha.";
+      const message = justClaimed
+        ? isMilestoneDay
+          ? "¡Enhorabuena! Has recibido un sobre de apoyo por reclamar el sobre diario 7 días seguidos."
+          : "¡Enhorabuena! Has recibido un sobre. Vuelve mañana para continuar tu racha."
+        : isMilestoneDay
+          ? "Ya reclamaste tu sobre. Vuelve mañana para empezar una nueva racha."
+          : "Ya reclamaste tu sobre. Vuelve mañana para continuar tu racha.";
 
       const overlay = document.createElement("div");
       overlay.className = "modal-overlay streak-overlay";
@@ -108,6 +116,11 @@ export function initUserHeader(): void {
         </div>
       `;
       document.body.appendChild(overlay);
+
+      if (justEarnedMilestone) {
+        const goalPip = overlay.querySelector(".streak-pip.goal");
+        setTimeout(() => goalPip?.classList.add("pop-in"), 7 * 70 + 350);
+      }
 
       const close = () => {
         overlay.remove();

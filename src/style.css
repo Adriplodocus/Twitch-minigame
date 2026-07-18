@@ -695,9 +695,42 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   border: 1px solid var(--border);
   background: var(--surface2);
   transition: border-color 0.2s, box-shadow 0.2s;
+  animation: streak-pip-in 0.35s ease both;
 }
 .streak-pip.goal {
   width: 3.4rem;
+}
+@keyframes streak-pip-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+.streak-pip.pop-in {
+  animation: streak-pip-pop 0.5s ease;
+}
+@keyframes streak-pip-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.3); }
+  60% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.streak-pip-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 1;
+}
+.streak-pip-shimmer::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.75) 50%, transparent 60%);
+  mix-blend-mode: overlay;
+  animation: shimmer-sweep 1.1s ease-out 2;
 }
 .streak-pip img {
   display: block;
