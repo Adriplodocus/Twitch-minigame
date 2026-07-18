@@ -71,7 +71,7 @@ export function initUserHeader(): void {
       claimedToday = true;
       dailyPackBtn.classList.add("claimed");
       const tooltip = dailyPackBtn.querySelector(".daily-pack-tooltip");
-      if (tooltip) tooltip.textContent = "Ver tu racha";
+      if (tooltip) tooltip.textContent = "Racha";
     };
 
     const streakInWeek = (streak: number) => (streak === 0 ? 0 : ((streak - 1) % 7) + 1);

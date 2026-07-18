@@ -10,6 +10,7 @@ import overlay from "./routes/overlay";
 import dailyPack from "./routes/daily-pack";
 import notifications from "./routes/notifications";
 import marketplace from "./routes/marketplace";
+import { handleScheduled } from "./scheduled";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -25,4 +26,4 @@ app.route("/api/daily-pack", dailyPack);
 app.route("/api/notifications", notifications);
 app.route("/api/marketplace", marketplace);
 
-export default app;
+export default Object.assign(app, { scheduled: handleScheduled });
