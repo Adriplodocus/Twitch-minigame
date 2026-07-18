@@ -82,10 +82,7 @@ export function initUserHeader(): void {
         const day = i + 1;
         const filled = day <= inWeek;
         const isGoal = day === 7;
-        const ribbon =
-          isGoal && filled
-            ? '<div class="streak-pip-corner"><div class="streak-pip-ribbon">★</div></div>'
-            : "";
+        const ribbon = isGoal ? '<div class="streak-pip-corner"><div class="streak-pip-ribbon">★</div></div>' : "";
         const check = filled ? '<span class="streak-pip-check">✔</span>' : "";
         return `<div class="streak-pip${filled ? " filled" : ""}${isGoal ? " goal" : ""}">
           <img src="/pack.webp" alt="" />
