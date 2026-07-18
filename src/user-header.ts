@@ -63,34 +63,80 @@ export function initUserHeader(): void {
   }
 
   const dailyPackBtn = document.getElementById("daily-pack-btn") as HTMLButtonElement | null;
-  const streakFill = document.getElementById("daily-streak-fill");
-  const streakGoal = document.getElementById("daily-streak-goal");
   if (dailyPackBtn) {
+    let claimedToday = false;
+    let currentStreak = 0;
+
     const markClaimed = () => {
-      dailyPackBtn.disabled = true;
+      claimedToday = true;
       dailyPackBtn.classList.add("claimed");
+      const tooltip = dailyPackBtn.querySelector(".daily-pack-tooltip");
+      if (tooltip) tooltip.textContent = "Ver tu racha";
     };
 
-    const renderStreak = (streak: number) => {
-      if (!streakFill || !streakGoal) return;
-      const streakInWeek = streak === 0 ? 0 : ((streak - 1) % 7) + 1;
-      streakFill.style.width = `${(streakInWeek / 7) * 100}%`;
-      streakGoal.classList.toggle("reached", streakInWeek === 7);
+    const streakInWeek = (streak: number) => (streak === 0 ? 0 : ((streak - 1) % 7) + 1);
+
+    const openStreakModal = (streak: number, milestone: boolean) => {
+      const inWeek = streakInWeek(streak);
+      const pips = Array.from({ length: 7 }, (_, i) => {
+        const day = i + 1;
+        const filled = day <= inWeek;
+        const isGoal = day === 7;
+        return `<div class="streak-pip${filled ? " filled" : ""}${isGoal ? " goal" : ""}">${
+          isGoal ? '<img src="/Freepack.png" alt="" />' : `<span>${day}</span>`
+        }</div>`;
+      }).join("");
+
+      const message = milestone
+        ? "¡Racha de 7 días completada! Sobre apoyo extra 🎁"
+        : "Vuelve mañana para seguir tu racha";
+
+      const overlay = document.createElement("div");
+      overlay.className = "modal-overlay streak-overlay";
+      overlay.innerHTML = `
+        <div class="modal streak-modal">
+          <img class="streak-modal-icon" src="/Freepack.png" alt="" />
+          <h3>Racha: ${streak} día${streak === 1 ? "" : "s"}</h3>
+          <div class="streak-pips">${pips}</div>
+          <p class="streak-modal-msg">${message}</p>
+          <button type="button" class="btn modal-cancel-btn streak-close-btn">Cerrar</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const close = () => {
+        overlay.remove();
+        document.removeEventListener("keydown", onKeydown);
+      };
+      function onKeydown(e: KeyboardEvent) {
+        if (e.key === "Escape") close();
+      }
+      overlay.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (target === overlay || target.closest(".streak-close-btn")) close();
+      });
+      document.addEventListener("keydown", onKeydown);
     };
 
     getDailyPackStatus().then(({ claimed, streak }) => {
+      currentStreak = streak;
       if (claimed) markClaimed();
-      renderStreak(streak);
     });
 
     dailyPackBtn.addEventListener("click", async () => {
+      if (claimedToday) {
+        openStreakModal(currentStreak, false);
+        return;
+      }
       try {
-        const { streak } = await claimDailyPack();
+        const { streak, milestone } = await claimDailyPack();
+        currentStreak = streak;
         markClaimed();
-        renderStreak(streak);
+        openStreakModal(streak, milestone);
         document.dispatchEvent(new Event("daily-pack-claimed"));
       } catch {
         markClaimed();
+        openStreakModal(currentStreak, false);
       }
     });
   }

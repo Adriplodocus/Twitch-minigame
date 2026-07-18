@@ -91,6 +91,9 @@ it("grants a bonus apoyo pack when the streak reaches 7", async () => {
   expect(bonus.results).toHaveLength(1);
   expect((bonus.results[0] as { tier: string }).tier).toBe("apoyo");
 
+  const allPacks = await env.DB.prepare("SELECT source FROM packs WHERE user_id = ?").bind("1").all();
+  expect(allPacks.results).toHaveLength(1);
+
   const notifications = await env.DB.prepare("SELECT message FROM notifications WHERE user_id = ?").bind("1").all();
   expect(notifications.results).toHaveLength(1);
 });

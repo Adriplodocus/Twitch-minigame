@@ -22,14 +22,9 @@ dailyPack.post("/claim", requireAuth, async (c) => {
   const user = c.get("user");
 
   try {
-    await c.env.DB.batch([
-      c.env.DB.prepare("INSERT INTO daily_pack_claims (user_id, claim_date) VALUES (?, date('now'))").bind(
-        user.twitchId
-      ),
-      c.env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily', 'gratis')").bind(
-        user.twitchId
-      ),
-    ]);
+    await c.env.DB.prepare("INSERT INTO daily_pack_claims (user_id, claim_date) VALUES (?, date('now'))")
+      .bind(user.twitchId)
+      .run();
   } catch (err) {
     if (err instanceof Error && /UNIQUE/i.test(err.message)) {
       return c.json({ error: "Ya reclamado hoy" }, 409);
@@ -58,6 +53,10 @@ dailyPack.post("/claim", requireAuth, async (c) => {
       .bind(user.twitchId)
       .run();
     await notify(c.env, user.twitchId, `¡Racha de ${streak} días! Sobre apoyo extra 🎁`, "/collection.html");
+  } else {
+    await c.env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily', 'gratis')")
+      .bind(user.twitchId)
+      .run();
   }
 
   return c.json({ ok: true, streak, milestone });

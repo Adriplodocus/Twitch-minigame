@@ -31,10 +31,11 @@ Tras el insert existente en `daily_pack_claims` (que sigue siendo el único gate
 1. Leer `daily_streaks` del user (`current_streak=0, last_claim_date=null` si no existe fila).
 2. `last_claim_date === date('now','-1 day')` → `new_streak = current_streak + 1`; en cualquier otro caso (primera vez, o gap de días) → `new_streak = 1`.
 3. Upsert `daily_streaks` (`INSERT ... ON CONFLICT(user_id) DO UPDATE`) con `new_streak` y `claim_date = date('now')`.
-4. Si `new_streak % 7 === 0` → insertar pack extra: `INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily_streak', 'apoyo')`.
-5. Respuesta: `{ ok: true, streak: new_streak, milestone: boolean }`.
+4. Si `new_streak % 7 === 0` (milestone) → insertar **solo** el pack bonus: `INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily_streak', 'apoyo')`. El sobre gratis normal (`source='daily'`) no se otorga ese día — el bonus lo sustituye, no se acumulan los dos.
+5. Si no es milestone → insertar el pack normal de siempre: `INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily', 'gratis')`.
+6. Respuesta: `{ ok: true, streak: new_streak, milestone: boolean }`.
 
-Sin condición de carrera nueva: el insert único en `daily_pack_claims` ya garantiza que como mucho una request por user/día llega a ejecutar este bloque.
+El insert anti-cheat en `daily_pack_claims` ya no va en batch con el insert del pack — se ejecuta solo, como gate. Solo tras confirmarlo con éxito se calcula la racha y se decide qué pack otorgar. Sigue sin haber condición de carrera nueva: ese insert único garantiza que como mucho una request por user/día llega a ejecutar el resto del bloque.
 
 ### `GET /api/daily-pack/status`
 
@@ -47,24 +48,20 @@ export function claimDailyPack(): Promise<{ ok: true; streak: number; milestone:
 
 ### Frontend
 
-Nuevo elemento sobre `.daily-pack-fab` (mismo contenedor `position: fixed`), en las 4 páginas viewer:
+Sin barra inline permanente sobre el FAB. En su lugar, un **popup modal** que se abre al pulsar `#daily-pack-btn`, tanto si el claim ocurre en ese click como si el sobre de hoy ya estaba reclamado (el botón deja de quedar `disabled` tras reclamar — sigue siendo clicable para consultar la racha, solo cambia el ícono a ✔ y el tooltip a "Ver tu racha").
 
-```html
-<div class="daily-streak-bar" id="daily-streak-bar">
-  <div class="daily-streak-fill" id="daily-streak-fill"></div>
-  <img class="daily-streak-goal" src="/Freepack.png" alt="" />
-</div>
-```
+Modal (reusa `.modal-overlay`/`.modal`, creado dinámicamente en `user-header.ts` como `openAlbumPickerModal` en `collection.ts`):
 
-- `streak_in_week = streak === 0 ? 0 : ((streak - 1) % 7) + 1` (posición 1–7 dentro del ciclo actual).
-- `daily-streak-fill`: `width: calc(streak_in_week / 7 * 100%)`, `transition: width 0.3s`, fondo `--pink`.
-- `daily-streak-goal`: ícono `Freepack.png` pequeño al final de la barra; recibe clase `.pack-foil-shine` (shimmer ya usado para tier `apoyo`) solo cuando `streak_in_week === 7` (bonus alcanzado ese día); opacidad reducida el resto del tiempo.
-- `user-header.ts`: `getDailyPackStatus()` pinta la barra al cargar (`streak`). Click handler usa `streak`/`milestone` de la respuesta de `claimDailyPack()` para actualizar la barra.
-- Si `milestone: true` → reusar sistema de notificaciones existente (`notify()` / panel de campana) para avisar "¡Racha de 7 días! Sobre apoyo extra 🎁" — no se construye UI de toast nueva.
+- Ícono grande de `Freepack.png`.
+- "Racha: N días".
+- **7 pips discretos** (círculos día 1–7, no barra continua): pips ≤ `streak_in_week` en `--pink`; el pip 7 lleva el ícono del sobre dentro y se ilumina en `--gold` al completarse (`streak_in_week === 7`). `streak_in_week = streak === 0 ? 0 : ((streak - 1) % 7) + 1`.
+- Mensaje: "¡Racha de 7 días completada! Sobre apoyo extra 🎁" si `milestone`, si no "Vuelve mañana para seguir tu racha".
+- Cierre con click fuera, Escape, o botón "Cerrar" (mismo patrón que `how-to-panel`).
+- Si `milestone: true` → además se reusa el sistema de notificaciones existente (`notify()` / campana) para persistir el aviso.
 
 ### Styling (`src/style.css`)
 
-`.daily-streak-bar`: barra fina (~4px alto) posicionada justo encima de `.daily-pack-fab`, ancho igual al botón, `border-radius: 100px`, fondo `var(--surface2)`. `.daily-streak-fill` con transición de ancho. `.daily-streak-goal`: ~16px, `position: absolute`, extremo derecho de la barra.
+`.streak-modal`: columna centrada. `.streak-pip`: círculo ~2rem, `--surface2` sin completar, `rgba(255,86,180,0.20)` + borde `--pink` al completarse; el pip meta (`.goal`) usa `--gold` en vez de `--pink` al completarse. `.daily-pack-img-btn.claimed` ya no lleva `cursor: not-allowed` (sigue siendo clicable).
 
 ## Testing
 
