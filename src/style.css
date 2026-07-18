@@ -667,6 +667,41 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   .daily-pack-fab { left: 0.75rem; bottom: 0.75rem; }
   .daily-pack-img-btn { width: 60px; height: 60px; }
 }
+
+.daily-streak-bar {
+  position: relative;
+  width: 76px;
+  height: 4px;
+  margin-bottom: 0.4rem;
+  border-radius: 100px;
+  background: var(--surface2);
+  overflow: visible;
+}
+.daily-streak-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 100px;
+  background: var(--pink);
+  transition: width 0.3s;
+}
+.daily-streak-goal {
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  transform: translateY(-50%);
+  opacity: 0.4;
+  transition: opacity 0.3s, filter 0.3s;
+}
+.daily-streak-goal.reached {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px var(--gold));
+}
+@media (max-width: 480px) {
+  .daily-streak-bar { width: 60px; }
+}
 .user-avatar {
   width: 2rem;
   height: 2rem;

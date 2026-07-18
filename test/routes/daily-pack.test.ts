@@ -10,6 +10,8 @@ async function sessionCookie(twitchId: string, username: string): Promise<string
 }
 
 beforeEach(async () => {
+  await env.DB.exec("DELETE FROM notifications");
+  await env.DB.exec("DELETE FROM daily_streaks");
   await env.DB.exec("DELETE FROM daily_pack_claims");
   await env.DB.exec("DELETE FROM pack_cards");
   await env.DB.exec("DELETE FROM user_cards");
@@ -28,14 +30,14 @@ it("reports not claimed before any claim", async () => {
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/daily-pack/status", { headers: { Cookie: cookie } }, env);
   expect(res.status).toBe(200);
-  expect(await res.json()).toEqual({ claimed: false });
+  expect(await res.json()).toEqual({ claimed: false, streak: 0 });
 });
 
 it("claims a daily pack and creates a pending pack", async () => {
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
   expect(res.status).toBe(200);
-  expect(await res.json()).toEqual({ ok: true });
+  expect(await res.json()).toEqual({ ok: true, streak: 1, milestone: false });
 
   const pack = await env.DB.prepare("SELECT source, tier, opened_at FROM packs WHERE user_id = ?")
     .bind("1")
@@ -45,7 +47,72 @@ it("claims a daily pack and creates a pending pack", async () => {
   expect(pack?.opened_at).toBeNull();
 
   const statusRes = await app.request("/api/daily-pack/status", { headers: { Cookie: cookie } }, env);
-  expect(await statusRes.json()).toEqual({ claimed: true });
+  expect(await statusRes.json()).toEqual({ claimed: true, streak: 1 });
+});
+
+it("increments streak when the previous claim was yesterday", async () => {
+  await env.DB.prepare(
+    "INSERT INTO daily_streaks (user_id, current_streak, last_claim_date) VALUES (?, ?, date('now', '-1 day'))"
+  )
+    .bind("1", 3)
+    .run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
+  expect(await res.json()).toEqual({ ok: true, streak: 4, milestone: false });
+});
+
+it("resets streak to 1 after a gap of more than one day", async () => {
+  await env.DB.prepare(
+    "INSERT INTO daily_streaks (user_id, current_streak, last_claim_date) VALUES (?, ?, date('now', '-3 day'))"
+  )
+    .bind("1", 5)
+    .run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
+  expect(await res.json()).toEqual({ ok: true, streak: 1, milestone: false });
+});
+
+it("grants a bonus apoyo pack when the streak reaches 7", async () => {
+  await env.DB.prepare(
+    "INSERT INTO daily_streaks (user_id, current_streak, last_claim_date) VALUES (?, ?, date('now', '-1 day'))"
+  )
+    .bind("1", 6)
+    .run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
+  expect(await res.json()).toEqual({ ok: true, streak: 7, milestone: true });
+
+  const bonus = await env.DB.prepare("SELECT tier FROM packs WHERE user_id = ? AND source = 'daily_streak'")
+    .bind("1")
+    .all();
+  expect(bonus.results).toHaveLength(1);
+  expect((bonus.results[0] as { tier: string }).tier).toBe("apoyo");
+
+  const notifications = await env.DB.prepare("SELECT message FROM notifications WHERE user_id = ?").bind("1").all();
+  expect(notifications.results).toHaveLength(1);
+});
+
+it("does not create a notification when the streak isn't a milestone", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
+
+  const notifications = await env.DB.prepare("SELECT id FROM notifications WHERE user_id = ?").bind("1").all();
+  expect(notifications.results).toHaveLength(0);
+});
+
+it("grants a bonus again at the next 7-day milestone", async () => {
+  await env.DB.prepare(
+    "INSERT INTO daily_streaks (user_id, current_streak, last_claim_date) VALUES (?, ?, date('now', '-1 day'))"
+  )
+    .bind("1", 13)
+    .run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
+  expect(await res.json()).toEqual({ ok: true, streak: 14, milestone: true });
 });
 
 it("rejects a second claim the same day", async () => {

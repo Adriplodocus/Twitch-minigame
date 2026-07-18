@@ -63,20 +63,31 @@ export function initUserHeader(): void {
   }
 
   const dailyPackBtn = document.getElementById("daily-pack-btn") as HTMLButtonElement | null;
+  const streakFill = document.getElementById("daily-streak-fill");
+  const streakGoal = document.getElementById("daily-streak-goal");
   if (dailyPackBtn) {
     const markClaimed = () => {
       dailyPackBtn.disabled = true;
       dailyPackBtn.classList.add("claimed");
     };
 
-    getDailyPackStatus().then(({ claimed }) => {
+    const renderStreak = (streak: number) => {
+      if (!streakFill || !streakGoal) return;
+      const streakInWeek = streak === 0 ? 0 : ((streak - 1) % 7) + 1;
+      streakFill.style.width = `${(streakInWeek / 7) * 100}%`;
+      streakGoal.classList.toggle("reached", streakInWeek === 7);
+    };
+
+    getDailyPackStatus().then(({ claimed, streak }) => {
       if (claimed) markClaimed();
+      renderStreak(streak);
     });
 
     dailyPackBtn.addEventListener("click", async () => {
       try {
-        await claimDailyPack();
+        const { streak } = await claimDailyPack();
         markClaimed();
+        renderStreak(streak);
         document.dispatchEvent(new Event("daily-pack-claimed"));
       } catch {
         markClaimed();

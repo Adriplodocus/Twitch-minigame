@@ -125,11 +125,11 @@ export function getPendingOfferCount(): Promise<{ count: number }> {
   return request("/trade/offers/pending-count");
 }
 
-export function getDailyPackStatus(): Promise<{ claimed: boolean }> {
+export function getDailyPackStatus(): Promise<{ claimed: boolean; streak: number }> {
   return request("/daily-pack/status");
 }
 
-export function claimDailyPack(): Promise<{ ok: true }> {
+export function claimDailyPack(): Promise<{ ok: true; streak: number; milestone: boolean }> {
   return request("/daily-pack/claim", { method: "POST" });
 }
 
