@@ -12,6 +12,15 @@ export const SHINY_CHANCE_BY_TIER: Record<PackTier, number> = {
   apoyo: 0.01,
 };
 
+export const RARITY_BOOST_DELTA: Record<Rarity, number> = {
+  common: -5.75,
+  rare: 2.5,
+  epic: 2,
+  legendary: 1.25,
+};
+
+export const SHINY_BOOST_DELTA = 0.0025;
+
 export const CATEGORY_WEIGHTS: Record<Exclude<Category, "normal">, number> = {
   inicial: 0.05,
   mega: 0.03,
@@ -51,10 +60,18 @@ function splitShinyWeight(
 
 function buildCardWeights<T extends { id: string; rarity: Rarity; category: Category; sortOrder: number }>(
   catalog: T[],
-  tier: PackTier
+  tier: PackTier,
+  boost: boolean
 ): Map<T, number> {
-  const rarityWeights = RARITY_WEIGHTS_BY_TIER[tier];
-  const shinyChance = SHINY_CHANCE_BY_TIER[tier];
+  const rarityWeights = boost
+    ? Object.fromEntries(
+        (Object.entries(RARITY_WEIGHTS_BY_TIER[tier]) as [Rarity, number][]).map(([rarity, weight]) => [
+          rarity,
+          weight + RARITY_BOOST_DELTA[rarity],
+        ])
+      ) as Record<Rarity, number>
+    : RARITY_WEIGHTS_BY_TIER[tier];
+  const shinyChance = SHINY_CHANCE_BY_TIER[tier] + (boost ? SHINY_BOOST_DELTA : 0);
 
   // For each (rarity, category) bucket, count how many rows each species
   // contributes, split shiny/non-shiny.
@@ -186,10 +203,11 @@ export function pickRandomCards<T extends { id: string; rarity: Rarity; category
   catalog: T[],
   count: number,
   tier: PackTier,
+  boost: boolean,
   random: () => number = Math.random
 ): T[] {
   if (catalog.length === 0) throw new Error("Catalog is empty");
-  const weights = buildCardWeights(catalog, tier);
+  const weights = buildCardWeights(catalog, tier, boost);
   const totalWeight = catalog.reduce((sum, card) => sum + weights.get(card)!, 0);
   const picks: T[] = [];
   for (let i = 0; i < count; i++) {

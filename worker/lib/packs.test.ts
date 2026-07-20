@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pickRandomCards, RARITY_WEIGHTS_BY_TIER, SHINY_CHANCE_BY_TIER } from "./packs";
+import { pickRandomCards, RARITY_WEIGHTS_BY_TIER, SHINY_CHANCE_BY_TIER, RARITY_BOOST_DELTA, SHINY_BOOST_DELTA } from "./packs";
 
 interface TestCard {
   id: string;
@@ -15,7 +15,7 @@ function sequenceRandom(values: number[]): () => number {
 
 describe("pickRandomCards", () => {
   it("throws on an empty catalog", () => {
-    expect(() => pickRandomCards([], 1, "gratis")).toThrow();
+    expect(() => pickRandomCards([], 1, "gratis", false)).toThrow();
   });
 
   it("picks shiny cards ~1% of the time within a rarity (apoyo tier), uniform among non-shiny", () => {
@@ -26,7 +26,7 @@ describe("pickRandomCards", () => {
       { id: "p1-shiny", rarity: "common", category: "normal", sortOrder: 1_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
-    const picks = pickRandomCards(catalog, rolls.length, "apoyo", sequenceRandom(rolls));
+    const picks = pickRandomCards(catalog, rolls.length, "apoyo", false, sequenceRandom(rolls));
     const shinyCount = picks.filter((c) => c.id === "p1-shiny").length;
     const shinyRatio = shinyCount / picks.length;
     expect(shinyRatio).toBeGreaterThan(0.005);
@@ -45,7 +45,7 @@ describe("pickRandomCards", () => {
       { id: "p1-shiny", rarity: "common", category: "normal", sortOrder: 1_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
-    const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
+    const picks = pickRandomCards(catalog, rolls.length, "gratis", false, sequenceRandom(rolls));
     const shinyRatio = picks.filter((c) => c.id === "p1-shiny").length / picks.length;
     expect(shinyRatio).toBeGreaterThan(0.002);
     expect(shinyRatio).toBeLessThan(0.008);
@@ -56,13 +56,13 @@ describe("pickRandomCards", () => {
       { id: "p1", rarity: "rare", category: "normal", sortOrder: 1_000_000 },
       { id: "p2", rarity: "rare", category: "normal", sortOrder: 2_000_000 },
     ];
-    const picks = pickRandomCards(catalog, 100, "gratis", () => 0.99);
+    const picks = pickRandomCards(catalog, 100, "gratis", false, () => 0.99);
     expect(picks.every((c) => !c.id.includes("-shiny"))).toBe(true);
   });
 
   it("still picks shiny cards if a rarity has only shiny variants", () => {
     const catalog: TestCard[] = [{ id: "p1-shiny", rarity: "legendary", category: "normal", sortOrder: 1_000_000 }];
-    const picks = pickRandomCards(catalog, 5, "gratis", () => 0.5);
+    const picks = pickRandomCards(catalog, 5, "gratis", false, () => 0.5);
     expect(picks.every((c) => c.id === "p1-shiny")).toBe(true);
   });
 
@@ -72,10 +72,10 @@ describe("pickRandomCards", () => {
       { id: "p2", rarity: "legendary", category: "normal", sortOrder: 2_000_000 },
     ];
     // common weight 71.5, legendary weight 1.5, total 73 -> common cutoff at roll < 71.5/73
-    const picks = pickRandomCards(catalog, 1, "gratis", () => 0.5);
+    const picks = pickRandomCards(catalog, 1, "gratis", false, () => 0.5);
     expect(picks[0].id).toBe("p1");
 
-    const legendaryPick = pickRandomCards(catalog, 1, "gratis", () => 0.999);
+    const legendaryPick = pickRandomCards(catalog, 1, "gratis", false, () => 0.999);
     expect(legendaryPick[0].id).toBe("p2");
   });
 
@@ -87,8 +87,8 @@ describe("pickRandomCards", () => {
     // apoyo: common 60, legendary 4, total 64 -> a roll that stays "common" under gratis
     // (71.5/73 ≈ 0.979) should flip to legendary under apoyo (60/64 = 0.9375).
     const roll = 0.96;
-    expect(pickRandomCards(catalog, 1, "gratis", () => roll)[0].id).toBe("p1");
-    expect(pickRandomCards(catalog, 1, "apoyo", () => roll)[0].id).toBe("p2");
+    expect(pickRandomCards(catalog, 1, "gratis", false, () => roll)[0].id).toBe("p1");
+    expect(pickRandomCards(catalog, 1, "apoyo", false, () => roll)[0].id).toBe("p2");
   });
 
   it("splits a rarity's weight budget across categories ~89/5/3/3 (normal/inicial/mega/gmax), independent of tier", () => {
@@ -99,7 +99,7 @@ describe("pickRandomCards", () => {
       { id: "gmax1", rarity: "common", category: "gmax", sortOrder: 4_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
-    const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
+    const picks = pickRandomCards(catalog, rolls.length, "gratis", false, sequenceRandom(rolls));
     const ratio = (id: string) => picks.filter((c) => c.id === id).length / picks.length;
 
     expect(ratio("normal1")).toBeGreaterThan(0.87);
@@ -118,7 +118,7 @@ describe("pickRandomCards", () => {
       { id: "inicial1", rarity: "rare", category: "inicial", sortOrder: 2_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
-    const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
+    const picks = pickRandomCards(catalog, rolls.length, "gratis", false, sequenceRandom(rolls));
     const ratio = (id: string) => picks.filter((c) => c.id === id).length / picks.length;
 
     expect(ratio("normal1")).toBeGreaterThan(0.93);
@@ -133,7 +133,7 @@ describe("pickRandomCards", () => {
       { id: "mega1-shiny", rarity: "epic", category: "mega", sortOrder: 1_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
-    const picks = pickRandomCards(catalog, rolls.length, "apoyo", sequenceRandom(rolls));
+    const picks = pickRandomCards(catalog, rolls.length, "apoyo", false, sequenceRandom(rolls));
     const shinyRatio = picks.filter((c) => c.id === "mega1-shiny").length / picks.length;
     expect(shinyRatio).toBeGreaterThan(0.005);
     expect(shinyRatio).toBeLessThan(0.015);
@@ -146,6 +146,62 @@ describe("pickRandomCards", () => {
     expect(SHINY_CHANCE_BY_TIER.apoyo).toBe(0.01);
   });
 
+  it("exposes the boost deltas from the spec", () => {
+    expect(RARITY_BOOST_DELTA).toEqual({ common: -5.75, rare: 2.5, epic: 2, legendary: 1.25 });
+    expect(SHINY_BOOST_DELTA).toBe(0.0025);
+  });
+
+  it("boosting a gratis pack lands rarity odds at the gratis/apoyo midpoint", () => {
+    const catalog: TestCard[] = [
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p2", rarity: "legendary", category: "normal", sortOrder: 2_000_000 },
+    ];
+    const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
+    const picks = pickRandomCards(catalog, rolls.length, "gratis", true, sequenceRandom(rolls));
+    const legendaryRatio = picks.filter((c) => c.id === "p2").length / picks.length;
+    // Only two rarities in this catalog, so the weight pool is just their two boosted
+    // weights: common 71.5-5.75=65.75, legendary 1.5+1.25=2.75 -> ratio 2.75/68.5 ≈ 0.040.
+    expect(legendaryRatio).toBeGreaterThan(0.02);
+    expect(legendaryRatio).toBeLessThan(0.05);
+  });
+
+  it("boosting an apoyo pack never makes rarity odds worse than unboosted apoyo", () => {
+    const catalog: TestCard[] = [
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p2", rarity: "legendary", category: "normal", sortOrder: 2_000_000 },
+    ];
+    const roll = 0.95;
+    const unboosted = pickRandomCards(catalog, 1, "apoyo", false, () => roll)[0].id;
+    const boosted = pickRandomCards(catalog, 1, "apoyo", true, () => roll)[0].id;
+    // apoyo legendary share (4/64=0.0625) < boosted apoyo legendary share (5.25/64ish) for the same roll,
+    // so any roll that already lands legendary unboosted must still land legendary boosted.
+    if (unboosted === "p2") expect(boosted).toBe("p2");
+  });
+
+  it("boost=false leaves odds identical to the existing unboosted behavior", () => {
+    const catalog: TestCard[] = [
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p2", rarity: "legendary", category: "normal", sortOrder: 2_000_000 },
+    ];
+    const picks = pickRandomCards(catalog, 1, "gratis", false, () => 0.5);
+    expect(picks[0].id).toBe("p1");
+    const legendaryPick = pickRandomCards(catalog, 1, "gratis", false, () => 0.999);
+    expect(legendaryPick[0].id).toBe("p2");
+  });
+
+  it("boosts shiny chance by the fixed delta on top of the tier's base chance", () => {
+    const catalog: TestCard[] = [
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p1-shiny", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+    ];
+    const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
+    const picks = pickRandomCards(catalog, rolls.length, "gratis", true, sequenceRandom(rolls));
+    const shinyRatio = picks.filter((c) => c.id === "p1-shiny").length / picks.length;
+    // gratis base 0.5% + boost delta 0.25% = 0.75%
+    expect(shinyRatio).toBeGreaterThan(0.004);
+    expect(shinyRatio).toBeLessThan(0.011);
+  });
+
   it("gives a multi-form species the same total pull chance as a single-form species", () => {
     const catalog: TestCard[] = [
       { id: "unown-a", rarity: "common", category: "normal", sortOrder: 201_000_000 },
@@ -156,7 +212,7 @@ describe("pickRandomCards", () => {
       { id: "wobbuffet", rarity: "common", category: "normal", sortOrder: 202_000_000 },
     ];
     const rolls = Array.from({ length: 20000 }, (_, i) => i / 20000);
-    const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
+    const picks = pickRandomCards(catalog, rolls.length, "gratis", false, sequenceRandom(rolls));
     const unownRatio = picks.filter((c) => c.id.startsWith("unown-")).length / picks.length;
     const wobbuffetRatio = picks.filter((c) => c.id === "wobbuffet").length / picks.length;
 
