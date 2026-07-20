@@ -31,22 +31,22 @@ function sequenceRandom(values: number[]): () => number {
 }
 
 it("returns the requested number of cards", () => {
-  const picks = pickRandomCards(catalog, 5, "gratis", () => 0.5);
+  const picks = pickRandomCards(catalog, 5, "gratis", false, () => 0.5);
   expect(picks).toHaveLength(5);
 });
 
 it("picks the first card when random() returns 0", () => {
-  const picks = pickRandomCards(catalog, 1, "gratis", () => 0);
+  const picks = pickRandomCards(catalog, 1, "gratis", false, () => 0);
   expect(picks[0].id).toBe("c1");
 });
 
 it("picks the last card when random() returns just under 1", () => {
-  const picks = pickRandomCards(catalog, 1, "gratis", () => 0.999999);
+  const picks = pickRandomCards(catalog, 1, "gratis", false, () => 0.999999);
   expect(picks[0].id).toBe("l1");
 });
 
 it("throws on an empty catalog", () => {
-  expect(() => pickRandomCards([], 5, "gratis")).toThrow();
+  expect(() => pickRandomCards([], 5, "gratis", false)).toThrow();
 });
 
 it("pickExactCards returns exactly the requested count per rarity", () => {

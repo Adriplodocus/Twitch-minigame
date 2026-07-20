@@ -264,7 +264,9 @@ admin.post("/test-pack", requireAdmin, async (c) => {
 
   let picked: { id: string; rarity: Rarity; category: Category; sortOrder: number }[];
   try {
-    picked = forcingCounts ? pickExactCards(catalog.results, counts!) : pickRandomCards(catalog.results, 10, tier);
+    picked = forcingCounts
+      ? pickExactCards(catalog.results, counts!)
+      : pickRandomCards(catalog.results, 10, tier, false);
   } catch (e) {
     return c.json({ error: e instanceof Error ? e.message : "Invalid counts" }, 400);
   }
