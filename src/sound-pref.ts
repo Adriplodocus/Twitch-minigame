@@ -14,9 +14,15 @@ export function toggleMuted(): boolean {
   return next;
 }
 
-export function playSound(src: string): void {
-  if (isMuted()) return;
+/** Resolves once the sound finishes playing (or immediately if muted/blocked),
+ * so callers can wait out the sound before moving on. */
+export function playSound(src: string): Promise<void> {
+  if (isMuted()) return Promise.resolve();
   const audio = new Audio(src);
   audio.volume = SOUND_VOLUME;
-  audio.play().catch(() => {});
+  return new Promise((resolve) => {
+    audio.addEventListener("ended", () => resolve(), { once: true });
+    audio.addEventListener("error", () => resolve(), { once: true });
+    audio.play().catch(() => resolve());
+  });
 }

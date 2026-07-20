@@ -35,13 +35,14 @@ export async function showPackReveal(
     const cardEl = wrapper.firstElementChild!;
     cardEl.classList.add("card-reveal");
     cardsRow.appendChild(cardEl);
+    const soundsPlaying: Promise<void>[] = [];
     if (cards[i].rarity === "legendary") {
-      playSound(`/cries/${Math.floor((cards[i].sortOrder ?? 0) / 1_000_000)}.ogg`);
+      soundsPlaying.push(playSound(`/cries/${Math.floor((cards[i].sortOrder ?? 0) / 1_000_000)}.ogg`));
     }
     if (splitCardName(cards[i].name).isShiny) {
-      playSound("/shiny-sound.mp3");
+      soundsPlaying.push(playSound("/shiny-sound.mp3"));
     }
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await Promise.all([new Promise((resolve) => setTimeout(resolve, 400)), ...soundsPlaying]);
   }
 
   const buttonsRow = document.createElement("div");
