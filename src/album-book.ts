@@ -1,5 +1,5 @@
 import type { CardView } from "./api";
-import { renderCardHtml, splitCardName } from "./card";
+import { renderCardHtml } from "./card";
 
 // Regional/Mega/Gmax forms keep the sortOrder of their base species' national
 // dex number (e.g. Tauros Paldea forms sort near #128) even though their
@@ -29,24 +29,12 @@ function chunkIntoPages(cards: CardView[]): (CardView | null)[][] {
   return Array.from({ length: count }, (_, i) => cardsForPage(cards, i));
 }
 
-type BookPage = { kind: "cards"; slots: (CardView | null)[] } | { kind: "divider"; label: string };
+type BookPage = (CardView | null)[];
 
-// Shinies are pulled out of dex order and shown after a "Shiny" divider page,
-// instead of interleaved next to their normal counterpart, so the main dex
-// order reads cleanly and shiny hunters get their own dedicated section.
 function buildPages(cards: CardView[]): BookPage[] {
-  const normal: CardView[] = [];
-  const shiny: CardView[] = [];
-  for (const card of cards) (splitCardName(card.name).isShiny ? shiny : normal).push(card);
-  normal.sort((a, b) => albumSortKey(a) - albumSortKey(b));
-  shiny.sort((a, b) => albumSortKey(a) - albumSortKey(b));
-
-  const pages: BookPage[] = chunkIntoPages(normal).map((slots) => ({ kind: "cards", slots }));
-  if (shiny.length > 0) {
-    pages.push({ kind: "divider", label: "Shiny" });
-    for (const slots of chunkIntoPages(shiny)) pages.push({ kind: "cards", slots });
-  }
-  if (pages.length % PAGES_PER_SPREAD !== 0) pages.push({ kind: "cards", slots: new Array(PAGE_SIZE).fill(null) });
+  const sorted = [...cards].sort((a, b) => albumSortKey(a) - albumSortKey(b));
+  const pages: BookPage[] = chunkIntoPages(sorted);
+  if (pages.length % PAGES_PER_SPREAD !== 0) pages.push(new Array(PAGE_SIZE).fill(null));
   return pages;
 }
 
@@ -104,10 +92,7 @@ export class AlbumBook {
 
   private renderPageHtml(pageIndex: number): string {
     const page = this.pages[pageIndex];
-    if (page.kind === "divider") {
-      return `<div class="book-page book-page-divider"><span class="book-page-divider-label">${page.label}</span></div>`;
-    }
-    return `<div class="book-page">${page.slots
+    return `<div class="book-page">${page
       .map((c) =>
         c
           ? renderCardHtml(c, "", this.deps.femaleVariantBaseNames, this.deps.formLabels)
