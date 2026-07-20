@@ -253,14 +253,16 @@ admin.post("/test-pack", requireAdmin, async (c) => {
     }
   }
 
-  const catalog = await c.env.DB.prepare("SELECT id, rarity, category FROM cards WHERE generation = ?")
+  const catalog = await c.env.DB.prepare(
+    "SELECT id, rarity, category, sort_order AS sortOrder FROM cards WHERE generation = ?"
+  )
     .bind(generation)
-    .all<{ id: string; rarity: Rarity; category: Category }>();
+    .all<{ id: string; rarity: Rarity; category: Category; sortOrder: number }>();
   if (!catalog.results || catalog.results.length === 0) {
     return c.json({ error: "Catalog is empty" }, 500);
   }
 
-  let picked: { id: string; rarity: Rarity; category: Category }[];
+  let picked: { id: string; rarity: Rarity; category: Category; sortOrder: number }[];
   try {
     picked = forcingCounts ? pickExactCards(catalog.results, counts!) : pickRandomCards(catalog.results, 10, tier);
   } catch (e) {

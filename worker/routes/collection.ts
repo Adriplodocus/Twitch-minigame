@@ -48,12 +48,15 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
     return c.json({ error: "Invalid generation" }, 400);
   }
 
-  const catalog = await c.env.DB.prepare("SELECT id, rarity, category FROM cards WHERE generation = ?")
+  const catalog = await c.env.DB.prepare(
+    "SELECT id, rarity, category, sort_order AS sortOrder FROM cards WHERE generation = ?"
+  )
     .bind(generation)
     .all<{
       id: string;
       rarity: Rarity;
       category: Category;
+      sortOrder: number;
     }>();
   if (!catalog.results || catalog.results.length === 0) {
     return c.json({ error: "Catalog is empty" }, 500);
