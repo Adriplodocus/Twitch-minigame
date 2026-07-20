@@ -166,7 +166,13 @@ nameFilterClear.addEventListener("click", () => {
   renderOwnedGrid();
 });
 
-document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
+document.getElementById("sort-field")!.addEventListener("change", (e) => {
+  const field = (e.target as HTMLSelectElement).value as SortField;
+  if (field === "rarity" || field === "quantity") {
+    (document.getElementById("sort-direction") as HTMLSelectElement).value = "desc";
+  }
+  renderOwnedGrid();
+});
 document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
 
 function showCoinActionError(message: string): void {

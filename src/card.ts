@@ -2,7 +2,14 @@ import type { CardView } from "./api";
 import { ensureCardTiltHandler } from "./card-tilt";
 import { DISCARD_VALUE, DISCARD_VALUE_SHINY, SHINY_CONVERSION_COST } from "./coins";
 
-export type SortField = "pokedex" | "recent" | "quantity";
+export type SortField = "pokedex" | "recent" | "quantity" | "rarity";
+
+const RARITY_RANK: Record<CardView["rarity"], number> = {
+  common: 0,
+  rare: 1,
+  epic: 2,
+  legendary: 3,
+};
 
 export function compareCards(a: CardView, b: CardView, field: SortField): number {
   switch (field) {
@@ -12,6 +19,8 @@ export function compareCards(a: CardView, b: CardView, field: SortField): number
       return (a.acquiredAt ?? "").localeCompare(b.acquiredAt ?? "");
     case "quantity":
       return a.quantity - b.quantity;
+    case "rarity":
+      return RARITY_RANK[a.rarity] - RARITY_RANK[b.rarity] || (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
   }
 }
 
