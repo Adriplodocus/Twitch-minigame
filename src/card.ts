@@ -1,5 +1,6 @@
 import type { CardView } from "./api";
 import { ensureCardTiltHandler } from "./card-tilt";
+import { DISCARD_VALUE, DISCARD_VALUE_SHINY, SHINY_CONVERSION_COST } from "./coins";
 
 export type SortField = "pokedex" | "recent" | "quantity";
 
@@ -74,6 +75,20 @@ export function collectFemaleVariantBaseNames(cards: CardView[]): Set<string> {
   return names;
 }
 
+export function collectShinyCapableIds(cards: CardView[]): Set<string> {
+  const shinyIds = new Set(cards.filter((c) => c.id.endsWith("-shiny")).map((c) => c.id));
+  const capable = new Set<string>();
+  for (const c of cards) {
+    if (!c.id.endsWith("-shiny") && shinyIds.has(`${c.id}-shiny`)) capable.add(c.id);
+  }
+  return capable;
+}
+
+export interface CoinActionsConfig {
+  coins: number;
+  shinyCapableIds: Set<string>;
+}
+
 function commonWordPrefixLength(wordLists: string[][]): number {
   if (wordLists.length === 0) return 0;
   const maxLen = Math.min(...wordLists.map((w) => w.length));
@@ -132,6 +147,42 @@ function ensureInfoTooltipHandler(): void {
   });
 }
 
+let coinActionsHandlerAttached = false;
+
+function ensureCoinActionsHandler(): void {
+  if (typeof document === "undefined") return;
+  if (coinActionsHandlerAttached) return;
+  coinActionsHandlerAttached = true;
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+
+    const discardBtn = target.closest<HTMLElement>(".coin-discard-btn");
+    if (discardBtn) {
+      const cardId = discardBtn.closest<HTMLElement>(".coin-actions")!.dataset.cardId!;
+      discardBtn.dispatchEvent(new CustomEvent("card-discard", { bubbles: true, detail: { cardId } }));
+      return;
+    }
+
+    const convertBtn = target.closest<HTMLElement>(".coin-convert-btn");
+    if (convertBtn && !convertBtn.hasAttribute("disabled")) {
+      convertBtn.closest(".coin-convert-wrap")!.classList.add("confirming");
+      return;
+    }
+
+    const yesBtn = target.closest<HTMLElement>(".coin-convert-yes");
+    if (yesBtn) {
+      const cardId = yesBtn.closest<HTMLElement>(".coin-actions")!.dataset.cardId!;
+      yesBtn.dispatchEvent(new CustomEvent("card-convert-shiny", { bubbles: true, detail: { cardId } }));
+      return;
+    }
+
+    const noBtn = target.closest<HTMLElement>(".coin-convert-no");
+    if (noBtn) {
+      noBtn.closest(".coin-convert-wrap")!.classList.remove("confirming");
+    }
+  });
+}
+
 function renderSparkleDot(): string {
   const pos = () => `${(8 + Math.random() * 80).toFixed(1)}%`;
   const rot = () => `${(Math.random() * 360).toFixed(0)}deg`;
@@ -147,10 +198,12 @@ export function renderCardHtml(
   femaleVariantBaseNames?: Set<string>,
   formLabels?: Map<string, string>,
   showQtyBadge = true,
-  footerBadgeHtml?: string
+  footerBadgeHtml?: string,
+  coinActions?: CoinActionsConfig
 ): string {
   ensureInfoTooltipHandler();
   ensureCardTiltHandler();
+  ensureCoinActionsHandler();
 
   const isOwned = card.quantity > 0;
   const ownedClass = isOwned ? "" : "unowned";
@@ -193,6 +246,36 @@ export function renderCardHtml(
     : "";
 
   const genderLine = isFemale ? "Hembra" : hasFemaleVariant ? "Macho" : null;
+
+  const coinActionsHtml = (() => {
+    if (!coinActions || !isOwned) return "";
+    const discardValue = isShiny ? DISCARD_VALUE_SHINY[card.rarity] : DISCARD_VALUE[card.rarity];
+    const showDiscard = card.quantity > 1;
+    const showConvert = !isShiny && coinActions.shinyCapableIds.has(card.id) && card.quantity >= 2;
+    if (!showDiscard && !showConvert) return "";
+
+    const convertCost = SHINY_CONVERSION_COST[card.rarity];
+    const canAfford = coinActions.coins >= convertCost;
+
+    return `
+      <div class="coin-actions" data-card-id="${card.id}">
+        ${showDiscard ? `<button type="button" class="btn coin-discard-btn">Descartar (+${discardValue})</button>` : ""}
+        ${
+          showConvert
+            ? `<div class="coin-convert-wrap">
+                <button type="button" class="btn coin-convert-btn"${canAfford ? "" : " disabled"}>Convertir a shiny (${convertCost})</button>
+                <div class="coin-convert-confirm">
+                  <span>¿Seguro?</span>
+                  <button type="button" class="btn coin-convert-yes">Sí</button>
+                  <button type="button" class="btn coin-convert-no">No</button>
+                </div>
+              </div>`
+            : ""
+        }
+      </div>
+    `;
+  })();
+
   const infoTooltip = `
     <div class="info-tooltip">
       <p><strong>${baseName}</strong></p>
@@ -200,6 +283,7 @@ export function renderCardHtml(
       <p>Rareza: ${RARITY_LABELS[card.rarity]}</p>
       ${isShiny ? `<p>Shiny: Sí</p>` : ""}
       ${genderLine ? `<p>Género: ${genderLine}</p>` : ""}
+      ${coinActionsHtml}
     </div>
   `;
 

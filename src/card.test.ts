@@ -1,5 +1,5 @@
 import { it, expect } from "vitest";
-import { renderCardHtml } from "./card";
+import { renderCardHtml, collectShinyCapableIds } from "./card";
 import type { CardView } from "./api";
 
 function card(overrides: Partial<CardView> = {}): CardView {
@@ -65,4 +65,92 @@ it("unowned shiny card gets no foil/shiny/sparkle/tiltable either", () => {
   expect(html).not.toMatch(/class="card [^"]*\bshiny\b/);
   expect(html).not.toMatch(/class="card [^"]*\btiltable\b/);
   expect(html).not.toContain('class="sparkle-layer"');
+});
+
+it("collectShinyCapableIds returns ids of normal cards that have a -shiny counterpart", () => {
+  const cards = [card({ id: "p1" }), card({ id: "p1-shiny" }), card({ id: "p2" })];
+  const capable = collectShinyCapableIds(cards);
+  expect(capable.has("p1")).toBe(true);
+  expect(capable.has("p2")).toBe(false);
+  expect(capable.has("p1-shiny")).toBe(false);
+});
+
+it("shows no coin action buttons when coinActions is not passed", () => {
+  const html = renderCardHtml(card({ quantity: 3 }));
+  expect(html).not.toContain("coin-actions");
+});
+
+it("shows the discard button with its coin value when quantity > 1", () => {
+  const html = renderCardHtml(card({ id: "p1", rarity: "rare", quantity: 3 }), "", undefined, undefined, true, undefined, {
+    coins: 0,
+    shinyCapableIds: new Set(),
+  });
+  expect(html).toContain("coin-discard-btn");
+  expect(html).toContain("+15"); // DISCARD_VALUE.rare
+});
+
+it("hides the discard button when quantity is 1", () => {
+  const html = renderCardHtml(card({ id: "p1", quantity: 1 }), "", undefined, undefined, true, undefined, {
+    coins: 0,
+    shinyCapableIds: new Set(),
+  });
+  expect(html).not.toContain("coin-discard-btn");
+});
+
+it("uses the shiny discard value for a shiny card id", () => {
+  const html = renderCardHtml(card({ id: "p1-shiny", name: "Bulbasaur Shiny", rarity: "rare", quantity: 3 }), "", undefined, undefined, true, undefined, {
+    coins: 0,
+    shinyCapableIds: new Set(),
+  });
+  expect(html).toContain("+120"); // DISCARD_VALUE_SHINY.rare
+});
+
+it("shows the convert button, enabled, when eligible and affordable", () => {
+  const html = renderCardHtml(card({ id: "p1", rarity: "common", quantity: 2 }), "", undefined, undefined, true, undefined, {
+    coins: 150,
+    shinyCapableIds: new Set(["p1"]),
+  });
+  expect(html).toContain("coin-convert-btn");
+  expect(html).toContain("150"); // SHINY_CONVERSION_COST.common
+  expect(html).not.toMatch(/coin-convert-btn"[^>]*disabled/);
+});
+
+it("shows the convert button disabled when coins are insufficient", () => {
+  const html = renderCardHtml(card({ id: "p1", rarity: "common", quantity: 2 }), "", undefined, undefined, true, undefined, {
+    coins: 0,
+    shinyCapableIds: new Set(["p1"]),
+  });
+  expect(html).toMatch(/coin-convert-btn"[^>]*disabled/);
+});
+
+it("hides the convert button when quantity is below 2", () => {
+  const html = renderCardHtml(card({ id: "p1", quantity: 1 }), "", undefined, undefined, true, undefined, {
+    coins: 9999,
+    shinyCapableIds: new Set(["p1"]),
+  });
+  expect(html).not.toContain("coin-convert-btn");
+});
+
+it("hides the convert button when the card has no shiny counterpart", () => {
+  const html = renderCardHtml(card({ id: "p1", quantity: 2 }), "", undefined, undefined, true, undefined, {
+    coins: 9999,
+    shinyCapableIds: new Set(), // p1 not in the set
+  });
+  expect(html).not.toContain("coin-convert-btn");
+});
+
+it("hides the convert button on a card that is already shiny", () => {
+  const html = renderCardHtml(card({ id: "p1-shiny", name: "Bulbasaur Shiny", quantity: 2 }), "", undefined, undefined, true, undefined, {
+    coins: 9999,
+    shinyCapableIds: new Set(["p1-shiny"]), // even if (incorrectly) present, shiny cards never show convert
+  });
+  expect(html).not.toContain("coin-convert-btn");
+});
+
+it("hides both coin action buttons for an unowned card", () => {
+  const html = renderCardHtml(card({ id: "p1", quantity: 0 }), "", undefined, undefined, true, undefined, {
+    coins: 9999,
+    shinyCapableIds: new Set(["p1"]),
+  });
+  expect(html).not.toContain("coin-actions");
 });
