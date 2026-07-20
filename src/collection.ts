@@ -1,5 +1,5 @@
-import { getCollection, openPack, broadcastPack, type CardView, type PendingPack } from "./api";
-import { renderCardHtml, collectFemaleVariantBaseNames, computeFormLabels, compareCards, type SortField } from "./card";
+import { getCollection, openPack, broadcastPack, discardCard, convertToShiny, type CardView, type PendingPack } from "./api";
+import { renderCardHtml, collectFemaleVariantBaseNames, collectShinyCapableIds, computeFormLabels, compareCards, type SortField } from "./card";
 import { attachTradeLinkButton } from "./trade-link";
 import { initUserHeader } from "./user-header";
 import { GENERATIONS } from "./generations";
@@ -9,7 +9,9 @@ import { completionPercent } from "./completion-percent";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
+let shinyCapableIds = new Set<string>();
 let ownedCards: CardView[] = [];
+let coins = 0;
 
 function renderOwnedGrid(): void {
   const grid = document.getElementById("owned-grid")!;
@@ -24,7 +26,9 @@ function renderOwnedGrid(): void {
     .filter((c) => (generation === null || c.generation === generation))
     .filter((c) => (!nameQuery || c.name.toLowerCase().includes(nameQuery)))
     .sort((a, b) => compareCards(a, b, field) * sign);
-  grid.innerHTML = sorted.map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels)).join("");
+  grid.innerHTML = sorted
+    .map((c) => renderCardHtml(c, "", femaleVariantBaseNames, formLabels, true, undefined, { coins, shinyCapableIds }))
+    .join("");
 }
 
 function openAlbumPickerModal(): Promise<number | null> {
@@ -132,6 +136,8 @@ async function load(): Promise<void> {
   const data = await getCollection();
   femaleVariantBaseNames = collectFemaleVariantBaseNames(data.cards);
   formLabels = computeFormLabels(data.cards);
+  shinyCapableIds = collectShinyCapableIds(data.cards);
+  coins = data.coins;
   ownedCards = data.cards.filter((c) => c.quantity > 0);
 
   document.getElementById("owned-heading")!.innerHTML =
@@ -162,6 +168,42 @@ nameFilterClear.addEventListener("click", () => {
 
 document.getElementById("sort-field")!.addEventListener("change", renderOwnedGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderOwnedGrid);
+
+function showCoinActionError(message: string): void {
+  const el = document.getElementById("coin-action-error")!;
+  el.textContent = message;
+  el.hidden = false;
+}
+
+function clearCoinActionError(): void {
+  document.getElementById("coin-action-error")!.hidden = true;
+}
+
+document.getElementById("owned-grid")!.addEventListener("card-discard", async (e) => {
+  const { cardId } = (e as CustomEvent<{ cardId: string }>).detail;
+  clearCoinActionError();
+  try {
+    const result = await discardCard(cardId);
+    coins = result.coins;
+    document.dispatchEvent(new CustomEvent("coins-updated", { detail: { coins } }));
+    await load();
+  } catch (err) {
+    showCoinActionError(err instanceof Error ? err.message : "Error al descartar la carta");
+  }
+});
+
+document.getElementById("owned-grid")!.addEventListener("card-convert-shiny", async (e) => {
+  const { cardId } = (e as CustomEvent<{ cardId: string }>).detail;
+  clearCoinActionError();
+  try {
+    const result = await convertToShiny(cardId);
+    coins = result.coins;
+    document.dispatchEvent(new CustomEvent("coins-updated", { detail: { coins } }));
+    await load();
+  } catch (err) {
+    showCoinActionError(err instanceof Error ? err.message : "Error al convertir la carta");
+  }
+});
 
 attachTradeLinkButton("trade-link-btn");
 initUserHeader();
