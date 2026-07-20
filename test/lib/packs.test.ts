@@ -2,17 +2,17 @@ import { it, expect } from "vitest";
 import { pickRandomCards, pickExactCards, RARITY_WEIGHTS_BY_TIER } from "../../worker/lib/packs";
 
 const catalog = [
-  { id: "c1", rarity: "common" as const, category: "normal" as const },
-  { id: "r1", rarity: "rare" as const, category: "normal" as const },
-  { id: "e1", rarity: "epic" as const, category: "normal" as const },
-  { id: "l1", rarity: "legendary" as const, category: "normal" as const },
+  { id: "c1", rarity: "common" as const, category: "normal" as const, sortOrder: 1_000_000 },
+  { id: "r1", rarity: "rare" as const, category: "normal" as const, sortOrder: 2_000_000 },
+  { id: "e1", rarity: "epic" as const, category: "normal" as const, sortOrder: 3_000_000 },
+  { id: "l1", rarity: "legendary" as const, category: "normal" as const, sortOrder: 4_000_000 },
 ];
 
 const shinyCatalog = [
-  { id: "c1", rarity: "common" as const },
-  { id: "c1-shiny", rarity: "common" as const },
-  { id: "l1", rarity: "legendary" as const },
-  { id: "l1-shiny", rarity: "legendary" as const },
+  { id: "c1", rarity: "common" as const, sortOrder: 1_000_000 },
+  { id: "c1-shiny", rarity: "common" as const, sortOrder: 1_000_000 },
+  { id: "l1", rarity: "legendary" as const, sortOrder: 4_000_000 },
+  { id: "l1-shiny", rarity: "legendary" as const, sortOrder: 4_000_000 },
 ];
 
 it("returns the requested number of cards", () => {
@@ -49,13 +49,25 @@ it("pickExactCards picks shiny cards from any rarity", () => {
 
 it("pickExactCards throws when a requested rarity has no non-shiny cards", () => {
   expect(() =>
-    pickExactCards([{ id: "r1-shiny", rarity: "rare" as const }], { common: 0, rare: 1, epic: 0, legendary: 0, shiny: 0 })
+    pickExactCards([{ id: "r1-shiny", rarity: "rare" as const, sortOrder: 2_000_000 }], {
+      common: 0,
+      rare: 1,
+      epic: 0,
+      legendary: 0,
+      shiny: 0,
+    })
   ).toThrow();
 });
 
 it("pickExactCards throws when shiny is requested but none exist", () => {
   expect(() =>
-    pickExactCards([{ id: "c1", rarity: "common" as const }], { common: 0, rare: 0, epic: 0, legendary: 0, shiny: 1 })
+    pickExactCards([{ id: "c1", rarity: "common" as const, sortOrder: 1_000_000 }], {
+      common: 0,
+      rare: 0,
+      epic: 0,
+      legendary: 0,
+      shiny: 1,
+    })
   ).toThrow();
 });
 
@@ -66,4 +78,14 @@ it("defines descending weights per rarity within each tier", () => {
     expect(weights.rare).toBeGreaterThan(weights.epic);
     expect(weights.epic).toBeGreaterThan(weights.legendary);
   }
+});
+
+it("pickExactCards avoids repeating a species across the whole pack when alternatives exist", () => {
+  const twoSpecies = [
+    { id: "c1", rarity: "common" as const, sortOrder: 1_000_000 },
+    { id: "c2", rarity: "common" as const, sortOrder: 2_000_000 },
+  ];
+  const picks = pickExactCards(twoSpecies, { common: 2, rare: 0, epic: 0, legendary: 0, shiny: 0 }, () => 0.999999);
+  const species = picks.map((c) => Math.floor(c.sortOrder / 1_000_000));
+  expect(new Set(species).size).toBe(2);
 });
