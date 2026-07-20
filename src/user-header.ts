@@ -36,6 +36,13 @@ export function initUserHeader(): void {
       avatar.alt = me.username;
       if (me.avatarUrl) avatar.src = me.avatarUrl;
     }
+    const coinsEl = document.getElementById("user-coins");
+    if (coinsEl) coinsEl.textContent = `${me.coins} 🪙`;
+  });
+
+  document.addEventListener("coins-updated", (e) => {
+    const coinsEl = document.getElementById("user-coins");
+    if (coinsEl) coinsEl.textContent = `${(e as CustomEvent<{ coins: number }>).detail.coins} 🪙`;
   });
 
   const howToBtn = document.getElementById("how-to-btn");
