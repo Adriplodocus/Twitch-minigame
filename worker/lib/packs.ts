@@ -121,7 +121,24 @@ export interface ExactCounts {
 
 const NON_SHINY_RARITIES: Rarity[] = ["common", "rare", "epic", "legendary"];
 
-export function pickExactCards<T extends { id: string; rarity: Rarity }>(
+function groupBySpecies<T extends { sortOrder: number }>(pool: T[]): Map<number, T[]> {
+  const groups = new Map<number, T[]>();
+  for (const card of pool) {
+    const species = speciesKey(card.sortOrder);
+    const group = groups.get(species);
+    if (group) group.push(card);
+    else groups.set(species, [card]);
+  }
+  return groups;
+}
+
+function pickCardBySpecies<T>(bySpecies: Map<number, T[]>, random: () => number): T {
+  const speciesKeys = [...bySpecies.keys()];
+  const group = bySpecies.get(speciesKeys[Math.floor(random() * speciesKeys.length)])!;
+  return group[Math.floor(random() * group.length)];
+}
+
+export function pickExactCards<T extends { id: string; rarity: Rarity; sortOrder: number }>(
   catalog: T[],
   counts: ExactCounts,
   random: () => number = Math.random
@@ -133,16 +150,18 @@ export function pickExactCards<T extends { id: string; rarity: Rarity }>(
     if (count === 0) continue;
     const pool = catalog.filter((card) => card.rarity === rarity && !isShinyCard(card.id));
     if (pool.length === 0) throw new Error(`No hay cartas ${rarity} no-shiny en esta generación`);
+    const bySpecies = groupBySpecies(pool);
     for (let i = 0; i < count; i++) {
-      picks.push(pool[Math.floor(random() * pool.length)]);
+      picks.push(pickCardBySpecies(bySpecies, random));
     }
   }
 
   if (counts.shiny > 0) {
     const shinyPool = catalog.filter((card) => isShinyCard(card.id));
     if (shinyPool.length === 0) throw new Error("No hay cartas shiny en esta generación");
+    const bySpecies = groupBySpecies(shinyPool);
     for (let i = 0; i < counts.shiny; i++) {
-      picks.push(shinyPool[Math.floor(random() * shinyPool.length)]);
+      picks.push(pickCardBySpecies(bySpecies, random));
     }
   }
 
