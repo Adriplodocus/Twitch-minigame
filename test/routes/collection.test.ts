@@ -128,6 +128,101 @@ it("opens a pending pack and grants 10 cards", async () => {
   expect(pack?.opened_at).not.toBeNull();
 });
 
+it("includes the caller's coin balance in the open response", async () => {
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(300, "1").run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1 }),
+    },
+    env
+  );
+  const json = await res.json<{ coins: number }>();
+  expect(json.coins).toBe(300);
+});
+
+it("debits 150 coins and opens the pack when boost is requested with enough coins", async () => {
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(200, "1").run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1, boost: true }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ cards: { id: string }[]; coins: number }>();
+  expect(json.cards).toHaveLength(10);
+  expect(json.coins).toBe(50);
+
+  const pack = await env.DB.prepare("SELECT opened_at FROM packs WHERE id = ?")
+    .bind(packResult!.id)
+    .first<{ opened_at: string | null }>();
+  expect(pack?.opened_at).not.toBeNull();
+});
+
+it("rejects boosting without enough coins and leaves the pack unopened", async () => {
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(100, "1").run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1, boost: true }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+  const json = await res.json<{ error: string }>();
+  expect(json.error).toBe("Not enough coins");
+
+  const pack = await env.DB.prepare("SELECT opened_at FROM packs WHERE id = ?")
+    .bind(packResult!.id)
+    .first<{ opened_at: string | null }>();
+  expect(pack?.opened_at).toBeNull();
+  const user = await env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?").bind("1").first<{ coins: number }>();
+  expect(user?.coins).toBe(100);
+});
+
+it("does not touch coins when boost is omitted", async () => {
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(300, "1").run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1 }),
+    },
+    env
+  );
+  const user = await env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?").bind("1").first<{ coins: number }>();
+  expect(user?.coins).toBe(300);
+});
+
 it("only draws cards from the requested generation", async () => {
   await env.DB.prepare("UPDATE cards SET generation = 2 WHERE id = 'r1'").run();
   const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")

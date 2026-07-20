@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { Category, Env, Rarity } from "../types";
 import { requireAuth } from "../middleware/auth";
 import { pickRandomCards, isShinyCard, shinyIdFor } from "../lib/packs";
-import { DISCARD_VALUE, DISCARD_VALUE_SHINY, SHINY_CONVERSION_COST } from "../lib/coins";
+import { DISCARD_VALUE, DISCARD_VALUE_SHINY, SHINY_CONVERSION_COST, PACK_BOOST_COST } from "../lib/coins";
 
 const collection = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
 
@@ -144,6 +144,18 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   if (!Number.isInteger(generation) || generation < 1 || generation > 9) {
     return c.json({ error: "Invalid generation" }, 400);
   }
+  const boost = (body as { boost?: unknown } | null)?.boost === true;
+
+  let coinsBalance: number | undefined = undefined;
+  if (boost) {
+    const coinsRow = await c.env.DB.prepare(
+      "UPDATE users SET coins = coins - ? WHERE twitch_id = ? AND coins >= ? RETURNING coins"
+    )
+      .bind(PACK_BOOST_COST, user.twitchId, PACK_BOOST_COST)
+      .first<{ coins: number }>();
+    if (!coinsRow) return c.json({ error: "Not enough coins" }, 400);
+    coinsBalance = coinsRow.coins;
+  }
 
   const catalog = await c.env.DB.prepare(
     "SELECT id, rarity, category, sort_order AS sortOrder FROM cards WHERE generation = ?"
@@ -159,7 +171,7 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
     return c.json({ error: "Catalog is empty" }, 500);
   }
 
-  const picked = pickRandomCards(catalog.results, 10, pack.tier, false);
+  const picked = pickRandomCards(catalog.results, 10, pack.tier, boost);
 
   const statements = picked.map((card) =>
     c.env.DB.prepare("INSERT INTO pack_cards (pack_id, card_id) VALUES (?, ?)").bind(packId, card.id)
@@ -186,7 +198,14 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   const detailsById = new Map(cardDetails.results.map((card) => [card.id, card]));
   const cards = picked.map((card) => ({ ...detailsById.get(card.id)!, quantity: 1 }));
 
-  return c.json({ cards });
+  if (coinsBalance === undefined) {
+    const userRow = await c.env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?")
+      .bind(user.twitchId)
+      .first<{ coins: number }>();
+    coinsBalance = userRow?.coins ?? 0;
+  }
+
+  return c.json({ cards, coins: coinsBalance });
 });
 
 collection.post("/packs/:id/broadcast", requireAuth, async (c) => {
