@@ -22,44 +22,55 @@ export function isShinyCard(id: string): boolean {
   return id.includes("-shiny");
 }
 
+export function speciesKey(sortOrder: number): number {
+  return Math.floor(sortOrder / 1_000_000);
+}
+
 function splitShinyWeight(
   rarityWeight: number,
-  shinyCount: number,
-  nonShinyCount: number,
+  shinySpeciesCount: number,
+  nonShinySpeciesCount: number,
   shiny: boolean,
   shinyChance: number
 ): number {
-  if (shinyCount === 0) return shiny ? 0 : rarityWeight / nonShinyCount;
-  if (nonShinyCount === 0) return shiny ? rarityWeight / shinyCount : 0;
-  return shiny ? (rarityWeight * shinyChance) / shinyCount : (rarityWeight * (1 - shinyChance)) / nonShinyCount;
+  if (shinySpeciesCount === 0) return shiny ? 0 : rarityWeight / nonShinySpeciesCount;
+  if (nonShinySpeciesCount === 0) return shiny ? rarityWeight / shinySpeciesCount : 0;
+  return shiny
+    ? (rarityWeight * shinyChance) / shinySpeciesCount
+    : (rarityWeight * (1 - shinyChance)) / nonShinySpeciesCount;
 }
 
-function buildCardWeights<T extends { id: string; rarity: Rarity; category: Category }>(
+function buildCardWeights<T extends { id: string; rarity: Rarity; category: Category; sortOrder: number }>(
   catalog: T[],
   tier: PackTier
 ): Map<T, number> {
   const rarityWeights = RARITY_WEIGHTS_BY_TIER[tier];
   const shinyChance = SHINY_CHANCE_BY_TIER[tier];
 
-  // Count cards per (rarity, category) bucket, split further into shiny/non-shiny.
-  const countsByRarityCategory = new Map<Rarity, Map<Category, { shiny: number; nonShiny: number }>>();
+  // For each (rarity, category) bucket, count how many rows each species
+  // contributes, split shiny/non-shiny.
+  const bucketsByRarityCategory = new Map<
+    Rarity,
+    Map<Category, { shinyRows: Map<number, number>; nonShinyRows: Map<number, number> }>
+  >();
   for (const card of catalog) {
-    let byCategory = countsByRarityCategory.get(card.rarity);
+    let byCategory = bucketsByRarityCategory.get(card.rarity);
     if (!byCategory) {
       byCategory = new Map();
-      countsByRarityCategory.set(card.rarity, byCategory);
+      bucketsByRarityCategory.set(card.rarity, byCategory);
     }
-    let counts = byCategory.get(card.category);
-    if (!counts) {
-      counts = { shiny: 0, nonShiny: 0 };
-      byCategory.set(card.category, counts);
+    let bucket = byCategory.get(card.category);
+    if (!bucket) {
+      bucket = { shinyRows: new Map(), nonShinyRows: new Map() };
+      byCategory.set(card.category, bucket);
     }
-    if (isShinyCard(card.id)) counts.shiny++;
-    else counts.nonShiny++;
+    const rows = isShinyCard(card.id) ? bucket.shinyRows : bucket.nonShinyRows;
+    const species = speciesKey(card.sortOrder);
+    rows.set(species, (rows.get(species) ?? 0) + 1);
   }
 
   const weights = new Map<T, number>();
-  for (const [rarity, byCategory] of countsByRarityCategory) {
+  for (const [rarity, byCategory] of bucketsByRarityCategory) {
     const rarityWeight = rarityWeights[rarity];
 
     // Only categories that actually have >=1 card in this rarity reserve their budget;
@@ -69,14 +80,31 @@ function buildCardWeights<T extends { id: string; rarity: Rarity; category: Cate
       if (byCategory.has(category)) normalFraction -= weightFraction;
     }
 
-    for (const [category, counts] of byCategory) {
+    for (const [category, bucket] of byCategory) {
       const categoryFraction = category === "normal" ? normalFraction : CATEGORY_WEIGHTS[category];
       const categoryBudget = rarityWeight * categoryFraction;
+      const perSpeciesShinyBudget = splitShinyWeight(
+        categoryBudget,
+        bucket.shinyRows.size,
+        bucket.nonShinyRows.size,
+        true,
+        shinyChance
+      );
+      const perSpeciesNonShinyBudget = splitShinyWeight(
+        categoryBudget,
+        bucket.shinyRows.size,
+        bucket.nonShinyRows.size,
+        false,
+        shinyChance
+      );
 
       for (const card of catalog) {
         if (card.rarity !== rarity || card.category !== category) continue;
         const shiny = isShinyCard(card.id);
-        weights.set(card, splitShinyWeight(categoryBudget, counts.shiny, counts.nonShiny, shiny, shinyChance));
+        const rows = shiny ? bucket.shinyRows : bucket.nonShinyRows;
+        const species = speciesKey(card.sortOrder);
+        const perSpeciesBudget = shiny ? perSpeciesShinyBudget : perSpeciesNonShinyBudget;
+        weights.set(card, perSpeciesBudget / rows.get(species)!);
       }
     }
   }
@@ -126,7 +154,7 @@ export function pickExactCards<T extends { id: string; rarity: Rarity }>(
   return picks;
 }
 
-export function pickRandomCards<T extends { id: string; rarity: Rarity; category: Category }>(
+export function pickRandomCards<T extends { id: string; rarity: Rarity; category: Category; sortOrder: number }>(
   catalog: T[],
   count: number,
   tier: PackTier,
@@ -134,12 +162,17 @@ export function pickRandomCards<T extends { id: string; rarity: Rarity; category
 ): T[] {
   if (catalog.length === 0) throw new Error("Catalog is empty");
   const weights = buildCardWeights(catalog, tier);
-  const totalWeight = catalog.reduce((sum, card) => sum + weights.get(card)!, 0);
   const picks: T[] = [];
+  const seenSpecies = new Set<number>();
+
   for (let i = 0; i < count; i++) {
+    let pool = catalog.filter((card) => !seenSpecies.has(speciesKey(card.sortOrder)));
+    if (pool.length === 0) pool = catalog;
+
+    const totalWeight = pool.reduce((sum, card) => sum + weights.get(card)!, 0);
     let roll = random() * totalWeight;
-    let chosen = catalog[catalog.length - 1];
-    for (const card of catalog) {
+    let chosen = pool[pool.length - 1];
+    for (const card of pool) {
       roll -= weights.get(card)!;
       if (roll <= 0) {
         chosen = card;
@@ -147,6 +180,7 @@ export function pickRandomCards<T extends { id: string; rarity: Rarity; category
       }
     }
     picks.push(chosen);
+    seenSpecies.add(speciesKey(chosen.sortOrder));
   }
   return picks;
 }

@@ -5,6 +5,7 @@ interface TestCard {
   id: string;
   rarity: "common" | "rare" | "epic" | "legendary";
   category: "normal" | "inicial" | "mega" | "gmax";
+  sortOrder: number;
 }
 
 function sequenceRandom(values: number[]): () => number {
@@ -19,10 +20,10 @@ describe("pickRandomCards", () => {
 
   it("picks shiny cards ~1% of the time within a rarity (apoyo tier), uniform among non-shiny", () => {
     const catalog: TestCard[] = [
-      { id: "p1", rarity: "common", category: "normal" },
-      { id: "p2", rarity: "common", category: "normal" },
-      { id: "p3", rarity: "common", category: "normal" },
-      { id: "p1-shiny", rarity: "common", category: "normal" },
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p2", rarity: "common", category: "normal", sortOrder: 2_000_000 },
+      { id: "p3", rarity: "common", category: "normal", sortOrder: 3_000_000 },
+      { id: "p1-shiny", rarity: "common", category: "normal", sortOrder: 1_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
     const picks = pickRandomCards(catalog, rolls.length, "apoyo", sequenceRandom(rolls));
@@ -40,8 +41,8 @@ describe("pickRandomCards", () => {
 
   it("picks shiny cards ~0.5% of the time within a rarity (gratis tier)", () => {
     const catalog: TestCard[] = [
-      { id: "p1", rarity: "common", category: "normal" },
-      { id: "p1-shiny", rarity: "common", category: "normal" },
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p1-shiny", rarity: "common", category: "normal", sortOrder: 1_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
     const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
@@ -52,23 +53,23 @@ describe("pickRandomCards", () => {
 
   it("gives shiny cards 0% chance if none exist for that rarity", () => {
     const catalog: TestCard[] = [
-      { id: "p1", rarity: "rare", category: "normal" },
-      { id: "p2", rarity: "rare", category: "normal" },
+      { id: "p1", rarity: "rare", category: "normal", sortOrder: 1_000_000 },
+      { id: "p2", rarity: "rare", category: "normal", sortOrder: 2_000_000 },
     ];
     const picks = pickRandomCards(catalog, 100, "gratis", () => 0.99);
     expect(picks.every((c) => !c.id.includes("-shiny"))).toBe(true);
   });
 
   it("still picks shiny cards if a rarity has only shiny variants", () => {
-    const catalog: TestCard[] = [{ id: "p1-shiny", rarity: "legendary", category: "normal" }];
+    const catalog: TestCard[] = [{ id: "p1-shiny", rarity: "legendary", category: "normal", sortOrder: 1_000_000 }];
     const picks = pickRandomCards(catalog, 5, "gratis", () => 0.5);
     expect(picks.every((c) => c.id === "p1-shiny")).toBe(true);
   });
 
   it("respects gratis tier rarity weights (common 71.5 vs legendary 1.5)", () => {
     const catalog: TestCard[] = [
-      { id: "p1", rarity: "common", category: "normal" },
-      { id: "p2", rarity: "legendary", category: "normal" },
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p2", rarity: "legendary", category: "normal", sortOrder: 2_000_000 },
     ];
     // common weight 71.5, legendary weight 1.5, total 73 -> common cutoff at roll < 71.5/73
     const picks = pickRandomCards(catalog, 1, "gratis", () => 0.5);
@@ -80,8 +81,8 @@ describe("pickRandomCards", () => {
 
   it("gives legendary a noticeably better chance in apoyo tier than gratis tier", () => {
     const catalog: TestCard[] = [
-      { id: "p1", rarity: "common", category: "normal" },
-      { id: "p2", rarity: "legendary", category: "normal" },
+      { id: "p1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "p2", rarity: "legendary", category: "normal", sortOrder: 2_000_000 },
     ];
     // apoyo: common 60, legendary 4, total 64 -> a roll that stays "common" under gratis
     // (71.5/73 ≈ 0.979) should flip to legendary under apoyo (60/64 = 0.9375).
@@ -92,10 +93,10 @@ describe("pickRandomCards", () => {
 
   it("splits a rarity's weight budget across categories ~89/5/3/3 (normal/inicial/mega/gmax), independent of tier", () => {
     const catalog: TestCard[] = [
-      { id: "normal1", rarity: "common", category: "normal" },
-      { id: "inicial1", rarity: "common", category: "inicial" },
-      { id: "mega1", rarity: "common", category: "mega" },
-      { id: "gmax1", rarity: "common", category: "gmax" },
+      { id: "normal1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "inicial1", rarity: "common", category: "inicial", sortOrder: 2_000_000 },
+      { id: "mega1", rarity: "common", category: "mega", sortOrder: 3_000_000 },
+      { id: "gmax1", rarity: "common", category: "gmax", sortOrder: 4_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
     const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
@@ -113,8 +114,8 @@ describe("pickRandomCards", () => {
 
   it("folds an absent category's weight budget entirely into normal for that rarity", () => {
     const catalog: TestCard[] = [
-      { id: "normal1", rarity: "rare", category: "normal" },
-      { id: "inicial1", rarity: "rare", category: "inicial" },
+      { id: "normal1", rarity: "rare", category: "normal", sortOrder: 1_000_000 },
+      { id: "inicial1", rarity: "rare", category: "inicial", sortOrder: 2_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
     const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
@@ -128,8 +129,8 @@ describe("pickRandomCards", () => {
 
   it("applies shiny within a non-normal category too", () => {
     const catalog: TestCard[] = [
-      { id: "mega1", rarity: "epic", category: "mega" },
-      { id: "mega1-shiny", rarity: "epic", category: "mega" },
+      { id: "mega1", rarity: "epic", category: "mega", sortOrder: 1_000_000 },
+      { id: "mega1-shiny", rarity: "epic", category: "mega", sortOrder: 1_000_000 },
     ];
     const rolls = Array.from({ length: 10000 }, (_, i) => i / 10000);
     const picks = pickRandomCards(catalog, rolls.length, "apoyo", sequenceRandom(rolls));
@@ -143,5 +144,47 @@ describe("pickRandomCards", () => {
     expect(RARITY_WEIGHTS_BY_TIER.apoyo).toEqual({ common: 60, rare: 20, epic: 16, legendary: 4 });
     expect(SHINY_CHANCE_BY_TIER.gratis).toBe(0.005);
     expect(SHINY_CHANCE_BY_TIER.apoyo).toBe(0.01);
+  });
+
+  it("gives a multi-form species the same total pull chance as a single-form species", () => {
+    const catalog: TestCard[] = [
+      { id: "unown-a", rarity: "common", category: "normal", sortOrder: 201_000_000 },
+      { id: "unown-b", rarity: "common", category: "normal", sortOrder: 201_000_000 },
+      { id: "unown-c", rarity: "common", category: "normal", sortOrder: 201_000_000 },
+      { id: "unown-d", rarity: "common", category: "normal", sortOrder: 201_000_000 },
+      { id: "unown-e", rarity: "common", category: "normal", sortOrder: 201_000_000 },
+      { id: "wobbuffet", rarity: "common", category: "normal", sortOrder: 202_000_000 },
+    ];
+    const rolls = Array.from({ length: 20000 }, (_, i) => i / 20000);
+    const picks = pickRandomCards(catalog, rolls.length, "gratis", sequenceRandom(rolls));
+    const unownRatio = picks.filter((c) => c.id.startsWith("unown-")).length / picks.length;
+    const wobbuffetRatio = picks.filter((c) => c.id === "wobbuffet").length / picks.length;
+
+    expect(unownRatio).toBeGreaterThan(0.45);
+    expect(unownRatio).toBeLessThan(0.55);
+    expect(wobbuffetRatio).toBeGreaterThan(0.45);
+    expect(wobbuffetRatio).toBeLessThan(0.55);
+  });
+
+  it("never draws the same species twice within a single pack when enough species exist", () => {
+    const catalog: TestCard[] = [
+      { id: "a1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "b1", rarity: "common", category: "normal", sortOrder: 2_000_000 },
+      { id: "c1", rarity: "common", category: "normal", sortOrder: 3_000_000 },
+      { id: "d1", rarity: "common", category: "normal", sortOrder: 4_000_000 },
+      { id: "e1", rarity: "common", category: "normal", sortOrder: 5_000_000 },
+    ];
+    const picks = pickRandomCards(catalog, 5, "gratis", () => 0.999999);
+    const speciesSeen = picks.map((c) => Math.floor(c.sortOrder / 1_000_000));
+    expect(new Set(speciesSeen).size).toBe(5);
+  });
+
+  it("falls back to repeating a species if the pack needs more picks than distinct species exist", () => {
+    const catalog: TestCard[] = [
+      { id: "unown-a", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+      { id: "unown-b", rarity: "common", category: "normal", sortOrder: 1_000_000 },
+    ];
+    const picks = pickRandomCards(catalog, 5, "gratis", () => 0.5);
+    expect(picks).toHaveLength(5);
   });
 });
