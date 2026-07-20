@@ -22,6 +22,7 @@ export interface PendingPack {
 export interface CollectionResponse {
   cards: CardView[];
   pendingPacks: PendingPack[];
+  coins: number;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -51,7 +52,7 @@ export function logout(): Promise<{ ok: boolean }> {
   return request("/auth/logout", { method: "POST" });
 }
 
-export function getMe(): Promise<{ ok: boolean; username: string; avatarUrl: string | null }> {
+export function getMe(): Promise<{ ok: boolean; username: string; avatarUrl: string | null; coins: number }> {
   return request("/auth/me");
 }
 
@@ -65,6 +66,22 @@ export function openPack(packId: number, generation: number): Promise<{ cards: C
 
 export function broadcastPack(packId: number): Promise<{ ok: true }> {
   return request(`/collection/packs/${packId}/broadcast`, { method: "POST" });
+}
+
+export function discardCard(cardId: string): Promise<{ ok: true; coins: number }> {
+  return request("/collection/discard", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cardId }),
+  });
+}
+
+export function convertToShiny(cardId: string): Promise<{ ok: true; coins: number }> {
+  return request("/collection/convert-shiny", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cardId }),
+  });
 }
 
 export function getUserCollection(username: string): Promise<{ username: string; cards: CardView[] }> {
