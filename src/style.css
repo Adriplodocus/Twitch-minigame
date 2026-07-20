@@ -1136,6 +1136,22 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   padding: 0.3rem 0.8rem;
   display: inline-block;
 }
+.album-cover-shiny {
+  border-color: rgba(255, 215, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(120, 90, 60, 0.10), 0 0 20px rgba(255, 215, 0, 0.12);
+}
+.album-cover-shiny:hover {
+  box-shadow: 0 10px 26px rgba(120, 90, 60, 0.18), 0 0 24px rgba(255, 215, 0, 0.24);
+}
+.album-cover-shiny-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+}
 
 .book-header {
   display: flex;
@@ -1190,20 +1206,6 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   border-radius: 14px;
   background: var(--surface2);
   opacity: 0.4;
-}
-
-.book-page-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.book-page-divider-label {
-  font-family: 'Russo One', sans-serif;
-  font-size: 2.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-em);
-  text-shadow: 0 0 20px rgba(255, 86, 180, 0.5), 0 0 40px rgba(0, 204, 255, 0.2);
 }
 
 @media (max-width: 700px) {
