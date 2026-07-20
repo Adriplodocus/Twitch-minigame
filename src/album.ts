@@ -21,7 +21,10 @@ function renderGenTile(gen: GenerationInfo, genCards: CardView[], isShiny: boole
           <span class="album-cover-gen-number">${gen.id}</span>
         </p>
         <p class="album-cover-region">${gen.region}</p>
-        <span class="album-cover-count">${genOwned}/${genCards.length} · ${completionPercent(genOwned, genCards.length)}%</span>
+        <span class="album-cover-count">
+          <span class="album-cover-count-raw">${genOwned}/${genCards.length}</span>
+          <span class="album-cover-count-pct">${completionPercent(genOwned, genCards.length)}%</span>
+        </span>
       </span>
     </a>
   `;
