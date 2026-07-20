@@ -12,7 +12,7 @@ function renderGenTile(gen: GenerationInfo, genCards: CardView[], isShiny: boole
   const shinyBadge = isShiny ? `<img class="album-cover-shiny-badge" src="/shiny-icon.webp" alt="Shiny" />` : "";
   return `
     <a class="album-cover${isShiny ? " album-cover-shiny" : ""}" href="/album.html?gen=${gen.id}${shinyParam}">
-      <img class="album-cover-bg" src="/album-covers/${gen.id}.webp" alt="" />
+      <img class="album-cover-bg" src="/album-covers/${gen.id}${isShiny ? "-shiny" : ""}.webp" alt="" />
       <span class="album-cover-overlay"></span>
       ${shinyBadge}
       <span class="album-cover-content">
