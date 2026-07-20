@@ -1,5 +1,7 @@
 # Species-fair pack odds — design spec
 
+> **Amendment (2026-07-20, later same day):** Part 2 ("no-repeat-species-per-pack") was implemented and then reverted at the requester's call. It applied to every species uniformly, not just multi-form ones — a normal single-form species (e.g. Wobbuffet) also became unable to appear twice in the same pack, which was never the complaint and felt like an artificial restriction. The weight-fairness fix (Part 1) already puts a multi-form species' odds of appearing twice in one pack on par with any other species doing so — ordinary variance, not flooding — so Part 2 was judged unnecessary on top of it. Only Part 1 (species-fair weighting in `buildCardWeights`) remains in `worker/lib/packs.ts`; `pickRandomCards` and `pickExactCards` are back to independent draws with replacement, no species-exclusion set, no fallback rule.
+
 ## Goal
 
 Multi-form species (Unown: 28 forms in gen 2, Pikachu: ~17 cap/event forms scattered across generations) are each modeled as independent card rows in the catalog with no species/family concept anywhere in the schema. Today's weighted draw splits a rarity+category's weight budget evenly **per card row**, so a 28-form species silently gets ~28x the pack odds of a 1-form species in the same bucket, and packs can hand out several forms of the same species back to back. Fix both:

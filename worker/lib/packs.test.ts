@@ -166,25 +166,4 @@ describe("pickRandomCards", () => {
     expect(wobbuffetRatio).toBeLessThan(0.55);
   });
 
-  it("never draws the same species twice within a single pack when enough species exist", () => {
-    const catalog: TestCard[] = [
-      { id: "a1", rarity: "common", category: "normal", sortOrder: 1_000_000 },
-      { id: "b1", rarity: "common", category: "normal", sortOrder: 2_000_000 },
-      { id: "c1", rarity: "common", category: "normal", sortOrder: 3_000_000 },
-      { id: "d1", rarity: "common", category: "normal", sortOrder: 4_000_000 },
-      { id: "e1", rarity: "common", category: "normal", sortOrder: 5_000_000 },
-    ];
-    const picks = pickRandomCards(catalog, 5, "gratis", () => 0.999999);
-    const speciesSeen = picks.map((c) => Math.floor(c.sortOrder / 1_000_000));
-    expect(new Set(speciesSeen).size).toBe(5);
-  });
-
-  it("falls back to repeating a species if the pack needs more picks than distinct species exist", () => {
-    const catalog: TestCard[] = [
-      { id: "unown-a", rarity: "common", category: "normal", sortOrder: 1_000_000 },
-      { id: "unown-b", rarity: "common", category: "normal", sortOrder: 1_000_000 },
-    ];
-    const picks = pickRandomCards(catalog, 5, "gratis", () => 0.5);
-    expect(picks).toHaveLength(5);
-  });
 });

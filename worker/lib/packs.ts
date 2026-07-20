@@ -121,21 +121,12 @@ export interface ExactCounts {
 
 const NON_SHINY_RARITIES: Rarity[] = ["common", "rare", "epic", "legendary"];
 
-export function pickExactCards<T extends { id: string; rarity: Rarity; sortOrder: number }>(
+export function pickExactCards<T extends { id: string; rarity: Rarity }>(
   catalog: T[],
   counts: ExactCounts,
   random: () => number = Math.random
 ): T[] {
   const picks: T[] = [];
-  const seenSpecies = new Set<number>();
-
-  const pickFrom = (pool: T[]): T => {
-    let eligible = pool.filter((card) => !seenSpecies.has(speciesKey(card.sortOrder)));
-    if (eligible.length === 0) eligible = pool;
-    const chosen = eligible[Math.floor(random() * eligible.length)];
-    seenSpecies.add(speciesKey(chosen.sortOrder));
-    return chosen;
-  };
 
   for (const rarity of NON_SHINY_RARITIES) {
     const count = counts[rarity];
@@ -143,7 +134,7 @@ export function pickExactCards<T extends { id: string; rarity: Rarity; sortOrder
     const pool = catalog.filter((card) => card.rarity === rarity && !isShinyCard(card.id));
     if (pool.length === 0) throw new Error(`No hay cartas ${rarity} no-shiny en esta generación`);
     for (let i = 0; i < count; i++) {
-      picks.push(pickFrom(pool));
+      picks.push(pool[Math.floor(random() * pool.length)]);
     }
   }
 
@@ -151,7 +142,7 @@ export function pickExactCards<T extends { id: string; rarity: Rarity; sortOrder
     const shinyPool = catalog.filter((card) => isShinyCard(card.id));
     if (shinyPool.length === 0) throw new Error("No hay cartas shiny en esta generación");
     for (let i = 0; i < counts.shiny; i++) {
-      picks.push(pickFrom(shinyPool));
+      picks.push(shinyPool[Math.floor(random() * shinyPool.length)]);
     }
   }
 
@@ -171,17 +162,12 @@ export function pickRandomCards<T extends { id: string; rarity: Rarity; category
 ): T[] {
   if (catalog.length === 0) throw new Error("Catalog is empty");
   const weights = buildCardWeights(catalog, tier);
+  const totalWeight = catalog.reduce((sum, card) => sum + weights.get(card)!, 0);
   const picks: T[] = [];
-  const seenSpecies = new Set<number>();
-
   for (let i = 0; i < count; i++) {
-    let pool = catalog.filter((card) => !seenSpecies.has(speciesKey(card.sortOrder)));
-    if (pool.length === 0) pool = catalog;
-
-    const totalWeight = pool.reduce((sum, card) => sum + weights.get(card)!, 0);
     let roll = random() * totalWeight;
-    let chosen = pool[pool.length - 1];
-    for (const card of pool) {
+    let chosen = catalog[catalog.length - 1];
+    for (const card of catalog) {
       roll -= weights.get(card)!;
       if (roll <= 0) {
         chosen = card;
@@ -189,7 +175,6 @@ export function pickRandomCards<T extends { id: string; rarity: Rarity; category
       }
     }
     picks.push(chosen);
-    seenSpecies.add(speciesKey(chosen.sortOrder));
   }
   return picks;
 }
