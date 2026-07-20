@@ -2,7 +2,7 @@ const STORAGE_KEY = "soundMuted";
 
 // No per-user control for this yet — just a flat cut on every website sound
 // effect (pack reveal cries/shiny, album page flip). Tune by feel.
-export const SOUND_VOLUME = 0.6;
+export const SOUND_VOLUME = 0.4;
 
 export function isMuted(): boolean {
   return localStorage.getItem(STORAGE_KEY) === "1";
