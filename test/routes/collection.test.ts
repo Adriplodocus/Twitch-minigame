@@ -399,6 +399,66 @@ it("requires auth for discard", async () => {
   expect(res.status).toBe(401);
 });
 
+it("discards multiple copies at once and credits coins for all of them", async () => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 5).run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId: "c1", quantity: 3 }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ coins: number }>();
+  expect(json.coins).toBe(15); // 3 x common discard value (5)
+
+  const owned = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ quantity: number }>();
+  expect(owned?.quantity).toBe(2);
+});
+
+it("rejects a bulk discard that would leave 0 copies", async () => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 3).run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId: "c1", quantity: 3 }),
+    },
+    env
+  );
+  expect(res.status).toBe(409);
+
+  const owned = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ quantity: number }>();
+  expect(owned?.quantity).toBe(3);
+});
+
+it.each([0, -1, 1.5, "3", null])("rejects an invalid quantity (%j)", async (quantity) => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 5).run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId: "c1", quantity }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
 it("converts a normal card to shiny, consuming a duplicate and coins", async () => {
   await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
     .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")

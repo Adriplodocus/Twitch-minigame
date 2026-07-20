@@ -68,11 +68,11 @@ export function broadcastPack(packId: number): Promise<{ ok: true }> {
   return request(`/collection/packs/${packId}/broadcast`, { method: "POST" });
 }
 
-export function discardCard(cardId: string): Promise<{ ok: true; coins: number }> {
+export function discardCard(cardId: string, quantity: number): Promise<{ ok: true; coins: number }> {
   return request("/collection/discard", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ cardId }),
+    body: JSON.stringify({ cardId, quantity }),
   });
 }
 

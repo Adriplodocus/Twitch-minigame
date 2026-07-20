@@ -37,6 +37,12 @@ function parseCardId(body: unknown): string | null {
   return typeof cardId === "string" && cardId.length > 0 ? cardId : null;
 }
 
+function parseQuantity(body: unknown, fallback: number): number | null {
+  const quantity = (body as { quantity?: unknown } | null)?.quantity;
+  if (quantity === undefined) return fallback;
+  return typeof quantity === "number" && Number.isInteger(quantity) && quantity > 0 ? quantity : null;
+}
+
 collection.post("/discard", requireAuth, async (c) => {
   const user = c.get("user");
 
@@ -48,6 +54,8 @@ collection.post("/discard", requireAuth, async (c) => {
   }
   const cardId = parseCardId(body);
   if (!cardId) return c.json({ error: "Invalid cardId" }, 400);
+  const quantity = parseQuantity(body, 1);
+  if (quantity === null) return c.json({ error: "Invalid quantity" }, 400);
 
   const card = await c.env.DB.prepare("SELECT rarity FROM cards WHERE id = ?")
     .bind(cardId)
@@ -55,13 +63,13 @@ collection.post("/discard", requireAuth, async (c) => {
   if (!card) return c.json({ error: "Not found" }, 404);
 
   const decremented = await c.env.DB.prepare(
-    "UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ? AND quantity - reserved > 1 RETURNING quantity"
+    "UPDATE user_cards SET quantity = quantity - ? WHERE user_id = ? AND card_id = ? AND quantity - reserved > ? RETURNING quantity"
   )
-    .bind(user.twitchId, cardId)
+    .bind(quantity, user.twitchId, cardId, quantity)
     .first<{ quantity: number }>();
   if (!decremented) return c.json({ error: "Nothing to discard" }, 409);
 
-  const value = isShinyCard(cardId) ? DISCARD_VALUE_SHINY[card.rarity] : DISCARD_VALUE[card.rarity];
+  const value = (isShinyCard(cardId) ? DISCARD_VALUE_SHINY[card.rarity] : DISCARD_VALUE[card.rarity]) * quantity;
 
   const coinsRow = await c.env.DB.prepare("UPDATE users SET coins = coins + ? WHERE twitch_id = ? RETURNING coins")
     .bind(value, user.twitchId)

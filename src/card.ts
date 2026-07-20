@@ -150,17 +150,56 @@ function ensureInfoTooltipHandler(): void {
 
 let coinActionsHandlerAttached = false;
 
+function dispatchDiscard(el: HTMLElement): void {
+  const wrap = el.closest<HTMLElement>(".coin-discard-wrap")!;
+  const qtyInput = wrap.querySelector<HTMLInputElement>(".coin-discard-qty")!;
+  const quantity = Math.max(1, Math.floor(Number(qtyInput.value)) || 1);
+  const cardId = wrap.closest<HTMLElement>(".coin-actions")!.dataset.cardId!;
+  el.dispatchEvent(new CustomEvent("card-discard", { bubbles: true, detail: { cardId, quantity } }));
+}
+
 function ensureCoinActionsHandler(): void {
   if (typeof document === "undefined") return;
   if (coinActionsHandlerAttached) return;
   coinActionsHandlerAttached = true;
+
+  document.addEventListener("input", (e) => {
+    const qtyInput = (e.target as HTMLElement).closest<HTMLInputElement>(".coin-discard-qty");
+    if (!qtyInput) return;
+    const max = Number(qtyInput.max) || 1;
+    let quantity = Math.floor(Number(qtyInput.value));
+    if (!Number.isFinite(quantity) || quantity < 1) quantity = 1;
+    if (quantity > max) quantity = max;
+    qtyInput.value = String(quantity);
+    const unitValue = Number(qtyInput.dataset.unitValue);
+    const valueEl = qtyInput.closest(".coin-discard-wrap")?.querySelector(".coin-discard-value");
+    if (valueEl) valueEl.textContent = `(+${quantity * unitValue})`;
+  });
+
   document.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
 
     const discardBtn = target.closest<HTMLElement>(".coin-discard-btn");
     if (discardBtn) {
-      const cardId = discardBtn.closest<HTMLElement>(".coin-actions")!.dataset.cardId!;
-      discardBtn.dispatchEvent(new CustomEvent("card-discard", { bubbles: true, detail: { cardId } }));
+      const wrap = discardBtn.closest<HTMLElement>(".coin-discard-wrap")!;
+      const qty = Number(wrap.querySelector<HTMLInputElement>(".coin-discard-qty")!.value) || 1;
+      if (qty > 1) {
+        wrap.classList.add("confirming");
+        return;
+      }
+      dispatchDiscard(discardBtn);
+      return;
+    }
+
+    const discardYesBtn = target.closest<HTMLElement>(".coin-discard-yes");
+    if (discardYesBtn) {
+      dispatchDiscard(discardYesBtn);
+      return;
+    }
+
+    const discardNoBtn = target.closest<HTMLElement>(".coin-discard-no");
+    if (discardNoBtn) {
+      discardNoBtn.closest(".coin-discard-wrap")!.classList.remove("confirming");
       return;
     }
 
@@ -251,7 +290,8 @@ export function renderCardHtml(
   const coinActionsHtml = (() => {
     if (!coinActions || !isOwned) return "";
     const discardValue = isShiny ? DISCARD_VALUE_SHINY[card.rarity] : DISCARD_VALUE[card.rarity];
-    const showDiscard = card.quantity > 1;
+    const maxDiscard = card.quantity - 1;
+    const showDiscard = maxDiscard >= 1;
     const showConvert = !isShiny && coinActions.shinyCapableIds.has(card.id) && card.quantity >= 2;
     if (!showDiscard && !showConvert) return "";
 
@@ -262,15 +302,23 @@ export function renderCardHtml(
       <div class="coin-actions" data-card-id="${card.id}">
         ${
           showDiscard
-            ? `<button type="button" class="btn coin-discard-btn" aria-label="Descartar (+${discardValue} monedas)" title="Descartar (+${discardValue} monedas)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  <line x1="10" y1="11" x2="10" y2="17" />
-                  <line x1="14" y1="11" x2="14" y2="17" />
-                </svg>
-                (+${discardValue})
-              </button>`
+            ? `<div class="coin-discard-wrap">
+                <input type="number" class="coin-discard-qty" min="1" max="${maxDiscard}" value="1" data-unit-value="${discardValue}" aria-label="Cantidad a descartar" />
+                <button type="button" class="btn coin-discard-btn" aria-label="Descartar" title="Descartar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
+                  </svg>
+                  <span class="coin-discard-value">(+${discardValue})</span>
+                </button>
+                <div class="coin-discard-confirm">
+                  <span>¿Seguro?</span>
+                  <button type="button" class="btn coin-discard-yes">Sí</button>
+                  <button type="button" class="btn coin-discard-no">No</button>
+                </div>
+              </div>`
             : ""
         }
         ${

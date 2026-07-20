@@ -179,21 +179,29 @@ function clearCoinActionError(): void {
   document.getElementById("coin-action-error")!.hidden = true;
 }
 
+const pendingCardActions = new Set<string>();
+
 document.getElementById("owned-grid")!.addEventListener("card-discard", async (e) => {
-  const { cardId } = (e as CustomEvent<{ cardId: string }>).detail;
+  const { cardId, quantity } = (e as CustomEvent<{ cardId: string; quantity: number }>).detail;
+  if (pendingCardActions.has(cardId)) return;
+  pendingCardActions.add(cardId);
   clearCoinActionError();
   try {
-    const result = await discardCard(cardId);
+    const result = await discardCard(cardId, quantity);
     coins = result.coins;
     document.dispatchEvent(new CustomEvent("coins-updated", { detail: { coins } }));
     await load();
   } catch (err) {
     showCoinActionError(err instanceof Error ? err.message : "Error al descartar la carta");
+  } finally {
+    pendingCardActions.delete(cardId);
   }
 });
 
 document.getElementById("owned-grid")!.addEventListener("card-convert-shiny", async (e) => {
   const { cardId } = (e as CustomEvent<{ cardId: string }>).detail;
+  if (pendingCardActions.has(cardId)) return;
+  pendingCardActions.add(cardId);
   clearCoinActionError();
   try {
     const result = await convertToShiny(cardId);
@@ -202,6 +210,8 @@ document.getElementById("owned-grid")!.addEventListener("card-convert-shiny", as
     await load();
   } catch (err) {
     showCoinActionError(err instanceof Error ? err.message : "Error al convertir la carta");
+  } finally {
+    pendingCardActions.delete(cardId);
   }
 });
 

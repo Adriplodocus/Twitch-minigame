@@ -473,7 +473,8 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   height: 12px;
   flex-shrink: 0;
 }
-.coin-convert-confirm {
+.coin-convert-confirm,
+.coin-discard-confirm {
   display: none;
   align-items: center;
   gap: 0.35rem;
@@ -485,6 +486,27 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   opacity: 0.4;
   cursor: not-allowed;
 }
+.coin-discard-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.coin-discard-wrap .coin-discard-btn { flex: 1; }
+.coin-discard-qty {
+  width: 2.2rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.25rem 0.3rem;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  text-align: center;
+}
+.coin-discard-qty:focus { border-color: rgba(0, 204, 255, 0.5); outline: none; }
+.coin-discard-wrap.confirming .coin-discard-qty,
+.coin-discard-wrap.confirming .coin-discard-btn { display: none; }
+.coin-discard-wrap.confirming .coin-discard-confirm { display: flex; }
 .coin-action-error {
   margin-top: 0.75rem;
   color: #e5173a;

@@ -97,6 +97,14 @@ it("hides the discard button when quantity is 1", () => {
   expect(html).not.toContain("coin-discard-btn");
 });
 
+it("caps the discard quantity input at copies minus one, carrying the per-unit value", () => {
+  const html = renderCardHtml(card({ id: "p1", rarity: "rare", quantity: 6 }), "", undefined, undefined, true, undefined, {
+    coins: 0,
+    shinyCapableIds: new Set(),
+  });
+  expect(html).toContain('class="coin-discard-qty" min="1" max="5" value="1" data-unit-value="15"');
+});
+
 it("uses the shiny discard value for a shiny card id", () => {
   const html = renderCardHtml(card({ id: "p1-shiny", name: "Bulbasaur Shiny", rarity: "rare", quantity: 3 }), "", undefined, undefined, true, undefined, {
     coins: 0,
