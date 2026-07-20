@@ -37,12 +37,13 @@ export function initUserHeader(): void {
       if (me.avatarUrl) avatar.src = me.avatarUrl;
     }
     const coinsEl = document.getElementById("user-coins");
-    if (coinsEl) coinsEl.textContent = `${me.coins} 🪙`;
+    if (coinsEl) coinsEl.innerHTML = `${me.coins} <img src="/coin-icon.webp" alt="monedas" class="coin-icon" />`;
   });
 
   document.addEventListener("coins-updated", (e) => {
     const coinsEl = document.getElementById("user-coins");
-    if (coinsEl) coinsEl.textContent = `${(e as CustomEvent<{ coins: number }>).detail.coins} 🪙`;
+    if (coinsEl)
+      coinsEl.innerHTML = `${(e as CustomEvent<{ coins: number }>).detail.coins} <img src="/coin-icon.webp" alt="monedas" class="coin-icon" />`;
   });
 
   const howToBtn = document.getElementById("how-to-btn");

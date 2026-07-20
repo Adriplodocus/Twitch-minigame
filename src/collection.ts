@@ -47,7 +47,7 @@ function openAlbumPickerModal(coins: number): Promise<{ generation: number; boos
         </div>
         <label class="modal-boost-toggle${disabled ? " disabled" : ""}">
           <input type="checkbox" id="modal-boost-checkbox" ${disabled ? "disabled" : ""} />
-          Boostear odds (${PACK_BOOST_COST} 🪙)
+          Boostear odds (${PACK_BOOST_COST} <img src="/coin-icon.webp" alt="monedas" class="coin-icon" />)
         </label>
         <button type="button" class="btn modal-cancel-btn">Cancelar</button>
       </div>

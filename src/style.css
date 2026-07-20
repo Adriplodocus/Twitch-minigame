@@ -960,11 +960,20 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   white-space: nowrap;
 }
 .user-coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 600;
   color: var(--gold);
   font-size: 0.8rem;
   white-space: nowrap;
+}
+.coin-icon {
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+  vertical-align: middle;
 }
 .icon-btn {
   display: inline-flex;
