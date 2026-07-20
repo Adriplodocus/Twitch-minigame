@@ -22,6 +22,15 @@ export function isShinyCard(id: string): boolean {
   return id.includes("-shiny");
 }
 
+// Female-variant ids append "-female" after the species (e.g. "p12-female"), but their shiny
+// counterpart inserts "-shiny" before that suffix ("p12-shiny-female"), not after the whole id
+// ("p12-female-shiny" doesn't exist in the catalog) — this mirrors how the catalog's CSV names
+// variants, not an arbitrary choice.
+export function shinyIdFor(id: string): string {
+  if (id.endsWith("-female")) return `${id.slice(0, -"-female".length)}-shiny-female`;
+  return `${id}-shiny`;
+}
+
 export function speciesKey(sortOrder: number): number {
   return Math.floor(sortOrder / 1_000_000);
 }

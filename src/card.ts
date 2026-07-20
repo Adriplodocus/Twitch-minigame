@@ -75,11 +75,18 @@ export function collectFemaleVariantBaseNames(cards: CardView[]): Set<string> {
   return names;
 }
 
+// Mirrors worker/lib/packs.ts's shinyIdFor: female-variant ids append "-female" after the
+// species, but their shiny counterpart inserts "-shiny" before that suffix, not after the whole id.
+function shinyIdFor(id: string): string {
+  if (id.endsWith("-female")) return `${id.slice(0, -"-female".length)}-shiny-female`;
+  return `${id}-shiny`;
+}
+
 export function collectShinyCapableIds(cards: CardView[]): Set<string> {
   const shinyIds = new Set(cards.filter((c) => c.id.includes("-shiny")).map((c) => c.id));
   const capable = new Set<string>();
   for (const c of cards) {
-    if (!c.id.includes("-shiny") && shinyIds.has(`${c.id}-shiny`)) capable.add(c.id);
+    if (!c.id.includes("-shiny") && shinyIds.has(shinyIdFor(c.id))) capable.add(c.id);
   }
   return capable;
 }

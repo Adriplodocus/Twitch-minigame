@@ -487,6 +487,36 @@ it("converts a normal card to shiny, consuming a duplicate and coins", async () 
   expect(shiny?.quantity).toBe(1);
 });
 
+it("converts a -female card using the -shiny-female id, not -female-shiny", async () => {
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-female", "Common Card (Hembra)", "common", "/cards/c1-female.png")
+    .run();
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-shiny-female", "Common Card Shiny (Hembra)", "common", "/cards/c1-shiny-female.png")
+    .run();
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)")
+    .bind("1", "c1-female", 2)
+    .run();
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(200, "1").run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/convert-shiny",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId: "c1-female" }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+
+  const shiny = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1-shiny-female")
+    .first<{ quantity: number }>();
+  expect(shiny?.quantity).toBe(1);
+});
+
 it("adds onto an existing shiny quantity instead of overwriting it", async () => {
   await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
     .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")

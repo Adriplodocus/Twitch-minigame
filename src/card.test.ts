@@ -75,6 +75,12 @@ it("collectShinyCapableIds returns ids of normal cards that have a -shiny counte
   expect(capable.has("p1-shiny")).toBe(false);
 });
 
+it("collectShinyCapableIds matches -female cards against -shiny-female, not -female-shiny", () => {
+  const cards = [card({ id: "p12-female" }), card({ id: "p12-shiny-female" })];
+  const capable = collectShinyCapableIds(cards);
+  expect(capable.has("p12-female")).toBe(true);
+});
+
 it("shows no coin action buttons when coinActions is not passed", () => {
   const html = renderCardHtml(card({ quantity: 3 }));
   expect(html).not.toContain("coin-actions");

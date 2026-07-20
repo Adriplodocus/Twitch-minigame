@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Category, Env, Rarity } from "../types";
 import { requireAuth } from "../middleware/auth";
-import { pickRandomCards, isShinyCard } from "../lib/packs";
+import { pickRandomCards, isShinyCard, shinyIdFor } from "../lib/packs";
 import { DISCARD_VALUE, DISCARD_VALUE_SHINY, SHINY_CONVERSION_COST } from "../lib/coins";
 
 const collection = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
@@ -91,7 +91,7 @@ collection.post("/convert-shiny", requireAuth, async (c) => {
   if (!cardId) return c.json({ error: "Invalid cardId" }, 400);
   if (isShinyCard(cardId)) return c.json({ error: "Already shiny" }, 400);
 
-  const shinyId = `${cardId}-shiny`;
+  const shinyId = shinyIdFor(cardId);
   const [card, shinyCard] = await Promise.all([
     c.env.DB.prepare("SELECT rarity FROM cards WHERE id = ?").bind(cardId).first<{ rarity: Rarity }>(),
     c.env.DB.prepare("SELECT id FROM cards WHERE id = ?").bind(shinyId).first<{ id: string }>(),

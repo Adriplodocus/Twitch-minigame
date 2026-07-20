@@ -1,5 +1,15 @@
 import { it, expect } from "vitest";
-import { pickRandomCards, pickExactCards, RARITY_WEIGHTS_BY_TIER } from "../../worker/lib/packs";
+import { pickRandomCards, pickExactCards, RARITY_WEIGHTS_BY_TIER, shinyIdFor } from "../../worker/lib/packs";
+
+it("shinyIdFor appends -shiny for regular cards", () => {
+  expect(shinyIdFor("p1")).toBe("p1-shiny");
+  expect(shinyIdFor("p10198")).toBe("p10198-shiny");
+});
+
+it("shinyIdFor inserts -shiny before -female instead of appending after it", () => {
+  expect(shinyIdFor("p12-female")).toBe("p12-shiny-female");
+  expect(shinyIdFor("p10235-female")).toBe("p10235-shiny-female");
+});
 
 const catalog = [
   { id: "c1", rarity: "common" as const, category: "normal" as const, sortOrder: 1_000_000 },
