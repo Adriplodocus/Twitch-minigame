@@ -141,6 +141,7 @@ function ensureInfoTooltipHandler(): void {
     const target = e.target as HTMLElement;
     const btn = target.closest<HTMLElement>(".info-btn");
     document.querySelectorAll<HTMLElement>(".info-tooltip.open").forEach((el) => {
+      if (el.contains(target)) return; // click landed inside this open tooltip (e.g. a coin action button) — leave it open
       if (el.closest(".card")?.querySelector(".info-btn") !== btn) el.classList.remove("open");
     });
     if (btn) btn.closest(".card")?.querySelector(".info-tooltip")?.classList.toggle("open");
