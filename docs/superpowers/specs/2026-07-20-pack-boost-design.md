@@ -32,6 +32,8 @@ Resultado (referencia, no vive como tabla — se deriva sumando el delta):
 
 `buildCardWeights` y `pickRandomCards` ganan un parámetro `boost: boolean`. Cuando es `true`, usan `RARITY_WEIGHTS_BY_TIER[tier][rarity] + RARITY_BOOST_DELTA[rarity]` y `SHINY_CHANCE_BY_TIER[tier] + SHINY_BOOST_DELTA` en vez de las tablas base. Resto del algoritmo (split por categoría inicial/mega/gmax, split shiny/no-shiny por especie) no cambia.
 
+`pickRandomCards` ya tiene `random: () => number = Math.random` como 4º parámetro posicional, usado por los tests existentes (`sequenceRandom`, etc.) para determinismo. `boost` se inserta ANTES de `random`, no después: `pickRandomCards(catalog, count, tier, boost, random = Math.random)`. Los ~12 call sites en `packs.test.ts` que hoy pasan `random` como 4º argumento pasan a pasarlo como 5º (con `boost` explícito, típicamente `false`, como 4º). El call site real queda `pickRandomCards(catalog.results, 10, pack.tier, boost === true)`.
+
 ### Coste
 
 150 coins fijo, sin importar el tier del sobre. Constante nueva en `worker/lib/coins.ts`:
