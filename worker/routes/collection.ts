@@ -146,17 +146,6 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   }
   const boost = (body as { boost?: unknown } | null)?.boost === true;
 
-  let coinsBalance: number | undefined = undefined;
-  if (boost) {
-    const coinsRow = await c.env.DB.prepare(
-      "UPDATE users SET coins = coins - ? WHERE twitch_id = ? AND coins >= ? RETURNING coins"
-    )
-      .bind(PACK_BOOST_COST, user.twitchId, PACK_BOOST_COST)
-      .first<{ coins: number }>();
-    if (!coinsRow) return c.json({ error: "Not enough coins" }, 400);
-    coinsBalance = coinsRow.coins;
-  }
-
   const catalog = await c.env.DB.prepare(
     "SELECT id, rarity, category, sort_order AS sortOrder FROM cards WHERE generation = ?"
   )
@@ -169,6 +158,32 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
     }>();
   if (!catalog.results || catalog.results.length === 0) {
     return c.json({ error: "Catalog is empty" }, 500);
+  }
+
+  let coinsBalance: number | undefined = undefined;
+  if (boost) {
+    const coinsRow = await c.env.DB.prepare(
+      "UPDATE users SET coins = coins - ? WHERE twitch_id = ? AND coins >= ? RETURNING coins"
+    )
+      .bind(PACK_BOOST_COST, user.twitchId, PACK_BOOST_COST)
+      .first<{ coins: number }>();
+    if (!coinsRow) return c.json({ error: "Not enough coins" }, 400);
+    coinsBalance = coinsRow.coins;
+  }
+
+  // Atomically claim the pack for this request. If a concurrent request already
+  // opened it, no row comes back here — bail out without inserting cards, and
+  // refund any boost debit we just took so it isn't lost to the losing request.
+  const claimed = await c.env.DB.prepare("UPDATE packs SET opened_at = CURRENT_TIMESTAMP WHERE id = ? AND opened_at IS NULL RETURNING id")
+    .bind(packId)
+    .first<{ id: number }>();
+  if (!claimed) {
+    if (boost) {
+      await c.env.DB.prepare("UPDATE users SET coins = coins + ? WHERE twitch_id = ?")
+        .bind(PACK_BOOST_COST, user.twitchId)
+        .run();
+    }
+    return c.json({ error: "Pack already opened" }, 409);
   }
 
   const picked = pickRandomCards(catalog.results, 10, pack.tier, boost);
@@ -184,7 +199,6 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
       ).bind(user.twitchId, card.id)
     );
   }
-  statements.push(c.env.DB.prepare("UPDATE packs SET opened_at = CURRENT_TIMESTAMP WHERE id = ?").bind(packId));
   await c.env.DB.batch(statements);
 
   const uniqueIds = [...new Set(picked.map((card) => card.id))];

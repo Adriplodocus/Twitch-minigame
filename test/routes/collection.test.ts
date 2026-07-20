@@ -319,6 +319,65 @@ it("rejects opening an already-opened pack", async () => {
   expect(res.status).toBe(409);
 });
 
+it("resolves a double-open race with exactly one success, one 409, and one set of cards", async () => {
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const requestBody = {
+    method: "POST",
+    headers: { Cookie: cookie, "Content-Type": "application/json" },
+    body: JSON.stringify({ generation: 1 }),
+  } as const;
+
+  const [res1, res2] = await Promise.all([
+    app.request(`/api/collection/packs/${packResult!.id}/open`, requestBody, env),
+    app.request(`/api/collection/packs/${packResult!.id}/open`, requestBody, env),
+  ]);
+
+  const statuses = [res1.status, res2.status].sort();
+  expect(statuses).toEqual([200, 409]);
+
+  const packCards = await env.DB.prepare("SELECT COUNT(*) AS count FROM pack_cards WHERE pack_id = ?")
+    .bind(packResult!.id)
+    .first<{ count: number }>();
+  expect(packCards?.count).toBe(10);
+});
+
+it("resolves a boosted double-open race with exactly one 150-coin debit", async () => {
+  // Enough coins to cover two boost debits, so the race is decided by the pack claim
+  // (not by one request failing on insufficient funds) — the loser must be refunded.
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(500, "1").run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const requestBody = {
+    method: "POST",
+    headers: { Cookie: cookie, "Content-Type": "application/json" },
+    body: JSON.stringify({ generation: 1, boost: true }),
+  } as const;
+
+  const [res1, res2] = await Promise.all([
+    app.request(`/api/collection/packs/${packResult!.id}/open`, requestBody, env),
+    app.request(`/api/collection/packs/${packResult!.id}/open`, requestBody, env),
+  ]);
+
+  const statuses = [res1.status, res2.status].sort();
+  expect(statuses).toEqual([200, 409]);
+
+  const packCards = await env.DB.prepare("SELECT COUNT(*) AS count FROM pack_cards WHERE pack_id = ?")
+    .bind(packResult!.id)
+    .first<{ count: number }>();
+  expect(packCards?.count).toBe(10);
+
+  // 500 - 150 (single net boost debit, the losing request's debit must have been refunded)
+  const user = await env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?").bind("1").first<{ coins: number }>();
+  expect(user?.coins).toBe(350);
+});
+
 it("opens a pack using its stored tier without erroring", async () => {
   const packResult = await env.DB.prepare("INSERT INTO packs (user_id, tier) VALUES (?, 'apoyo') RETURNING id")
     .bind("1")

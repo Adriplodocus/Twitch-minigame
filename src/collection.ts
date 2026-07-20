@@ -92,6 +92,7 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
 
     const wrapper = document.createElement("div");
     wrapper.className = shouldShowFoil(pack.tier) ? "pack-wrapper apoyo" : "pack-wrapper";
+    wrapper.dataset.packId = String(pack.id);
     wrapper.style.animationDelay = idleDelay;
     const hoverScale = document.createElement("div");
     hoverScale.className = "pack-hover-scale";
@@ -171,6 +172,12 @@ async function load(): Promise<void> {
       await revealPack(packId, result.cards);
       await load();
     } catch (err) {
+      if (boost) {
+        document.querySelector(`#pending-packs [data-pack-id="${packId}"] .pack-boost-corner`)?.remove();
+      }
+      const data = await getCollection();
+      coins = data.coins;
+      document.dispatchEvent(new CustomEvent("coins-updated", { detail: { coins } }));
       showCoinActionError(err instanceof Error ? err.message : "Error al abrir el sobre");
     }
   });
