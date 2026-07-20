@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { Category, Env, Rarity } from "../types";
 import { requireAuth } from "../middleware/auth";
 import { pickRandomCards, isShinyCard } from "../lib/packs";
-import { DISCARD_VALUE, DISCARD_VALUE_SHINY } from "../lib/coins";
+import { DISCARD_VALUE, DISCARD_VALUE_SHINY, SHINY_CONVERSION_COST } from "../lib/coins";
 
 const collection = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
 
@@ -75,6 +75,57 @@ collection.post("/discard", requireAuth, async (c) => {
   const coins = results[results.length - 1].results[0].coins;
 
   return c.json({ ok: true, coins });
+});
+
+collection.post("/convert-shiny", requireAuth, async (c) => {
+  const user = c.get("user");
+
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+  const cardId = parseCardId(body);
+  if (!cardId) return c.json({ error: "Invalid cardId" }, 400);
+  if (isShinyCard(cardId)) return c.json({ error: "Already shiny" }, 400);
+
+  const shinyId = `${cardId}-shiny`;
+  const [card, shinyCard, owned, userRow] = await Promise.all([
+    c.env.DB.prepare("SELECT rarity FROM cards WHERE id = ?").bind(cardId).first<{ rarity: Rarity }>(),
+    c.env.DB.prepare("SELECT id FROM cards WHERE id = ?").bind(shinyId).first<{ id: string }>(),
+    c.env.DB.prepare("SELECT quantity, reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
+      .bind(user.twitchId, cardId)
+      .first<{ quantity: number; reserved: number }>(),
+    c.env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?").bind(user.twitchId).first<{ coins: number }>(),
+  ]);
+  if (!card) return c.json({ error: "Not found" }, 404);
+  if (!shinyCard) return c.json({ error: "No shiny version available" }, 404);
+
+  const available = (owned?.quantity ?? 0) - (owned?.reserved ?? 0);
+  if (available < 2) return c.json({ error: "Not enough copies" }, 409);
+
+  const cost = SHINY_CONVERSION_COST[card.rarity];
+  const coins = userRow?.coins ?? 0;
+  if (coins < cost) return c.json({ error: "Not enough coins" }, 400);
+
+  const results = await c.env.DB.batch<{ coins: number }>([
+    c.env.DB.prepare("UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ?").bind(
+      user.twitchId,
+      cardId
+    ),
+    c.env.DB.prepare(
+      `INSERT INTO user_cards (user_id, card_id, quantity, updated_at) VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+       ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + 1, updated_at = CURRENT_TIMESTAMP`
+    ).bind(user.twitchId, shinyId),
+    c.env.DB.prepare("UPDATE users SET coins = coins - ? WHERE twitch_id = ? RETURNING coins").bind(
+      cost,
+      user.twitchId
+    ),
+  ]);
+  const newCoins = results[results.length - 1].results[0].coins;
+
+  return c.json({ ok: true, coins: newCoins });
 });
 
 collection.post("/packs/:id/open", requireAuth, async (c) => {

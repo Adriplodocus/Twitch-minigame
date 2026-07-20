@@ -398,3 +398,128 @@ it("requires auth for discard", async () => {
   const res = await app.request("/api/collection/discard", { method: "POST" }, env);
   expect(res.status).toBe(401);
 });
+
+it("converts a normal card to shiny, consuming a duplicate and coins", async () => {
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")
+    .run();
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 2).run();
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(200, "1").run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/convert-shiny",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ coins: number }>();
+  expect(json.coins).toBe(50); // 200 - 150 (common conversion cost)
+
+  const normal = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ quantity: number }>();
+  expect(normal?.quantity).toBe(1);
+
+  const shiny = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1-shiny")
+    .first<{ quantity: number }>();
+  expect(shiny?.quantity).toBe(1);
+});
+
+it("adds onto an existing shiny quantity instead of overwriting it", async () => {
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")
+    .run();
+  await env.DB.batch([
+    env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 2),
+    env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1-shiny", 1),
+    env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(200, "1"),
+  ]);
+
+  const cookie = await sessionCookie("1", "viewer1");
+  await app.request(
+    "/api/collection/convert-shiny",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+
+  const shiny = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1-shiny")
+    .first<{ quantity: number }>();
+  expect(shiny?.quantity).toBe(2);
+});
+
+it("rejects converting with only 1 available copy", async () => {
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")
+    .run();
+  await env.DB.batch([
+    env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 1),
+    env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(200, "1"),
+  ]);
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/convert-shiny",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+
+it("rejects converting without enough coins", async () => {
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")
+    .run();
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 2).run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/convert-shiny",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(400);
+
+  const normal = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ quantity: number }>();
+  expect(normal?.quantity).toBe(2); // untouched
+});
+
+it("rejects converting a card with no shiny counterpart in the catalog", async () => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 2).run();
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(9999, "1").run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/convert-shiny",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(404);
+});
+
+it("rejects converting a card that is already shiny", async () => {
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")
+    .run();
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)")
+    .bind("1", "c1-shiny", 2)
+    .run();
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(9999, "1").run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/convert-shiny",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1-shiny" }) },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("requires auth for convert-shiny", async () => {
+  const res = await app.request("/api/collection/convert-shiny", { method: "POST" }, env);
+  expect(res.status).toBe(401);
+});
