@@ -61,16 +61,23 @@ function shakeAlert(alertEl: HTMLElement): void {
   setTimeout(() => alertEl.classList.remove("shake"), SHAKE_DURATION_MS);
 }
 
-function playCardSequence(
+/** Resolves once the sound finishes playing (or immediately if blocked). */
+function playAudio(src: string): Promise<void> {
+  const audio = new Audio(src);
+  return new Promise((resolve) => {
+    audio.addEventListener("ended", () => resolve(), { once: true });
+    audio.addEventListener("error", () => resolve(), { once: true });
+    audio.play().catch(() => resolve());
+  });
+}
+
+async function playCardSequence(
   alertEl: HTMLElement,
   container: HTMLElement,
   cards: OverlayEventCard[],
   onDone: () => void,
-): void {
-  let i = 0;
-
-  function showCard(): void {
-    const card = cards[i];
+): Promise<void> {
+  for (const card of cards) {
     const kind = hypeKind(card);
     const prev = container.querySelector<HTMLElement>(".card-slot.current");
 
@@ -89,26 +96,25 @@ function playCardSequence(
       prev.addEventListener("transitionend", () => prev.remove(), { once: true });
     }
 
+    let soundChain = Promise.resolve();
     if (kind === "legendary") {
-      new Audio(`/cries/${card.dexNumber}.ogg`).play().catch(() => {});
+      soundChain = soundChain.then(() => playAudio(`/cries/${card.dexNumber}.ogg`));
       if (splitCardName(card.name).isShiny) {
-        new Audio("/shiny-sound.mp3").play().catch(() => {});
+        soundChain = soundChain.then(() => playAudio("/shiny-sound.mp3"));
       }
-    }
-    if (kind === "shiny") {
-      new Audio("/shiny-sound.mp3").play().catch(() => {});
+    } else if (kind === "shiny") {
+      soundChain = soundChain.then(() => playAudio("/shiny-sound.mp3"));
     }
     if (kind) {
       spawnConfetti(slot);
       shakeAlert(alertEl);
     }
 
-    i++;
-    const hold = CARD_TRANSITION_MS + CARD_HOLD_MS + (kind ? HYPE_HOLD_BONUS_MS : 0);
-    setTimeout(i < cards.length ? showCard : onDone, hold);
+    const minHold = CARD_TRANSITION_MS + CARD_HOLD_MS + (kind ? HYPE_HOLD_BONUS_MS : 0);
+    await Promise.all([new Promise((resolve) => setTimeout(resolve, minHold)), soundChain]);
   }
 
-  showCard();
+  onDone();
 }
 
 function showNextAlert(): void {
