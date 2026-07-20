@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import type { Category, Env, Rarity } from "../types";
 import { requireAuth } from "../middleware/auth";
-import { pickRandomCards } from "../lib/packs";
+import { pickRandomCards, isShinyCard } from "../lib/packs";
+import { DISCARD_VALUE, DISCARD_VALUE_SHINY } from "../lib/coins";
 
 const collection = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
 
@@ -29,6 +30,51 @@ collection.get("/", requireAuth, async (c) => {
     .first<{ coins: number }>();
 
   return c.json({ cards: cards.results, pendingPacks: pendingPacks.results, coins: userRow?.coins ?? 0 });
+});
+
+function parseCardId(body: unknown): string | null {
+  const cardId = (body as { cardId?: unknown } | null)?.cardId;
+  return typeof cardId === "string" && cardId.length > 0 ? cardId : null;
+}
+
+collection.post("/discard", requireAuth, async (c) => {
+  const user = c.get("user");
+
+  let body: unknown;
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+  const cardId = parseCardId(body);
+  if (!cardId) return c.json({ error: "Invalid cardId" }, 400);
+
+  const card = await c.env.DB.prepare("SELECT rarity FROM cards WHERE id = ?")
+    .bind(cardId)
+    .first<{ rarity: Rarity }>();
+  if (!card) return c.json({ error: "Not found" }, 404);
+
+  const owned = await c.env.DB.prepare("SELECT quantity, reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind(user.twitchId, cardId)
+    .first<{ quantity: number; reserved: number }>();
+  const available = (owned?.quantity ?? 0) - (owned?.reserved ?? 0);
+  if (available <= 1) return c.json({ error: "Nothing to discard" }, 409);
+
+  const value = isShinyCard(cardId) ? DISCARD_VALUE_SHINY[card.rarity] : DISCARD_VALUE[card.rarity];
+
+  const results = await c.env.DB.batch<{ coins: number }>([
+    c.env.DB.prepare("UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ?").bind(
+      user.twitchId,
+      cardId
+    ),
+    c.env.DB.prepare("UPDATE users SET coins = coins + ? WHERE twitch_id = ? RETURNING coins").bind(
+      value,
+      user.twitchId
+    ),
+  ]);
+  const coins = results[results.length - 1].results[0].coins;
+
+  return c.json({ ok: true, coins });
 });
 
 collection.post("/packs/:id/open", requireAuth, async (c) => {

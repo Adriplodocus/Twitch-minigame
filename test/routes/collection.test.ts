@@ -295,3 +295,106 @@ it("rejects broadcasting a pack that belongs to another user", async () => {
   );
   expect(res.status).toBe(404);
 });
+
+it("discards a duplicate card and credits coins by rarity", async () => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 3).run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ ok: true; coins: number }>();
+  expect(json.coins).toBe(5); // common discard value
+
+  const owned = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ quantity: number }>();
+  expect(owned?.quantity).toBe(2);
+});
+
+it("credits the higher shiny discard value for a shiny card id", async () => {
+  await env.DB.prepare("INSERT INTO cards (id, name, rarity, image_path) VALUES (?, ?, ?, ?)")
+    .bind("c1-shiny", "Common Card Shiny", "common", "/cards/c1-shiny.png")
+    .run();
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)")
+    .bind("1", "c1-shiny", 2)
+    .run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1-shiny" }) },
+    env
+  );
+  const json = await res.json<{ coins: number }>();
+  expect(json.coins).toBe(40); // common shiny discard value
+});
+
+it("rejects discarding the only copy of a card", async () => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 1).run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(409);
+
+  const owned = await env.DB.prepare("SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?")
+    .bind("1", "c1")
+    .first<{ quantity: number }>();
+  expect(owned?.quantity).toBe(1);
+});
+
+it("rejects discarding a reserved copy that would drop available quantity to 0", async () => {
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity, reserved) VALUES (?, ?, ?, ?)")
+    .bind("1", "c1", 2, 1)
+    .run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+
+it("rejects discarding a card the user doesn't own", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "c1" }) },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+
+it("rejects discarding an unknown cardId", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify({ cardId: "nope" }) },
+    env
+  );
+  expect(res.status).toBe(404);
+});
+
+it("rejects a discard request with a null body", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/collection/discard",
+    { method: "POST", headers: { Cookie: cookie, "Content-Type": "application/json" }, body: JSON.stringify(null) },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("requires auth for discard", async () => {
+  const res = await app.request("/api/collection/discard", { method: "POST" }, env);
+  expect(res.status).toBe(401);
+});
