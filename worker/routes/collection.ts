@@ -24,7 +24,11 @@ collection.get("/", requireAuth, async (c) => {
     .bind(user.twitchId)
     .all();
 
-  return c.json({ cards: cards.results, pendingPacks: pendingPacks.results });
+  const userRow = await c.env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?")
+    .bind(user.twitchId)
+    .first<{ coins: number }>();
+
+  return c.json({ cards: cards.results, pendingPacks: pendingPacks.results, coins: userRow?.coins ?? 0 });
 });
 
 collection.post("/packs/:id/open", requireAuth, async (c) => {

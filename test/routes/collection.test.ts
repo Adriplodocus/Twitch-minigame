@@ -87,6 +87,22 @@ it("includes the tier of each pending pack", async () => {
   expect(tiers).toEqual(["apoyo", "gratis"]);
 });
 
+it("includes the user's coin balance", async () => {
+  await env.DB.prepare("UPDATE users SET coins = ? WHERE twitch_id = ?").bind(250, "1").run();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/collection", { headers: { Cookie: cookie } }, env);
+  const json = await res.json<{ coins: number }>();
+  expect(json.coins).toBe(250);
+});
+
+it("defaults coin balance to 0 for a brand new user", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request("/api/collection", { headers: { Cookie: cookie } }, env);
+  const json = await res.json<{ coins: number }>();
+  expect(json.coins).toBe(0);
+});
+
 it("opens a pending pack and grants 10 cards", async () => {
   const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
     .bind("1")

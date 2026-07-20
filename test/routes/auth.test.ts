@@ -23,6 +23,17 @@ it("accepts /me with a valid session cookie", async () => {
   expect(json.username).toBe("viewer1");
 });
 
+it("includes the user's coin balance in /me", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username, coins) VALUES (?, ?, ?)")
+    .bind("1", "viewer1", 75)
+    .run();
+  const { signSession } = await import("../../worker/lib/jwt");
+  const token = await signSession({ twitchId: "1", username: "viewer1" }, env.JWT_SECRET);
+  const res = await app.request("/api/auth/me", { headers: { Cookie: `session=${token}` } }, env);
+  const json = await res.json<{ coins: number }>();
+  expect(json.coins).toBe(75);
+});
+
 it("redirects to Twitch authorize URL on login", async () => {
   const res = await app.request("/api/auth/login", { redirect: "manual" }, env);
   expect(res.status).toBe(302);

@@ -9,10 +9,10 @@ const auth = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; us
 
 auth.get("/me", requireAuth, async (c) => {
   const user = c.get("user");
-  const row = await c.env.DB.prepare("SELECT avatar_url AS avatarUrl FROM users WHERE twitch_id = ?")
+  const row = await c.env.DB.prepare("SELECT avatar_url AS avatarUrl, coins FROM users WHERE twitch_id = ?")
     .bind(user.twitchId)
-    .first<{ avatarUrl: string | null }>();
-  return c.json({ ok: true, username: user.username, avatarUrl: row?.avatarUrl ?? null });
+    .first<{ avatarUrl: string | null; coins: number }>();
+  return c.json({ ok: true, username: user.username, avatarUrl: row?.avatarUrl ?? null, coins: row?.coins ?? 0 });
 });
 
 auth.get("/login", (c) => {
