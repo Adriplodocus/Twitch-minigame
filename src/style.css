@@ -464,7 +464,14 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .coin-actions .btn {
   font-size: 0.55rem;
   padding: 0.3rem 0.5rem;
+  gap: 0.3rem;
   justify-content: center;
+}
+.coin-actions .btn svg { flex-shrink: 0; }
+.coin-convert-sparkle {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 .coin-convert-confirm {
   display: none;
