@@ -89,14 +89,6 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
     img.alt = "Abrir sobre";
     const idleDelay = `-${(index * 0.7) % 2.4}s`;
     img.style.animationDelay = idleDelay;
-    img.addEventListener("click", async () => {
-      const choice = await openAlbumPickerModal(coins);
-      if (choice === null) return;
-      img.classList.add("opening");
-      onOpen(pack.id, choice.generation, choice.boost).finally(() => {
-        img.classList.remove("opening");
-      });
-    });
 
     const wrapper = document.createElement("div");
     wrapper.className = shouldShowFoil(pack.tier) ? "pack-wrapper apoyo" : "pack-wrapper";
@@ -118,6 +110,24 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
     }
     wrapper.appendChild(hoverScale);
     row.appendChild(wrapper);
+
+    img.addEventListener("click", async () => {
+      const choice = await openAlbumPickerModal(coins);
+      if (choice === null) return;
+      img.classList.add("opening");
+      if (choice.boost) {
+        const boostCorner = document.createElement("div");
+        boostCorner.className = "pack-apoyo-corner pack-boost-corner";
+        const boostRibbon = document.createElement("div");
+        boostRibbon.className = "pack-apoyo-ribbon pack-boost-ribbon";
+        boostRibbon.textContent = "⚡";
+        boostCorner.appendChild(boostRibbon);
+        hoverScale.appendChild(boostCorner);
+      }
+      onOpen(pack.id, choice.generation, choice.boost).finally(() => {
+        img.classList.remove("opening");
+      });
+    });
   });
 }
 
