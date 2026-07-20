@@ -1,5 +1,6 @@
 import type { CardView } from "./api";
 import { renderCardHtml } from "./card";
+import { isMuted, SOUND_VOLUME } from "./sound-pref";
 
 // Regional/Mega/Gmax forms keep the sortOrder of their base species' national
 // dex number (e.g. Tauros Paldea forms sort near #128) even though their
@@ -72,6 +73,7 @@ export class AlbumBook {
   ) {
     this.pages = buildPages(cards);
     this.totalPages = this.pages.length;
+    deps.flipSound.volume = SOUND_VOLUME;
     this.pagesPerSpread = this.mobileQuery.matches ? 1 : PAGES_PER_SPREAD;
     this.totalSpreads = this.totalPages / this.pagesPerSpread;
     deps.firstBtn.addEventListener("click", () => this.jump(0));
@@ -138,8 +140,10 @@ export class AlbumBook {
       direction === 1
         ? spread.querySelector<HTMLElement>(".book-page:last-child")
         : spread.querySelector<HTMLElement>(".book-page:first-child");
-    this.deps.flipSound.currentTime = 0;
-    this.deps.flipSound.play().catch(() => {});
+    if (!isMuted()) {
+      this.deps.flipSound.currentTime = 0;
+      this.deps.flipSound.play().catch(() => {});
+    }
     page?.classList.add(`book-page-flip-out-${side}`);
     window.setTimeout(() => {
       this.render();

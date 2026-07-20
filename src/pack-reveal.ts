@@ -1,6 +1,6 @@
 import { renderCardHtml, splitCardName } from "./card";
 import type { CardView } from "./api";
-import { isMuted } from "./sound-pref";
+import { playSound } from "./sound-pref";
 
 function preloadImage(src: string): Promise<void> {
   return new Promise((resolve) => {
@@ -35,11 +35,11 @@ export async function showPackReveal(
     const cardEl = wrapper.firstElementChild!;
     cardEl.classList.add("card-reveal");
     cardsRow.appendChild(cardEl);
-    if (!isMuted() && cards[i].rarity === "legendary") {
-      new Audio(`/cries/${Math.floor((cards[i].sortOrder ?? 0) / 1_000_000)}.ogg`).play().catch(() => {});
+    if (cards[i].rarity === "legendary") {
+      playSound(`/cries/${Math.floor((cards[i].sortOrder ?? 0) / 1_000_000)}.ogg`);
     }
-    if (!isMuted() && splitCardName(cards[i].name).isShiny) {
-      new Audio("/shiny-sound.mp3").play().catch(() => {});
+    if (splitCardName(cards[i].name).isShiny) {
+      playSound("/shiny-sound.mp3");
     }
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
