@@ -76,10 +76,10 @@ export function collectFemaleVariantBaseNames(cards: CardView[]): Set<string> {
 }
 
 export function collectShinyCapableIds(cards: CardView[]): Set<string> {
-  const shinyIds = new Set(cards.filter((c) => c.id.endsWith("-shiny")).map((c) => c.id));
+  const shinyIds = new Set(cards.filter((c) => c.id.includes("-shiny")).map((c) => c.id));
   const capable = new Set<string>();
   for (const c of cards) {
-    if (!c.id.endsWith("-shiny") && shinyIds.has(`${c.id}-shiny`)) capable.add(c.id);
+    if (!c.id.includes("-shiny") && shinyIds.has(`${c.id}-shiny`)) capable.add(c.id);
   }
   return capable;
 }

@@ -54,27 +54,20 @@ collection.post("/discard", requireAuth, async (c) => {
     .first<{ rarity: Rarity }>();
   if (!card) return c.json({ error: "Not found" }, 404);
 
-  const owned = await c.env.DB.prepare("SELECT quantity, reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
+  const decremented = await c.env.DB.prepare(
+    "UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ? AND quantity - reserved > 1 RETURNING quantity"
+  )
     .bind(user.twitchId, cardId)
-    .first<{ quantity: number; reserved: number }>();
-  const available = (owned?.quantity ?? 0) - (owned?.reserved ?? 0);
-  if (available <= 1) return c.json({ error: "Nothing to discard" }, 409);
+    .first<{ quantity: number }>();
+  if (!decremented) return c.json({ error: "Nothing to discard" }, 409);
 
   const value = isShinyCard(cardId) ? DISCARD_VALUE_SHINY[card.rarity] : DISCARD_VALUE[card.rarity];
 
-  const results = await c.env.DB.batch<{ coins: number }>([
-    c.env.DB.prepare("UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ?").bind(
-      user.twitchId,
-      cardId
-    ),
-    c.env.DB.prepare("UPDATE users SET coins = coins + ? WHERE twitch_id = ? RETURNING coins").bind(
-      value,
-      user.twitchId
-    ),
-  ]);
-  const coins = results[results.length - 1].results[0].coins;
+  const coinsRow = await c.env.DB.prepare("UPDATE users SET coins = coins + ? WHERE twitch_id = ? RETURNING coins")
+    .bind(value, user.twitchId)
+    .first<{ coins: number }>();
 
-  return c.json({ ok: true, coins });
+  return c.json({ ok: true, coins: coinsRow!.coins });
 });
 
 collection.post("/convert-shiny", requireAuth, async (c) => {
@@ -91,41 +84,36 @@ collection.post("/convert-shiny", requireAuth, async (c) => {
   if (isShinyCard(cardId)) return c.json({ error: "Already shiny" }, 400);
 
   const shinyId = `${cardId}-shiny`;
-  const [card, shinyCard, owned, userRow] = await Promise.all([
+  const [card, shinyCard] = await Promise.all([
     c.env.DB.prepare("SELECT rarity FROM cards WHERE id = ?").bind(cardId).first<{ rarity: Rarity }>(),
     c.env.DB.prepare("SELECT id FROM cards WHERE id = ?").bind(shinyId).first<{ id: string }>(),
-    c.env.DB.prepare("SELECT quantity, reserved FROM user_cards WHERE user_id = ? AND card_id = ?")
-      .bind(user.twitchId, cardId)
-      .first<{ quantity: number; reserved: number }>(),
-    c.env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?").bind(user.twitchId).first<{ coins: number }>(),
   ]);
   if (!card) return c.json({ error: "Not found" }, 404);
   if (!shinyCard) return c.json({ error: "No shiny version available" }, 404);
 
-  const available = (owned?.quantity ?? 0) - (owned?.reserved ?? 0);
-  if (available < 2) return c.json({ error: "Not enough copies" }, 409);
-
   const cost = SHINY_CONVERSION_COST[card.rarity];
-  const coins = userRow?.coins ?? 0;
-  if (coins < cost) return c.json({ error: "Not enough coins" }, 400);
 
-  const results = await c.env.DB.batch<{ coins: number }>([
-    c.env.DB.prepare("UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ?").bind(
-      user.twitchId,
-      cardId
-    ),
+  // Trade-off: if the batch below fails the copies guard, these coins stay spent (see task-8 report).
+  const coinsRow = await c.env.DB.prepare("UPDATE users SET coins = coins - ? WHERE twitch_id = ? AND coins >= ? RETURNING coins")
+    .bind(cost, user.twitchId, cost)
+    .first<{ coins: number }>();
+  if (!coinsRow) return c.json({ error: "Not enough coins" }, 400);
+
+  const results = await c.env.DB.batch<{ quantity: number }>([
     c.env.DB.prepare(
-      `INSERT INTO user_cards (user_id, card_id, quantity, updated_at) VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+      `INSERT INTO user_cards (user_id, card_id, quantity, updated_at)
+       SELECT ?, ?, 1, CURRENT_TIMESTAMP
+       WHERE (SELECT COALESCE(quantity, 0) - COALESCE(reserved, 0) FROM user_cards WHERE user_id = ? AND card_id = ?) >= 2
        ON CONFLICT(user_id, card_id) DO UPDATE SET quantity = quantity + 1, updated_at = CURRENT_TIMESTAMP`
-    ).bind(user.twitchId, shinyId),
-    c.env.DB.prepare("UPDATE users SET coins = coins - ? WHERE twitch_id = ? RETURNING coins").bind(
-      cost,
-      user.twitchId
-    ),
+    ).bind(user.twitchId, shinyId, user.twitchId, cardId),
+    c.env.DB.prepare(
+      "UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ? AND quantity - reserved >= 2 RETURNING quantity"
+    ).bind(user.twitchId, cardId),
   ]);
-  const newCoins = results[results.length - 1].results[0].coins;
+  const decremented = results[results.length - 1].results[0];
+  if (!decremented) return c.json({ error: "Not enough copies" }, 409);
 
-  return c.json({ ok: true, coins: newCoins });
+  return c.json({ ok: true, coins: coinsRow.coins });
 });
 
 collection.post("/packs/:id/open", requireAuth, async (c) => {
