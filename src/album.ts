@@ -9,7 +9,7 @@ import { completionPercent } from "./completion-percent";
 function renderGenTile(gen: GenerationInfo, genCards: CardView[], isShiny: boolean): string {
   const genOwned = genCards.filter((c) => c.quantity > 0).length;
   const shinyParam = isShiny ? "&shiny=1" : "";
-  const shinyBadge = isShiny ? `<img class="album-cover-shiny-badge" src="/shiny-icon.webp" alt="" />` : "";
+  const shinyBadge = isShiny ? `<img class="album-cover-shiny-badge" src="/shiny-icon.webp" alt="Shiny" />` : "";
   return `
     <a class="album-cover${isShiny ? " album-cover-shiny" : ""}" href="/album.html?gen=${gen.id}${shinyParam}">
       <img class="album-cover-bg" src="/album-covers/${gen.id}.webp" alt="" />
