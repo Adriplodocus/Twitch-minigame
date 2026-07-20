@@ -20,3 +20,5 @@ export const SHINY_CONVERSION_COST: Record<Rarity, number> = {
   epic: 1000,
   legendary: 3500,
 };
+
+export const PACK_BOOST_COST = 150;

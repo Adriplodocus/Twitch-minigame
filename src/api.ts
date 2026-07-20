@@ -56,11 +56,11 @@ export function getMe(): Promise<{ ok: boolean; username: string; avatarUrl: str
   return request("/auth/me");
 }
 
-export function openPack(packId: number, generation: number): Promise<{ cards: CardView[] }> {
+export function openPack(packId: number, generation: number, boost: boolean = false): Promise<{ cards: CardView[]; coins: number }> {
   return request(`/collection/packs/${packId}/open`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ generation }),
+    body: JSON.stringify({ generation, boost }),
   });
 }
 

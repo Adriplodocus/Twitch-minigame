@@ -1475,6 +1475,21 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   color: var(--muted);
   box-shadow: none;
 }
+.modal-boost-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-em);
+  justify-content: center;
+}
+.modal-boost-toggle.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--muted);
+}
 .page-header-actions a.btn {
   position: relative;
 }

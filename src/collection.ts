@@ -6,6 +6,7 @@ import { GENERATIONS } from "./generations";
 import { shouldShowFoil } from "./pack-tier-foil";
 import { showPackReveal } from "./pack-reveal";
 import { completionPercent } from "./completion-percent";
+import { PACK_BOOST_COST } from "./coins";
 
 let femaleVariantBaseNames = new Set<string>();
 let formLabels = new Map<string, string>();
@@ -31,10 +32,11 @@ function renderOwnedGrid(): void {
     .join("");
 }
 
-function openAlbumPickerModal(): Promise<number | null> {
+function openAlbumPickerModal(coins: number): Promise<{ generation: number; boost: boolean } | null> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
+    const disabled = coins < PACK_BOOST_COST;
     overlay.innerHTML = `
       <div class="modal">
         <h3>¿De qué álbum quieres abrir el sobre?</h3>
@@ -43,6 +45,10 @@ function openAlbumPickerModal(): Promise<number | null> {
             (g) => `<button type="button" class="btn modal-gen-btn" data-gen="${g.id}">Gen ${g.id} · ${g.region}</button>`
           ).join("")}
         </div>
+        <label class="modal-boost-toggle${disabled ? " disabled" : ""}">
+          <input type="checkbox" id="modal-boost-checkbox" ${disabled ? "disabled" : ""} />
+          Boostear odds (${PACK_BOOST_COST} 🪙)
+        </label>
         <button type="button" class="btn modal-cancel-btn">Cancelar</button>
       </div>
     `;
@@ -52,8 +58,9 @@ function openAlbumPickerModal(): Promise<number | null> {
       const target = e.target as HTMLElement;
       const genBtn = target.closest<HTMLElement>(".modal-gen-btn");
       if (genBtn) {
+        const boost = (document.getElementById("modal-boost-checkbox") as HTMLInputElement).checked;
         overlay.remove();
-        resolve(Number(genBtn.dataset.gen));
+        resolve({ generation: Number(genBtn.dataset.gen), boost });
         return;
       }
       if (target.closest(".modal-cancel-btn") || target === overlay) {
@@ -64,7 +71,7 @@ function openAlbumPickerModal(): Promise<number | null> {
   });
 }
 
-function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generation: number) => Promise<void>): void {
+function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generation: number, boost: boolean) => Promise<void>): void {
   const container = document.getElementById("pending-packs")!;
   if (packs.length === 0) {
     container.innerHTML = "";
@@ -83,10 +90,10 @@ function renderPendingPacks(packs: PendingPack[], onOpen: (id: number, generatio
     const idleDelay = `-${(index * 0.7) % 2.4}s`;
     img.style.animationDelay = idleDelay;
     img.addEventListener("click", async () => {
-      const generation = await openAlbumPickerModal();
-      if (generation === null) return;
+      const choice = await openAlbumPickerModal(coins);
+      if (choice === null) return;
       img.classList.add("opening");
-      onOpen(pack.id, generation).finally(() => {
+      onOpen(pack.id, choice.generation, choice.boost).finally(() => {
         img.classList.remove("opening");
       });
     });
@@ -145,10 +152,17 @@ async function load(): Promise<void> {
   renderGenFilterOptions(data.cards);
   renderOwnedGrid();
 
-  renderPendingPacks(data.pendingPacks, async (packId, generation) => {
-    const result = await openPack(packId, generation);
-    await revealPack(packId, result.cards);
-    await load();
+  renderPendingPacks(data.pendingPacks, async (packId, generation, boost) => {
+    clearCoinActionError();
+    try {
+      const result = await openPack(packId, generation, boost);
+      coins = result.coins;
+      document.dispatchEvent(new CustomEvent("coins-updated", { detail: { coins } }));
+      await revealPack(packId, result.cards);
+      await load();
+    } catch (err) {
+      showCoinActionError(err instanceof Error ? err.message : "Error al abrir el sobre");
+    }
   });
 }
 
