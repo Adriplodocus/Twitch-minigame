@@ -187,6 +187,15 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   }
 
   const picked = pickRandomCards(catalog.results, 10, pack.tier, boost);
+  const uniqueIds = [...new Set(picked.map((card) => card.id))];
+  const placeholders = uniqueIds.map(() => "?").join(",");
+
+  const ownedBefore = await c.env.DB.prepare(
+    `SELECT card_id AS cardId FROM user_cards WHERE user_id = ? AND card_id IN (${placeholders}) AND quantity > 0`
+  )
+    .bind(user.twitchId, ...uniqueIds)
+    .all<{ cardId: string }>();
+  const ownedBeforeIds = new Set(ownedBefore.results.map((row) => row.cardId));
 
   const statements = picked.map((card) =>
     c.env.DB.prepare("INSERT INTO pack_cards (pack_id, card_id) VALUES (?, ?)").bind(packId, card.id)
@@ -201,8 +210,6 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
   }
   await c.env.DB.batch(statements);
 
-  const uniqueIds = [...new Set(picked.map((card) => card.id))];
-  const placeholders = uniqueIds.map(() => "?").join(",");
   const cardDetails = await c.env.DB.prepare(
     `SELECT id, name, rarity, image_path AS imagePath, sort_order AS sortOrder FROM cards WHERE id IN (${placeholders})`
   )
@@ -210,7 +217,11 @@ collection.post("/packs/:id/open", requireAuth, async (c) => {
     .all<{ id: string; name: string; rarity: Rarity; imagePath: string; sortOrder: number }>();
 
   const detailsById = new Map(cardDetails.results.map((card) => [card.id, card]));
-  const cards = picked.map((card) => ({ ...detailsById.get(card.id)!, quantity: 1 }));
+  const cards = picked.map((card) => ({
+    ...detailsById.get(card.id)!,
+    quantity: 1,
+    isNew: !ownedBeforeIds.has(card.id),
+  }));
 
   if (coinsBalance === undefined) {
     const userRow = await c.env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?")

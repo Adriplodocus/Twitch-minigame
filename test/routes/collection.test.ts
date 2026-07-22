@@ -245,6 +245,51 @@ it("only draws cards from the requested generation", async () => {
   expect(json.cards.every((c) => c.id === "r1")).toBe(true);
 });
 
+it("flags every card as new the first time a brand-new user opens a pack", async () => {
+  await env.DB.prepare("DELETE FROM cards WHERE id = 'r1'").run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1 }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ cards: { id: string; isNew: boolean }[] }>();
+  expect(json.cards).toHaveLength(10);
+  expect(json.cards.every((c) => c.id === "c1" && c.isNew === true)).toBe(true);
+});
+
+it("does not flag a card as new when the user already owns a copy", async () => {
+  await env.DB.prepare("DELETE FROM cards WHERE id = 'r1'").run();
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES (?, ?, ?)").bind("1", "c1", 1).run();
+  const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
+    .bind("1")
+    .first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    `/api/collection/packs/${packResult!.id}/open`,
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ generation: 1 }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ cards: { id: string; isNew: boolean }[] }>();
+  expect(json.cards).toHaveLength(10);
+  expect(json.cards.every((c) => c.isNew === false)).toBe(true);
+});
+
 it("rejects opening a pack with an invalid generation", async () => {
   const packResult = await env.DB.prepare("INSERT INTO packs (user_id) VALUES (?) RETURNING id")
     .bind("1")
