@@ -284,15 +284,44 @@ function populateTestPackGenerations(): void {
   );
 }
 
-function readTestPackCounts(): { common: number; rare: number; epic: number; legendary: number; shiny: number } {
+function readTestPackCounts(): {
+  common: number;
+  rare: number;
+  epic: number;
+  legendary: number;
+  shinyCommon: number;
+  shinyRare: number;
+  shinyEpic: number;
+  shinyLegendary: number;
+} {
   const value = (id: string) => Number((document.getElementById(id) as HTMLInputElement).value) || 0;
   return {
     common: value("tp-common"),
     rare: value("tp-rare"),
     epic: value("tp-epic"),
     legendary: value("tp-legendary"),
-    shiny: value("tp-shiny"),
+    shinyCommon: value("tp-shiny-common"),
+    shinyRare: value("tp-shiny-rare"),
+    shinyEpic: value("tp-shiny-epic"),
+    shinyLegendary: value("tp-shiny-legendary"),
   };
+}
+
+function readTestPackNewCount(): number {
+  return Number((document.getElementById("tp-new-count") as HTMLInputElement).value) || 0;
+}
+
+function recomputeTestPackCommon(): void {
+  const value = (id: string) => Number((document.getElementById(id) as HTMLInputElement).value) || 0;
+  const rest =
+    value("tp-rare") +
+    value("tp-epic") +
+    value("tp-legendary") +
+    value("tp-shiny-common") +
+    value("tp-shiny-rare") +
+    value("tp-shiny-epic") +
+    value("tp-shiny-legendary");
+  (document.getElementById("tp-common") as HTMLInputElement).value = String(Math.max(0, 10 - rest));
 }
 
 async function openTestPack(): Promise<void> {
@@ -300,12 +329,13 @@ async function openTestPack(): Promise<void> {
   const generation = Number((document.getElementById("test-pack-generation") as HTMLSelectElement).value);
   const tier = (document.getElementById("test-pack-tier") as HTMLSelectElement).value;
   const counts = readTestPackCounts();
+  const newCount = readTestPackNewCount();
   const forcingCounts = Object.values(counts).some((n) => n > 0);
 
   const result = await request<{ packId: number; cards: CardView[] }>("/test-pack", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(forcingCounts ? { generation, tier, counts } : { generation, tier }),
+    body: JSON.stringify(forcingCounts ? { generation, tier, counts, newCount } : { generation, tier, newCount }),
   });
 
   if (!result.ok) {
@@ -496,6 +526,9 @@ document.getElementById("grant-btn")!.addEventListener("click", grantPacks);
 document.getElementById("test-pack-btn")!.addEventListener("click", openTestPack);
 document.getElementById("cfg-save-btn")!.addEventListener("click", savePackGrantConfig);
 populateTestPackGenerations();
+["tp-rare", "tp-epic", "tp-legendary", "tp-shiny-common", "tp-shiny-rare", "tp-shiny-epic", "tp-shiny-legendary"].forEach(
+  (id) => document.getElementById(id)!.addEventListener("input", recomputeTestPackCommon)
+);
 document.getElementById("search-input")!.addEventListener("input", (e) => {
   clearTimeout(searchDebounce);
   const query = (e.target as HTMLInputElement).value;

@@ -83,24 +83,50 @@
               </select>
               <button class="btn" id="test-pack-btn">Abrir sobre de prueba</button>
             </div>
-            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-              <label style="display: flex; align-items: center; gap: 0.3rem;">Common
-                <input type="number" min="0" id="tp-common" value="0" class="input" style="width: 3.5rem;" />
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.3rem;">Rare
-                <input type="number" min="0" id="tp-rare" value="0" class="input" style="width: 3.5rem;" />
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.3rem;">Epic
-                <input type="number" min="0" id="tp-epic" value="0" class="input" style="width: 3.5rem;" />
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.3rem;">Legendary
-                <input type="number" min="0" id="tp-legendary" value="0" class="input" style="width: 3.5rem;" />
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.3rem;">Shiny
-                <input type="number" min="0" id="tp-shiny" value="0" class="input" style="width: 3.5rem;" />
-              </label>
+            <div class="tp-columns">
+              <div class="cfg-column">
+                <h3 class="cfg-column-title">Normales</h3>
+                <label>
+                  <span class="cfg-label-text">Common</span>
+                  <input type="number" min="0" id="tp-common" value="0" class="input" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Rare</span>
+                  <input type="number" min="0" id="tp-rare" value="0" class="input" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Epic</span>
+                  <input type="number" min="0" id="tp-epic" value="0" class="input" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Legendary</span>
+                  <input type="number" min="0" id="tp-legendary" value="0" class="input" />
+                </label>
+              </div>
+              <div class="cfg-column">
+                <h3 class="cfg-column-title">Shiny</h3>
+                <label>
+                  <span class="cfg-label-text">Common</span>
+                  <input type="number" min="0" id="tp-shiny-common" value="0" class="input" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Rare</span>
+                  <input type="number" min="0" id="tp-shiny-rare" value="0" class="input" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Epic</span>
+                  <input type="number" min="0" id="tp-shiny-epic" value="0" class="input" />
+                </label>
+                <label>
+                  <span class="cfg-label-text">Legendary</span>
+                  <input type="number" min="0" id="tp-shiny-legendary" value="0" class="input" />
+                </label>
+              </div>
             </div>
-            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text);">Déjalo en 0 para probabilidades reales. Si rellenas, debe sumar 10.</p>
+            <label style="display: flex; align-items: center; gap: 0.3rem; margin-top: 0.75rem;">Marcar como NEW
+              <input type="number" min="0" max="10" id="tp-new-count" value="0" class="input" style="width: 3.5rem;" />
+            </label>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text);">Déjalo todo en 0 para probabilidades reales. Si rellenas alguna rareza, Common normal se autocompleta para sumar 10.</p>
             <p id="test-pack-message" style="margin-top: 0.5rem;"></p>
           </div>
 
