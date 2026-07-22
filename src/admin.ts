@@ -66,6 +66,17 @@ function showPanelView(): void {
   document.getElementById("panel-view")!.style.display = "block";
 }
 
+function formatHistoryDate(sqliteTimestamp: string): string {
+  const iso = sqliteTimestamp.includes("T") ? sqliteTimestamp : `${sqliteTimestamp.replace(" ", "T")}Z`;
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yy = String(d.getFullYear() % 100).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${dd}/${mm}/${yy} ${hh}:${min}`;
+}
+
 function renderHistory(history: HistoryRow[]): void {
   const container = document.getElementById("history-body")!;
   const rows = history.map((h) => {
@@ -81,7 +92,7 @@ function renderHistory(history: HistoryRow[]): void {
     tdSource.textContent = sourceLabel(h.source);
     const tdCreatedAt = document.createElement("td");
     tdCreatedAt.style.padding = "0.4rem";
-    tdCreatedAt.textContent = h.createdAt;
+    tdCreatedAt.textContent = formatHistoryDate(h.createdAt);
     const tdActions = document.createElement("td");
     tdActions.style.padding = "0.4rem";
     if (h.openedAt === null) {
