@@ -309,51 +309,33 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 
 .card.foil.card-rarity-rare {
   background: linear-gradient(115deg, var(--surface) 20%, #d8f3f7 40%, var(--surface) 60%);
-  animation: card-in-fade 0.3s ease both;
+  background-size: 250% 250%;
+  animation: card-in-fade 0.3s ease both, foil-shift 5s ease-in-out infinite;
 }
 .card.foil.card-rarity-epic {
   background: linear-gradient(115deg, var(--surface) 15%, #eaddfb 35%, #d8f3f7 50%, #eaddfb 65%, var(--surface) 85%);
-  animation: card-in-fade 0.3s ease both;
+  background-size: 280% 280%;
+  animation: card-in-fade 0.3s ease both, foil-shift 4s ease-in-out infinite;
 }
 .card.foil.card-rarity-legendary {
   background: linear-gradient(115deg, var(--surface) 10%, #fbe9b8 30%, #eaddfb 45%, #d8f3f7 60%, #fbe9b8 75%, var(--surface) 90%);
-  animation: card-in-fade 0.3s ease both;
+  background-size: 320% 320%;
+  animation: card-in-fade 0.3s ease both, foil-shift 3.2s ease-in-out infinite;
   box-shadow: 0 4px 16px rgba(120, 90, 60, 0.10), 0 0 14px rgba(232, 185, 58, 0.4);
 }
 .card.foil.card-rarity-legendary:hover {
   box-shadow: 0 10px 26px rgba(120, 90, 60, 0.18), 0 0 14px rgba(232, 185, 58, 0.4);
 }
-
-/* GPU-friendly replacement for the old whole-background `foil-shift`
-   animation (animated `background-position` forces a repaint every frame,
-   on every foil card on screen, indefinitely — see pack-open freeze perf
-   investigation). Mirrors `.pack-foil-shine`'s already-correct pattern:
-   an oversized `::before` translated via `transform`, composite-only. */
-.foil-shine {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: 20px;
-  pointer-events: none;
+@keyframes foil-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
-.foil-shine::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.55) 50%, transparent 60%);
-  mix-blend-mode: overlay;
-  animation: shimmer-sweep 5s ease-in-out infinite;
-}
-.card.card-rarity-epic .foil-shine::before { animation-duration: 4s; }
-.card.card-rarity-legendary .foil-shine::before { animation-duration: 3.2s; }
 
 .card.foil.shiny.card-rarity-common {
   border-color: #b9bec4;
   background: linear-gradient(115deg, var(--surface) 20%, #eef1f4 40%, var(--surface) 60%);
-  animation: card-in-fade 0.3s ease both;
+  background-size: 250% 250%;
+  animation: card-in-fade 0.3s ease both, foil-shift 5s ease-in-out infinite;
 }
 
 .glare {
@@ -409,8 +391,9 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .foil-shine::before {
+  .card.foil {
     animation: none !important;
+    background-position: 0% 50% !important;
   }
   .sparkle-layer .dot {
     animation: none !important;
