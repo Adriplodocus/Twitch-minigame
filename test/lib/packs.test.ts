@@ -50,16 +50,44 @@ it("throws on an empty catalog", () => {
 });
 
 it("pickExactCards returns exactly the requested count per rarity", () => {
-  const picks = pickExactCards(shinyCatalog, { common: 2, rare: 0, epic: 0, legendary: 1, shiny: 0 });
+  const picks = pickExactCards(shinyCatalog, {
+    common: 2,
+    rare: 0,
+    epic: 0,
+    legendary: 1,
+    shinyCommon: 0,
+    shinyRare: 0,
+    shinyEpic: 0,
+    shinyLegendary: 0,
+  });
   expect(picks.filter((c) => c.rarity === "common")).toHaveLength(2);
   expect(picks.filter((c) => c.rarity === "legendary")).toHaveLength(1);
   expect(picks.every((c) => !c.id.includes("-shiny"))).toBe(true);
 });
 
-it("pickExactCards picks shiny cards from any rarity", () => {
-  const picks = pickExactCards(shinyCatalog, { common: 0, rare: 0, epic: 0, legendary: 0, shiny: 3 }, () => 0.99);
+it("pickExactCards picks shiny cards of the requested rarity only", () => {
+  const picks = pickExactCards(
+    shinyCatalog,
+    { common: 0, rare: 0, epic: 0, legendary: 0, shinyCommon: 0, shinyRare: 0, shinyEpic: 0, shinyLegendary: 3 },
+    () => 0.99
+  );
   expect(picks).toHaveLength(3);
-  expect(picks.every((c) => c.id.includes("-shiny"))).toBe(true);
+  expect(picks.every((c) => c.id === "l1-shiny")).toBe(true);
+});
+
+it("pickExactCards keeps shiny rarities independent — shinyCommon never returns a legendary shiny", () => {
+  const picks = pickExactCards(shinyCatalog, {
+    common: 0,
+    rare: 0,
+    epic: 0,
+    legendary: 0,
+    shinyCommon: 3,
+    shinyRare: 0,
+    shinyEpic: 0,
+    shinyLegendary: 0,
+  });
+  expect(picks).toHaveLength(3);
+  expect(picks.every((c) => c.id === "c1-shiny")).toBe(true);
 });
 
 it("pickExactCards throws when a requested rarity has no non-shiny cards", () => {
@@ -69,19 +97,25 @@ it("pickExactCards throws when a requested rarity has no non-shiny cards", () =>
       rare: 1,
       epic: 0,
       legendary: 0,
-      shiny: 0,
+      shinyCommon: 0,
+      shinyRare: 0,
+      shinyEpic: 0,
+      shinyLegendary: 0,
     })
   ).toThrow();
 });
 
-it("pickExactCards throws when shiny is requested but none exist", () => {
+it("pickExactCards throws when a requested shiny rarity has no cards", () => {
   expect(() =>
     pickExactCards([{ id: "c1", rarity: "common" as const, sortOrder: 1_000_000 }], {
       common: 0,
       rare: 0,
       epic: 0,
       legendary: 0,
-      shiny: 1,
+      shinyCommon: 1,
+      shinyRare: 0,
+      shinyEpic: 0,
+      shinyLegendary: 0,
     })
   ).toThrow();
 });
@@ -98,7 +132,16 @@ it("pickExactCards distributes a rarity's picks evenly across species, not per r
   const rolls = Array.from({ length: 20000 }, (_, i) => i / 20000);
   const picks = pickExactCards(
     multiFormCatalog,
-    { common: 10000, rare: 0, epic: 0, legendary: 0, shiny: 0 },
+    {
+      common: 10000,
+      rare: 0,
+      epic: 0,
+      legendary: 0,
+      shinyCommon: 0,
+      shinyRare: 0,
+      shinyEpic: 0,
+      shinyLegendary: 0,
+    },
     sequenceRandom(rolls)
   );
   const unownRatio = picks.filter((c) => c.id.startsWith("unown-")).length / picks.length;

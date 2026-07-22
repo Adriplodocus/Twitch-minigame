@@ -142,10 +142,22 @@ export interface ExactCounts {
   rare: number;
   epic: number;
   legendary: number;
-  shiny: number;
+  shinyCommon: number;
+  shinyRare: number;
+  shinyEpic: number;
+  shinyLegendary: number;
 }
 
-const NON_SHINY_RARITIES: Rarity[] = ["common", "rare", "epic", "legendary"];
+const EXACT_COUNT_BUCKETS: { rarity: Rarity; countKey: keyof ExactCounts; shiny: boolean }[] = [
+  { rarity: "common", countKey: "common", shiny: false },
+  { rarity: "rare", countKey: "rare", shiny: false },
+  { rarity: "epic", countKey: "epic", shiny: false },
+  { rarity: "legendary", countKey: "legendary", shiny: false },
+  { rarity: "common", countKey: "shinyCommon", shiny: true },
+  { rarity: "rare", countKey: "shinyRare", shiny: true },
+  { rarity: "epic", countKey: "shinyEpic", shiny: true },
+  { rarity: "legendary", countKey: "shinyLegendary", shiny: true },
+];
 
 function groupBySpecies<T extends { sortOrder: number }>(pool: T[]): Map<number, T[]> {
   const groups = new Map<number, T[]>();
@@ -171,22 +183,16 @@ export function pickExactCards<T extends { id: string; rarity: Rarity; sortOrder
 ): T[] {
   const picks: T[] = [];
 
-  for (const rarity of NON_SHINY_RARITIES) {
-    const count = counts[rarity];
+  for (const bucket of EXACT_COUNT_BUCKETS) {
+    const count = counts[bucket.countKey];
     if (count === 0) continue;
-    const pool = catalog.filter((card) => card.rarity === rarity && !isShinyCard(card.id));
-    if (pool.length === 0) throw new Error(`No hay cartas ${rarity} no-shiny en esta generación`);
+    const pool = catalog.filter((card) => card.rarity === bucket.rarity && isShinyCard(card.id) === bucket.shiny);
+    if (pool.length === 0) {
+      const label = bucket.shiny ? `${bucket.rarity} shiny` : `${bucket.rarity} no-shiny`;
+      throw new Error(`No hay cartas ${label} en esta generación`);
+    }
     const bySpecies = groupBySpecies(pool);
     for (let i = 0; i < count; i++) {
-      picks.push(pickCardBySpecies(bySpecies, random));
-    }
-  }
-
-  if (counts.shiny > 0) {
-    const shinyPool = catalog.filter((card) => isShinyCard(card.id));
-    if (shinyPool.length === 0) throw new Error("No hay cartas shiny en esta generación");
-    const bySpecies = groupBySpecies(shinyPool);
-    for (let i = 0; i < counts.shiny; i++) {
       picks.push(pickCardBySpecies(bySpecies, random));
     }
   }
