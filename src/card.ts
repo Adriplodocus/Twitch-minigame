@@ -298,6 +298,11 @@ export function renderCardHtml(
   const hasSparkle = isOwned && isShiny;
   const vfxClasses = `${hasFoil ? " foil" : ""}${hasSparkle ? " shiny" : ""}${isOwned ? " tiltable" : ""}`;
   const glareHtml = isOwned ? `<div class="glare"></div>` : "";
+  // GPU-friendly stand-in for the old whole-background `foil-shift` animation
+  // (animated `background-position`, which forces a repaint every frame on
+  // every foil card on screen — see perf investigation in the pack-open
+  // freeze report). This overlay only animates `transform`, composite-only.
+  const foilShineHtml = hasFoil ? `<div class="foil-shine"></div>` : "";
   const sparkleHtml = hasSparkle
     ? `<div class="sparkle-layer">${Array.from({ length: 7 }, () => renderSparkleDot()).join("")}</div>`
     : "";
@@ -374,6 +379,7 @@ export function renderCardHtml(
 
   return `
     <div class="card card-rarity-${card.rarity}${vfxClasses} ${ownedClass} card-in">
+      ${foilShineHtml}
       ${glareHtml}
       ${sparkleHtml}
       ${newBadgeHtml}
