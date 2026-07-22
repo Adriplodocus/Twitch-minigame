@@ -23,6 +23,18 @@ it("owned common non-shiny gets no foil/shiny/sparkle, but is tiltable with a gl
   expect(html).toContain('class="glare"');
 });
 
+it("shows the NEW badge when isNew is true", () => {
+  const html = renderCardHtml(card({ isNew: true }));
+  expect(html).toContain('class="card-badge-new"');
+});
+
+it("does not show the NEW badge when isNew is false or omitted", () => {
+  const htmlFalse = renderCardHtml(card({ isNew: false }));
+  const htmlOmitted = renderCardHtml(card());
+  expect(htmlFalse).not.toContain('class="card-badge-new"');
+  expect(htmlOmitted).not.toContain('class="card-badge-new"');
+});
+
 it("owned rare non-shiny gets foil, tiltable, and a glare layer, but no shiny class/sparkles", () => {
   const html = renderCardHtml(card({ rarity: "rare" }));
   expect(html).toMatch(/class="card card-rarity-rare foil tiltable/);

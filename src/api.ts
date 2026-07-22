@@ -11,6 +11,7 @@ export interface CardView {
   generation: number;
   sortOrder?: number;
   acquiredAt?: string | null;
+  isNew?: boolean;
 }
 
 export interface PendingPack {

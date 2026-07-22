@@ -281,6 +281,7 @@ export function renderCardHtml(
       ? `<span class="gender-icon gender-male">♂</span>`
       : "";
   const shinyIcon = isShiny ? `<img class="shiny-icon" src="/shiny-icon.webp" alt="Shiny" />` : "";
+  const newBadgeHtml = card.isNew ? `<span class="card-badge-new">✦ New</span>` : "";
   // footerBadgeHtml, when passed (even as ""), replaces the auto x-quantity
   // badge in the footer's first slot — used by callers that show their own
   // status badge (e.g. marketplace's "Tienes N") integrated into the same
@@ -375,6 +376,7 @@ export function renderCardHtml(
     <div class="card card-rarity-${card.rarity}${vfxClasses} ${ownedClass} card-in">
       ${glareHtml}
       ${sparkleHtml}
+      ${newBadgeHtml}
       ${genderIcon}
       ${shinyIcon}
       <img class="card-art" src="${card.imagePath}" alt="${baseName}" loading="lazy" />
