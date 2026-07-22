@@ -612,7 +612,16 @@ it("opens a test pack with an exact forced composition", async () => {
       body: JSON.stringify({
         generation: 1,
         tier: "gratis",
-        counts: { common: 3, rare: 2, epic: 2, legendary: 2, shiny: 1 },
+        counts: {
+          common: 3,
+          rare: 2,
+          epic: 2,
+          legendary: 2,
+          shinyCommon: 0,
+          shinyRare: 0,
+          shinyEpic: 0,
+          shinyLegendary: 1,
+        },
       }),
     },
     env
@@ -625,6 +634,54 @@ it("opens a test pack with an exact forced composition", async () => {
   expect(json.cards.filter((c) => c.rarity === "epic")).toHaveLength(2);
   expect(json.cards.filter((c) => c.id === "l1")).toHaveLength(2);
   expect(json.cards.filter((c) => c.id === "l1-shiny")).toHaveLength(1);
+});
+
+it("marks the first N cards of a test pack as new", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('__test__', 'Prueba')").run();
+  await env.DB.prepare(
+    "INSERT INTO cards (id, name, rarity, image_path, generation) VALUES ('c1', 'Common', 'common', '/c1.png', 1)"
+  ).run();
+
+  const res = await app.request(
+    "/api/admin/test-pack",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({
+        generation: 1,
+        tier: "gratis",
+        counts: {
+          common: 10,
+          rare: 0,
+          epic: 0,
+          legendary: 0,
+          shinyCommon: 0,
+          shinyRare: 0,
+          shinyEpic: 0,
+          shinyLegendary: 0,
+        },
+        newCount: 3,
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(200);
+  const json = await res.json<{ cards: { isNew: boolean }[] }>();
+  expect(json.cards.filter((c) => c.isNew)).toHaveLength(3);
+  expect(json.cards.filter((c) => !c.isNew)).toHaveLength(7);
+});
+
+it("rejects a test pack with an out-of-range newCount", async () => {
+  const res = await app.request(
+    "/api/admin/test-pack",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: await adminCookie() },
+      body: JSON.stringify({ generation: 1, tier: "gratis", newCount: 11 }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
 });
 
 it("rejects a test pack with counts that don't sum to 10", async () => {
@@ -641,7 +698,16 @@ it("rejects a test pack with counts that don't sum to 10", async () => {
       body: JSON.stringify({
         generation: 1,
         tier: "gratis",
-        counts: { common: 1, rare: 0, epic: 0, legendary: 0, shiny: 0 },
+        counts: {
+          common: 1,
+          rare: 0,
+          epic: 0,
+          legendary: 0,
+          shinyCommon: 0,
+          shinyRare: 0,
+          shinyEpic: 0,
+          shinyLegendary: 0,
+        },
       }),
     },
     env
@@ -737,7 +803,16 @@ it("rejects forced counts requesting a rarity with no cards in that generation",
       body: JSON.stringify({
         generation: 1,
         tier: "gratis",
-        counts: { common: 0, rare: 0, epic: 0, legendary: 10, shiny: 0 },
+        counts: {
+          common: 0,
+          rare: 0,
+          epic: 0,
+          legendary: 10,
+          shinyCommon: 0,
+          shinyRare: 0,
+          shinyEpic: 0,
+          shinyLegendary: 0,
+        },
       }),
     },
     env

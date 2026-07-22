@@ -231,9 +231,9 @@ admin.post("/paypal-donations/:txnId/cancel", requireAdmin, async (c) => {
 
 admin.post("/test-pack", requireAdmin, async (c) => {
   const body = await c.req
-    .json<{ generation?: number; tier?: string; counts?: ExactCounts }>()
-    .catch(() => ({}) as { generation?: number; tier?: string; counts?: ExactCounts });
-  const { generation, tier, counts } = body;
+    .json<{ generation?: number; tier?: string; counts?: ExactCounts; newCount?: number }>()
+    .catch(() => ({}) as { generation?: number; tier?: string; counts?: ExactCounts; newCount?: number });
+  const { generation, tier, counts, newCount = 0 } = body;
 
   if (!Number.isInteger(generation) || generation! < 1 || generation! > 9) {
     return c.json({ error: "Invalid generation" }, 400);
@@ -241,8 +241,22 @@ admin.post("/test-pack", requireAdmin, async (c) => {
   if (tier !== "gratis" && tier !== "apoyo") {
     return c.json({ error: "Invalid tier" }, 400);
   }
+  if (!Number.isInteger(newCount) || newCount < 0 || newCount > 10) {
+    return c.json({ error: "Invalid newCount" }, 400);
+  }
 
-  const countValues = counts ? [counts.common, counts.rare, counts.epic, counts.legendary, counts.shiny] : [];
+  const countValues = counts
+    ? [
+        counts.common,
+        counts.rare,
+        counts.epic,
+        counts.legendary,
+        counts.shinyCommon,
+        counts.shinyRare,
+        counts.shinyEpic,
+        counts.shinyLegendary,
+      ]
+    : [];
   const forcingCounts = countValues.some((n) => n > 0);
   if (forcingCounts) {
     if (!countValues.every((n) => Number.isInteger(n) && n >= 0)) {
@@ -294,7 +308,11 @@ admin.post("/test-pack", requireAdmin, async (c) => {
     .all<{ id: string; name: string; rarity: Rarity; imagePath: string; sortOrder: number }>();
 
   const detailsById = new Map(cardDetails.results.map((card) => [card.id, card]));
-  const cards = picked.map((card) => ({ ...detailsById.get(card.id)!, quantity: 1 }));
+  const cards = picked.map((card, i) => ({
+    ...detailsById.get(card.id)!,
+    quantity: 1,
+    isNew: i < newCount,
+  }));
 
   return c.json({ packId, cards });
 });
