@@ -167,6 +167,7 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 
 .card {
   position: relative;
+  z-index: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -333,6 +334,7 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
    animation never moved background-position-y off 50%. */
 .foil-shine {
   position: absolute;
+  z-index: -1;
   inset: 0;
   overflow: hidden;
   border-radius: 20px;
