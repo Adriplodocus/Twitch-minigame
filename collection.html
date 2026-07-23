@@ -95,19 +95,6 @@
       <p id="coin-action-error" class="coin-action-error" hidden></p>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
         <div class="filter-field">
-          <label for="gen-filter">Generación</label>
-          <select id="gen-filter" class="input">
-            <option value="">Todas</option>
-          </select>
-        </div>
-        <div class="filter-field">
-          <label for="name-filter">Nombre</label>
-          <span class="name-filter-wrap">
-            <input id="name-filter" class="input" type="text" placeholder="Buscar por nombre..." />
-            <button type="button" id="name-filter-clear" class="name-filter-clear" hidden aria-label="Limpiar búsqueda">×</button>
-          </span>
-        </div>
-        <div class="filter-field">
           <label for="sort-field">Ordenar por</label>
           <select id="sort-field" class="input">
             <option value="pokedex">Pokédex</option>
@@ -122,6 +109,19 @@
             <option value="asc">Ascendente</option>
             <option value="desc">Descendente</option>
           </select>
+        </div>
+        <div class="filter-field">
+          <label for="gen-filter">Generación</label>
+          <select id="gen-filter" class="input">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="name-filter">Nombre</label>
+          <span class="name-filter-wrap">
+            <input id="name-filter" class="input" type="text" placeholder="Buscar por nombre..." />
+            <button type="button" id="name-filter-clear" class="name-filter-clear" hidden aria-label="Limpiar búsqueda">×</button>
+          </span>
         </div>
       </div>
       <div id="owned-grid" class="card-grid" style="margin-top: 1.25rem;"></div>

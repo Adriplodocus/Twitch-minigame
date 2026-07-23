@@ -8,6 +8,8 @@ import {
   filterCardsByName,
   type SortField,
 } from "./card";
+import { GENERATIONS } from "./generations";
+import { completionPercent } from "./completion-percent";
 
 let currentTargetUsername = "";
 let currentMarketplaceDemandId: number | null = null;
@@ -73,12 +75,29 @@ function renderSelectableCard(
   return renderCardHtml(card, input, femaleVariantBaseNames, formLabels);
 }
 
+function renderGenFilterOptions(selectId: string, cards: CardView[]): void {
+  const genFilter = document.getElementById(selectId) as HTMLSelectElement;
+  const previousValue = genFilter.value;
+  const optionsHtml = GENERATIONS.map((g) => {
+    const genCards = cards.filter((c) => c.generation === g.id);
+    const genOwned = genCards.filter((c) => c.quantity > 0).length;
+    const pct = completionPercent(genOwned, genCards.length);
+    return `<option value="${g.id}">Gen ${g.id} · ${g.region} (${genOwned}/${genCards.length} · ${pct}%)</option>`;
+  }).join("");
+  genFilter.innerHTML = `<option value="">Todas</option>${optionsHtml}`;
+  genFilter.value = previousValue;
+}
+
 function renderTargetGrid(): void {
   const field = (document.getElementById("target-sort-field") as HTMLSelectElement).value as TargetSortField;
   const direction = (document.getElementById("target-sort-direction") as HTMLSelectElement).value;
   const sign = direction === "desc" ? -1 : 1;
+  const genValue = (document.getElementById("target-gen-filter") as HTMLSelectElement).value;
+  const generation = genValue ? Number(genValue) : null;
   const query = (document.getElementById("target-filter") as HTMLInputElement).value;
-  const filtered = filterCardsByName(targetCards, query).sort((a, b) => compareTargetCards(a, b, field, sign));
+  const filtered = filterCardsByName(targetCards, query)
+    .filter((c) => generation === null || c.generation === generation)
+    .sort((a, b) => compareTargetCards(a, b, field, sign));
   document.getElementById("target-collection")!.innerHTML = filtered
     .map((c) => renderSelectableCard(c, "request-qty", requestQuantities, targetFemaleVariants, targetFormLabels))
     .join("");
@@ -88,8 +107,12 @@ function renderMyGrid(): void {
   const field = (document.getElementById("sort-field") as HTMLSelectElement).value as SortField;
   const direction = (document.getElementById("sort-direction") as HTMLSelectElement).value;
   const sign = direction === "desc" ? -1 : 1;
+  const genValue = (document.getElementById("my-gen-filter") as HTMLSelectElement).value;
+  const generation = genValue ? Number(genValue) : null;
   const query = (document.getElementById("my-filter") as HTMLInputElement).value;
-  const filtered = filterCardsByName(myCards, query).sort((a, b) => compareCards(a, b, field) * sign);
+  const filtered = filterCardsByName(myCards, query)
+    .filter((c) => generation === null || c.generation === generation)
+    .sort((a, b) => compareCards(a, b, field) * sign);
   document.getElementById("my-cards")!.innerHTML = filtered
     .map((c) => renderSelectableCard(c, "offer-qty", offerQuantities, myFemaleVariants, myFormLabels))
     .join("");
@@ -167,6 +190,9 @@ async function init(): Promise<void> {
   myFormLabels = computeFormLabels(myCards);
   targetFormLabels = computeFormLabels(targetCards);
 
+  renderGenFilterOptions("target-gen-filter", targetCards);
+  renderGenFilterOptions("my-gen-filter", myCards);
+
   renderTargetGrid();
   if (lockedDemandCardId) {
     document.getElementById("my-cards-section")!.style.display = "none";
@@ -191,7 +217,20 @@ async function sendOffer(): Promise<void> {
   window.location.href = "/offers.html";
 }
 
-document.getElementById("target-filter")!.addEventListener("input", renderTargetGrid);
+function wireNameFilterClear(inputId: string, clearId: string, render: () => void): void {
+  const input = document.getElementById(inputId) as HTMLInputElement;
+  const clearBtn = document.getElementById(clearId) as HTMLButtonElement;
+  input.addEventListener("input", () => {
+    clearBtn.hidden = input.value.length === 0;
+    render();
+  });
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    clearBtn.hidden = true;
+    render();
+  });
+}
+
 document.getElementById("target-sort-field")!.addEventListener("change", (e) => {
   const field = (e.target as HTMLSelectElement).value as TargetSortField;
   if (field === "toGet") {
@@ -200,9 +239,12 @@ document.getElementById("target-sort-field")!.addEventListener("change", (e) => 
   renderTargetGrid();
 });
 document.getElementById("target-sort-direction")!.addEventListener("change", renderTargetGrid);
+document.getElementById("target-gen-filter")!.addEventListener("change", renderTargetGrid);
+wireNameFilterClear("target-filter", "target-filter-clear", renderTargetGrid);
 document.getElementById("sort-field")!.addEventListener("change", renderMyGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderMyGrid);
-document.getElementById("my-filter")!.addEventListener("input", renderMyGrid);
+document.getElementById("my-gen-filter")!.addEventListener("change", renderMyGrid);
+wireNameFilterClear("my-filter", "my-filter-clear", renderMyGrid);
 document.getElementById("target-collection")!.addEventListener("input", (e) => trackQuantity(e, "request-qty", requestQuantities));
 document.getElementById("my-cards")!.addEventListener("input", (e) => trackQuantity(e, "offer-qty", offerQuantities));
 document.getElementById("send-offer-btn")!.addEventListener("click", sendOffer);

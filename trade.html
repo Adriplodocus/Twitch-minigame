@@ -85,32 +85,68 @@
       <div id="offer-builder" style="display: none; margin-top: 1.5rem;">
         <h2 id="target-heading">Cartas</h2>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
-          <select id="target-sort-field" class="input">
-            <option value="toGet" selected>Por conseguir</option>
-            <option value="pokedex">Pokédex</option>
-            <option value="quantity">Cantidad</option>
-          </select>
-          <select id="target-sort-direction" class="input">
-            <option value="asc">Ascendente</option>
-            <option value="desc" selected>Descendente</option>
-          </select>
-          <input class="input" id="target-filter" placeholder="Buscar por nombre" style="flex: 1; min-width: 160px;" />
+          <div class="filter-field">
+            <label for="target-sort-field">Ordenar por</label>
+            <select id="target-sort-field" class="input">
+              <option value="toGet" selected>Por conseguir</option>
+              <option value="pokedex">Pokédex</option>
+              <option value="quantity">Cantidad</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="target-sort-direction">Dirección</label>
+            <select id="target-sort-direction" class="input">
+              <option value="asc">Ascendente</option>
+              <option value="desc" selected>Descendente</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="target-gen-filter">Generación</label>
+            <select id="target-gen-filter" class="input">
+              <option value="">Todas</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="target-filter">Nombre</label>
+            <span class="name-filter-wrap">
+              <input id="target-filter" class="input" type="text" placeholder="Buscar por nombre..." />
+              <button type="button" id="target-filter-clear" class="name-filter-clear" hidden aria-label="Limpiar búsqueda">×</button>
+            </span>
+          </div>
         </div>
         <div id="target-collection" class="card-grid"></div>
 
         <div id="my-cards-section">
           <h2 style="margin-top: 1.5rem;">Tus cartas</h2>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
-            <select id="sort-field" class="input">
-              <option value="pokedex">Pokédex</option>
-              <option value="recent">Recientes</option>
-              <option value="quantity">Cantidad</option>
-            </select>
-            <select id="sort-direction" class="input">
-              <option value="asc">Ascendente</option>
-              <option value="desc">Descendente</option>
-            </select>
-            <input class="input" id="my-filter" placeholder="Buscar por nombre" style="flex: 1; min-width: 160px;" />
+            <div class="filter-field">
+              <label for="sort-field">Ordenar por</label>
+              <select id="sort-field" class="input">
+                <option value="pokedex">Pokédex</option>
+                <option value="recent">Recientes</option>
+                <option value="quantity">Cantidad</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="sort-direction">Dirección</label>
+              <select id="sort-direction" class="input">
+                <option value="asc">Ascendente</option>
+                <option value="desc">Descendente</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="my-gen-filter">Generación</label>
+              <select id="my-gen-filter" class="input">
+                <option value="">Todas</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="my-filter">Nombre</label>
+              <span class="name-filter-wrap">
+                <input id="my-filter" class="input" type="text" placeholder="Buscar por nombre..." />
+                <button type="button" id="my-filter-clear" class="name-filter-clear" hidden aria-label="Limpiar búsqueda">×</button>
+              </span>
+            </div>
           </div>
           <div id="my-cards" class="card-grid"></div>
         </div>
