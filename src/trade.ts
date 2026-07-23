@@ -125,6 +125,22 @@ function trackQuantity(e: Event, inputClass: string, quantities: Map<string, num
   const value = Number(target.value);
   if (value > 0) quantities.set(cardId, value);
   else quantities.delete(cardId);
+  updateOfferSummary();
+}
+
+function sumQuantities(quantities: Map<string, number>): number {
+  return Array.from(quantities.values()).reduce((sum, q) => sum + q, 0);
+}
+
+function updateOfferSummary(): void {
+  const offerCount = sumQuantities(offerQuantities);
+  const requestCount = sumQuantities(requestQuantities);
+  const text =
+    offerCount === 0 && requestCount === 0
+      ? "Selecciona cartas para armar tu oferta"
+      : `Ofreces ${offerCount} ${offerCount === 1 ? "carta" : "cartas"} · Pides ${requestCount} ${requestCount === 1 ? "carta" : "cartas"}`;
+  document.getElementById("offer-summary-text")!.textContent = text;
+  (document.getElementById("send-offer-btn") as HTMLButtonElement).disabled = offerCount === 0 && requestCount === 0;
 }
 
 function quantitiesToItems(quantities: Map<string, number>): { cardId: string; quantity: number }[] {
@@ -200,6 +216,8 @@ async function init(): Promise<void> {
     renderMyGrid();
   }
   document.getElementById("offer-builder")!.style.display = "block";
+  document.getElementById("offer-summary-bar")!.style.display = "flex";
+  updateOfferSummary();
 }
 
 async function sendOffer(): Promise<void> {

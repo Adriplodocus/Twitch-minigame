@@ -70,14 +70,14 @@
         </button>
       </div>
     </header>
-    <div class="daily-pack-fab">
+    <div class="daily-pack-fab daily-pack-fab-raised">
       <button class="daily-pack-img-btn" id="daily-pack-btn" type="button" aria-label="Reclama tu sobre diario">
         <img src="/Freepack.png" alt="" />
         <span class="daily-pack-check" aria-hidden="true">✔</span>
         <span class="daily-pack-tooltip">Reclama tu sobre diario</span>
       </button>
     </div>
-    <div class="container" style="padding: 2rem 1rem;">
+    <div class="container" style="padding: 2rem 1rem 6rem;">
       <h1 id="trade-heading">Trading</h1>
 
       <div id="trade-error" style="display: none; margin-top: 1.5rem; color: #C24747; font-weight: 700;"></div>
@@ -150,13 +150,15 @@
           </div>
           <div id="my-cards" class="card-grid"></div>
         </div>
-
-        <button class="btn" id="send-offer-btn" style="margin-top: 1.5rem;">Enviar oferta</button>
       </div>
     </div>
     <footer class="site-footer">
       Creado por <a href="https://mrklypp.com/" target="_blank" rel="noopener">MrKlypp</a> · © 2026
     </footer>
+    <div class="offer-summary-bar" id="offer-summary-bar" style="display: none;">
+      <span class="offer-summary-text" id="offer-summary-text"></span>
+      <button class="btn" id="send-offer-btn">Enviar oferta</button>
+    </div>
     <script type="module" src="/src/trade.ts"></script>
   </body>
 </html>
