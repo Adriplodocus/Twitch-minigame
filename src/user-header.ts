@@ -67,7 +67,9 @@ export function initUserHeader(): void {
 
     const streakInWeek = (streak: number) => (streak === 0 ? 0 : ((streak - 1) % 7) + 1);
 
-    const openStreakModal = (streak: number, justClaimed: boolean) => {
+    const DAY_COINS = [10, 20, 30, 40, 50, 60, 90];
+
+    const openStreakModal = (streak: number, justClaimed: boolean, coinsAwarded?: number) => {
       const inWeek = streakInWeek(streak);
       const isMilestoneDay = inWeek === 7;
       const justEarnedMilestone = justClaimed && isMilestoneDay;
@@ -84,13 +86,15 @@ export function initUserHeader(): void {
           ${shimmer}
           ${check}
           <span class="streak-pip-day">${day}</span>
+          <span class="streak-pip-coins">+${DAY_COINS[i]} <img src="/coin-icon.webp" alt="" class="coin-icon" /></span>
         </div>`;
       }).join("");
 
+      const coinsMsg = justClaimed && coinsAwarded ? ` +${coinsAwarded} monedas.` : "";
       const message = justClaimed
         ? isMilestoneDay
-          ? "¡Enhorabuena! Has recibido un sobre premium por reclamar el sobre diario 7 días seguidos."
-          : "¡Enhorabuena! Has recibido un sobre. Vuelve mañana para continuar tu racha."
+          ? `¡Enhorabuena! Has recibido un sobre premium por reclamar el sobre diario 7 días seguidos.${coinsMsg}`
+          : `¡Enhorabuena! Has recibido un sobre.${coinsMsg} Vuelve mañana para continuar tu racha.`
         : isMilestoneDay
           ? "Ya reclamaste tu sobre. Vuelve mañana para empezar una nueva racha."
           : "Ya reclamaste tu sobre. Vuelve mañana para continuar tu racha.";
@@ -138,10 +142,11 @@ export function initUserHeader(): void {
         return;
       }
       try {
-        const { streak, milestone } = await claimDailyPack();
+        const { streak, milestone, coinsAwarded, coins } = await claimDailyPack();
         currentStreak = streak;
         markClaimed();
-        openStreakModal(streak, milestone);
+        openStreakModal(streak, milestone, coinsAwarded);
+        document.dispatchEvent(new CustomEvent("coins-updated", { detail: { coins } }));
         document.dispatchEvent(new Event("daily-pack-claimed"));
       } catch {
         markClaimed();

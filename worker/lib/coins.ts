@@ -22,3 +22,6 @@ export const SHINY_CONVERSION_COST: Record<Rarity, number> = {
 };
 
 export const PACK_BOOST_COST = 150;
+
+export const DAILY_CLAIM_STEP_COINS = 10;
+export const DAILY_CLAIM_MILESTONE_COINS = 90;

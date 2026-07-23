@@ -149,7 +149,7 @@ export function getDailyPackStatus(): Promise<{ claimed: boolean; streak: number
   return request("/daily-pack/status");
 }
 
-export function claimDailyPack(): Promise<{ ok: true; streak: number; milestone: boolean }> {
+export function claimDailyPack(): Promise<{ ok: true; streak: number; milestone: boolean; coinsAwarded: number; coins: number }> {
   return request("/daily-pack/claim", { method: "POST" });
 }
 

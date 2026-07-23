@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { Env } from "../types";
 import { requireAuth } from "../middleware/auth";
 import { notify } from "../lib/notifications";
+import { DAILY_CLAIM_STEP_COINS, DAILY_CLAIM_MILESTONE_COINS } from "../lib/coins";
 
 const dailyPack = new Hono<{ Bindings: Env; Variables: { user: { twitchId: string; username: string } } }>();
 
@@ -48,6 +49,11 @@ dailyPack.post("/claim", requireAuth, async (c) => {
     .bind(user.twitchId, streak)
     .run();
 
+  const coinsAwarded = milestone ? DAILY_CLAIM_MILESTONE_COINS : (streak % 7) * DAILY_CLAIM_STEP_COINS;
+  const coinsRow = await c.env.DB.prepare("UPDATE users SET coins = coins + ? WHERE twitch_id = ? RETURNING coins")
+    .bind(coinsAwarded, user.twitchId)
+    .first<{ coins: number }>();
+
   if (milestone) {
     await c.env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily_streak', 'apoyo')")
       .bind(user.twitchId)
@@ -59,7 +65,7 @@ dailyPack.post("/claim", requireAuth, async (c) => {
       .run();
   }
 
-  return c.json({ ok: true, streak, milestone });
+  return c.json({ ok: true, streak, milestone, coinsAwarded, coins: coinsRow!.coins });
 });
 
 export default dailyPack;

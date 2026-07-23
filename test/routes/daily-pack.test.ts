@@ -37,7 +37,7 @@ it("claims a daily pack and creates a pending pack", async () => {
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
   expect(res.status).toBe(200);
-  expect(await res.json()).toEqual({ ok: true, streak: 1, milestone: false });
+  expect(await res.json()).toEqual({ ok: true, streak: 1, milestone: false, coinsAwarded: 10, coins: 10 });
 
   const pack = await env.DB.prepare("SELECT source, tier, opened_at FROM packs WHERE user_id = ?")
     .bind("1")
@@ -48,6 +48,11 @@ it("claims a daily pack and creates a pending pack", async () => {
 
   const statusRes = await app.request("/api/daily-pack/status", { headers: { Cookie: cookie } }, env);
   expect(await statusRes.json()).toEqual({ claimed: true, streak: 1 });
+
+  const userRow = await env.DB.prepare("SELECT coins FROM users WHERE twitch_id = ?")
+    .bind("1")
+    .first<{ coins: number }>();
+  expect(userRow?.coins).toBe(10);
 });
 
 it("increments streak when the previous claim was yesterday", async () => {
@@ -59,7 +64,7 @@ it("increments streak when the previous claim was yesterday", async () => {
 
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
-  expect(await res.json()).toEqual({ ok: true, streak: 4, milestone: false });
+  expect(await res.json()).toEqual({ ok: true, streak: 4, milestone: false, coinsAwarded: 40, coins: 40 });
 });
 
 it("resets streak to 1 after a gap of more than one day", async () => {
@@ -71,7 +76,7 @@ it("resets streak to 1 after a gap of more than one day", async () => {
 
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
-  expect(await res.json()).toEqual({ ok: true, streak: 1, milestone: false });
+  expect(await res.json()).toEqual({ ok: true, streak: 1, milestone: false, coinsAwarded: 10, coins: 10 });
 });
 
 it("grants a bonus apoyo pack when the streak reaches 7", async () => {
@@ -83,7 +88,7 @@ it("grants a bonus apoyo pack when the streak reaches 7", async () => {
 
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
-  expect(await res.json()).toEqual({ ok: true, streak: 7, milestone: true });
+  expect(await res.json()).toEqual({ ok: true, streak: 7, milestone: true, coinsAwarded: 90, coins: 90 });
 
   const bonus = await env.DB.prepare("SELECT tier FROM packs WHERE user_id = ? AND source = 'daily_streak'")
     .bind("1")
@@ -115,7 +120,7 @@ it("grants a bonus again at the next 7-day milestone", async () => {
 
   const cookie = await sessionCookie("1", "viewer1");
   const res = await app.request("/api/daily-pack/claim", { method: "POST", headers: { Cookie: cookie } }, env);
-  expect(await res.json()).toEqual({ ok: true, streak: 14, milestone: true });
+  expect(await res.json()).toEqual({ ok: true, streak: 14, milestone: true, coinsAwarded: 90, coins: 90 });
 });
 
 it("rejects a second claim the same day", async () => {
