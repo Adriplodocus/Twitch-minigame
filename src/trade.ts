@@ -6,6 +6,7 @@ import {
   computeFormLabels,
   compareCards,
   filterCardsByName,
+  RARITY_LABELS,
   type SortField,
 } from "./card";
 import { GENERATIONS } from "./generations";
@@ -134,17 +135,19 @@ function sumQuantities(quantities: Map<string, number>): number {
 
 function cardNamesLabel(quantities: Map<string, number>, cards: CardView[]): string {
   return Array.from(quantities, ([cardId, qty]) => {
-    const name = cards.find((c) => c.id === cardId)?.name ?? cardId;
+    const card = cards.find((c) => c.id === cardId);
+    const name = card ? `${card.name} (${RARITY_LABELS[card.rarity]})` : cardId;
     return qty > 1 ? `${qty}x ${name}` : name;
   }).join(", ");
 }
 
 function updateOfferSummary(): void {
+  const requestCount = sumQuantities(requestQuantities);
   const offerCount = sumQuantities(offerQuantities);
-  const isEmpty = offerCount === 0 && requestQuantities.size === 0;
+  const isEmpty = requestCount === 0 && offerCount === 0;
   const text = isEmpty
     ? "Selecciona cartas para armar tu oferta"
-    : `Recibes ${cardNamesLabel(requestQuantities, targetCards) || "nada"} · Ofreces ${offerCount} ${offerCount === 1 ? "cromo" : "cromos"}`;
+    : `Recibes ${requestCount} ${requestCount === 1 ? "cromo" : "cromos"} · Entregas ${cardNamesLabel(offerQuantities, myCards) || "nada"}`;
   document.getElementById("offer-summary-text")!.textContent = text;
   (document.getElementById("send-offer-btn") as HTMLButtonElement).disabled = isEmpty;
 }
