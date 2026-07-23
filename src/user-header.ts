@@ -89,7 +89,7 @@ export function initUserHeader(): void {
 
       const message = justClaimed
         ? isMilestoneDay
-          ? "¡Enhorabuena! Has recibido un sobre de apoyo por reclamar el sobre diario 7 días seguidos."
+          ? "¡Enhorabuena! Has recibido un sobre premium por reclamar el sobre diario 7 días seguidos."
           : "¡Enhorabuena! Has recibido un sobre. Vuelve mañana para continuar tu racha."
         : isMilestoneDay
           ? "Ya reclamaste tu sobre. Vuelve mañana para empezar una nueva racha."

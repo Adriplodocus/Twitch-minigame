@@ -52,7 +52,7 @@ dailyPack.post("/claim", requireAuth, async (c) => {
     await c.env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily_streak', 'apoyo')")
       .bind(user.twitchId)
       .run();
-    await notify(c.env, user.twitchId, `¡Racha de ${streak} días! Sobre apoyo extra 🎁`, "/collection.html");
+    await notify(c.env, user.twitchId, `¡Racha de ${streak} días! Sobre premium extra 🎁`, "/collection.html");
   } else {
     await c.env.DB.prepare("INSERT INTO packs (user_id, source, tier) VALUES (?, 'daily', 'gratis')")
       .bind(user.twitchId)
