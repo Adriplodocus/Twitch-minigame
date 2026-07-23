@@ -235,6 +235,7 @@ function openCreateDemandModal(): void {
 
   submitBtn.addEventListener("click", async () => {
     errorEl.hidden = true;
+    submitBtn.disabled = true;
     try {
       await createMarketplaceDemand({ demandCardId: wizardDemand!.id });
       overlay.remove();
@@ -242,6 +243,7 @@ function openCreateDemandModal(): void {
     } catch (err) {
       errorEl.textContent = err instanceof Error ? err.message : "Error al crear la demanda";
       errorEl.hidden = false;
+      submitBtn.disabled = false;
     }
   });
 

@@ -669,41 +669,15 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   gap: 0.6rem;
   flex-shrink: 0;
 }
-.howto-fab {
-  position: fixed;
-  right: 1.25rem;
-  bottom: 1.25rem;
-  z-index: 40;
-}
-.howto-fab-btn {
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--text-em);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 14px rgba(120, 90, 60, 0.3);
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.15s;
-}
-.howto-fab-btn:hover,
-.howto-fab-btn[aria-expanded="true"] {
-  border-color: var(--pink);
-  transform: translateY(-2px);
-}
 .info-popover {
-  position: absolute;
-  bottom: calc(100% + 0.6rem);
-  right: 0;
-  z-index: 30;
+  position: fixed;
+  top: 3.6rem;
+  right: 1rem;
+  z-index: 40;
   min-width: 340px;
   max-width: min(90vw, 380px);
+  max-height: 70vh;
+  overflow-y: auto;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -742,6 +716,15 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .info-popover strong a { color: inherit; text-decoration: none; }
 .info-popover strong a:hover { color: var(--blue); text-decoration: underline; }
 .info-popover span { color: var(--muted); font-size: 0.7rem; }
+.info-popover strong a.info-popover-cta {
+  color: var(--pink);
+  animation: cta-glow 2.4s ease-in-out infinite;
+}
+.info-popover strong a.info-popover-cta:hover { color: var(--blue); }
+@keyframes cta-glow {
+  0%, 100% { text-shadow: 0 0 0 rgba(255, 86, 180, 0); }
+  50% { text-shadow: 0 0 6px rgba(255, 86, 180, 0.65); }
+}
 @media (max-width: 480px) {
   .info-popover { min-width: 220px; }
 }
@@ -1683,8 +1666,8 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 /* position: fixed (not absolute) — .page-header sets overflow-x: auto, which per
    spec forces overflow-y to compute to auto too, so an absolutely-positioned
    dropdown anchored inside .page-header-user would get clipped/scrolled inside
-   the header instead of floating over the page. .howto-fab sidesteps the same
-   issue by also using position: fixed. */
+   the header instead of floating over the page. .info-popover sidesteps the
+   same issue by also using position: fixed. */
 .notif-panel {
   position: fixed;
   top: 3.6rem;

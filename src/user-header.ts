@@ -1,5 +1,4 @@
 import { getMe, getPendingOfferCount, getDailyPackStatus, claimDailyPack, logout } from "./api";
-import { isMuted, toggleMuted } from "./sound-pref";
 import { initNotifications } from "./notifications";
 
 export function initUserHeader(): void {
@@ -10,22 +9,6 @@ export function initUserHeader(): void {
 
   const headerUser = document.querySelector(".page-header-user");
   if (headerUser) {
-    const muteBtn = document.createElement("button");
-    muteBtn.className = "icon-btn";
-    muteBtn.type = "button";
-    const render = () => {
-      const muted = isMuted();
-      muteBtn.textContent = muted ? "🔇" : "🔊";
-      muteBtn.title = muted ? "Sonido desactivado" : "Sonido activado";
-      muteBtn.setAttribute("aria-label", muteBtn.title);
-    };
-    render();
-    muteBtn.addEventListener("click", () => {
-      toggleMuted();
-      render();
-    });
-    headerUser.insertBefore(muteBtn, headerUser.firstChild);
-
     initNotifications(headerUser);
   }
 
