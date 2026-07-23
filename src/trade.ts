@@ -1,4 +1,4 @@
-import { getCollection, getUserCollection, createOffer, getMe, type CardView } from "./api";
+import { getCollection, getUserCollection, createOffer, getMe, getMarketplaceDemand, type CardView } from "./api";
 import { initUserHeader } from "./user-header";
 import {
   renderCardHtml,
@@ -10,6 +10,8 @@ import {
 } from "./card";
 
 let currentTargetUsername = "";
+let currentMarketplaceDemandId: number | null = null;
+let lockedDemandCardId: string | null = null;
 let myCards: CardView[] = [];
 let targetCards: CardView[] = [];
 let myFemaleVariants = new Set<string>();
@@ -27,16 +29,18 @@ function renderSelectableCard(
   formLabels: Map<string, string>
 ): string {
   if (card.quantity === 0) return "";
-  const value = quantities.get(card.id) ?? 0;
+  const isLocked = inputClass === "offer-qty" && card.id === lockedDemandCardId;
+  const value = isLocked ? 1 : quantities.get(card.id) ?? 0;
   const input = `
     <input
       type="number"
       class="input ${inputClass}"
       data-card-id="${card.id}"
-      min="0"
-      max="${card.quantity}"
+      min="${isLocked ? 1 : 0}"
+      max="${isLocked ? 1 : card.quantity}"
       value="${value}"
       style="margin-top: 0.5rem; width: 100%;"
+      ${isLocked ? "disabled" : ""}
     />
   `;
   return renderCardHtml(card, input, femaleVariantBaseNames, formLabels);
@@ -85,7 +89,22 @@ function showError(message: string): void {
 
 async function init(): Promise<void> {
   const params = new URLSearchParams(window.location.search);
-  const targetUsername = params.get("with");
+  const demandIdParam = params.get("demandId");
+
+  let targetUsername = params.get("with");
+
+  if (demandIdParam) {
+    try {
+      const demand = await getMarketplaceDemand(Number(demandIdParam));
+      targetUsername = demand.creatorUsername;
+      lockedDemandCardId = demand.demand.cardId;
+      currentMarketplaceDemandId = Number(demandIdParam);
+    } catch {
+      showError("Esta demanda ya no está disponible.");
+      return;
+    }
+  }
+
   if (!targetUsername) {
     showError("Falta el usuario con quien comerciar. Pídele a alguien su enlace de trade.");
     return;
@@ -110,6 +129,8 @@ async function init(): Promise<void> {
   targetCards = target.cards;
   currentTargetUsername = targetUsername;
 
+  if (lockedDemandCardId) offerQuantities.set(lockedDemandCardId, 1);
+
   document.getElementById("trade-heading")!.textContent = `Intercambio con ${targetUsername}`;
   document.getElementById("target-heading")!.textContent = `Cartas de ${targetUsername}`;
 
@@ -129,7 +150,12 @@ async function sendOffer(): Promise<void> {
   const requestCards = quantitiesToItems(requestQuantities);
   if (offerCards.length === 0 && requestCards.length === 0) return;
 
-  await createOffer({ toUsername: currentTargetUsername, offerCards, requestCards });
+  await createOffer({
+    toUsername: currentTargetUsername,
+    offerCards,
+    requestCards,
+    ...(currentMarketplaceDemandId !== null ? { marketplaceDemandId: currentMarketplaceDemandId } : {}),
+  });
   window.location.href = "/offers.html";
 }
 
