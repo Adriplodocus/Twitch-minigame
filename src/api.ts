@@ -102,6 +102,7 @@ export interface TradeOfferSummary {
   id: number;
   status: string;
   autoExpired: boolean;
+  isMarketplaceResponse: boolean;
   toUser?: string;
   fromUser?: string;
   items: TradeOfferItem[];
@@ -115,6 +116,7 @@ export function createOffer(input: {
   toUsername: string;
   offerCards: { cardId: string; quantity: number }[];
   requestCards: { cardId: string; quantity: number }[];
+  marketplaceDemandId?: number;
 }): Promise<{ id: number; status: string }> {
   return request("/trade/offers", {
     method: "POST",
@@ -167,51 +169,43 @@ export function listNotifications(): Promise<{ notifications: NotificationView[]
   return request("/notifications");
 }
 
-export interface MarketplaceCardView {
-  cardId: string;
-  name: string;
-  rarity: Rarity;
-  imagePath: string;
-  quantity: number;
-  viewerQuantity: number;
-}
-
-export interface MarketplaceOfferSummary {
+export interface MarketplaceDemandSummary {
   id: number;
   creatorUsername: string;
   createdAt: string;
   demand: { cardId: string; name: string; rarity: Rarity; imagePath: string; viewerQuantity: number };
-  offerItems: MarketplaceCardView[];
 }
 
-export interface MyMarketplaceOffer {
+export interface MyMarketplaceDemand {
   id: number;
-  status: "active" | "accepted";
   createdAt: string;
-  acceptedAt: string | null;
   demand: { cardId: string; name: string; rarity: Rarity; imagePath: string };
-  offerItems: { cardId: string; name: string; rarity: Rarity; imagePath: string; quantity: number }[];
 }
 
-export function listMarketplaceOffers(params: {
+export interface MarketplaceDemandDetail {
+  id: number;
+  creatorUsername: string;
+  demand: { cardId: string; name: string; rarity: Rarity; imagePath: string };
+}
+
+export function listMarketplaceDemands(params: {
   page: number;
   demandQuery?: string;
-  offerQuery?: string;
-}): Promise<{ offers: MarketplaceOfferSummary[]; totalCount: number; page: number; pageSize: number }> {
+}): Promise<{ offers: MarketplaceDemandSummary[]; totalCount: number; page: number; pageSize: number }> {
   const q = new URLSearchParams({ page: String(params.page) });
   if (params.demandQuery) q.set("demandQuery", params.demandQuery);
-  if (params.offerQuery) q.set("offerQuery", params.offerQuery);
   return request(`/marketplace/offers?${q.toString()}`);
 }
 
-export function listMyMarketplaceOffers(): Promise<{ offers: MyMarketplaceOffer[] }> {
+export function listMyMarketplaceDemands(): Promise<{ offers: MyMarketplaceDemand[] }> {
   return request("/marketplace/offers/mine");
 }
 
-export function createMarketplaceOffer(input: {
-  demandCardId: string;
-  offerItems: { cardId: string; quantity: number }[];
-}): Promise<{ id: number; status: string }> {
+export function getMarketplaceDemand(id: number): Promise<MarketplaceDemandDetail> {
+  return request(`/marketplace/offers/${id}`);
+}
+
+export function createMarketplaceDemand(input: { demandCardId: string }): Promise<{ id: number }> {
   return request("/marketplace/offers", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -219,14 +213,6 @@ export function createMarketplaceOffer(input: {
   });
 }
 
-export function acceptMarketplaceOffer(id: number): Promise<{ status: string }> {
-  return request(`/marketplace/offers/${id}/accept`, { method: "POST" });
-}
-
-export function cancelMarketplaceOffer(id: number): Promise<{ ok: boolean }> {
+export function cancelMarketplaceDemand(id: number): Promise<{ ok: boolean }> {
   return request(`/marketplace/offers/${id}/cancel`, { method: "POST" });
-}
-
-export function deleteMarketplaceOffer(id: number): Promise<{ ok: boolean }> {
-  return request(`/marketplace/offers/${id}`, { method: "DELETE" });
 }
