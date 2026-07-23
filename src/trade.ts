@@ -26,19 +26,16 @@ type TargetSortField = "pokedex" | "toGet" | "quantity";
 
 // "toGet" isn't a generic SortField: it needs my own ownership (myQuantityById),
 // not the target's, so it's handled separately from card.ts's compareCards.
-// Ascending puts cards I already have first (low-to-high target quantity,
-// highest generation first); the generic asc/desc sign flip in
-// renderTargetGrid then naturally gives the "toGet" default (desc) the
-// intended order: cards I don't have first, most copies first, lowest
-// generation first.
-function compareTargetCards(a: CardView, b: CardView, field: TargetSortField): number {
+// Cards I don't have always come first regardless of asc/desc; only the
+// quantity/generation tie-break within each group flips with sign.
+function compareTargetCards(a: CardView, b: CardView, field: TargetSortField, sign: number): number {
   if (field === "toGet") {
     const aOwned = (myQuantityById.get(a.id) ?? 0) > 0;
     const bOwned = (myQuantityById.get(b.id) ?? 0) > 0;
-    if (aOwned !== bOwned) return aOwned ? -1 : 1;
-    return a.quantity - b.quantity || b.generation - a.generation;
+    if (aOwned !== bOwned) return aOwned ? 1 : -1;
+    return (a.quantity - b.quantity || b.generation - a.generation) * sign;
   }
-  return compareCards(a, b, field);
+  return compareCards(a, b, field) * sign;
 }
 
 function renderSelectableCard(
@@ -81,7 +78,7 @@ function renderTargetGrid(): void {
   const direction = (document.getElementById("target-sort-direction") as HTMLSelectElement).value;
   const sign = direction === "desc" ? -1 : 1;
   const query = (document.getElementById("target-filter") as HTMLInputElement).value;
-  const filtered = filterCardsByName(targetCards, query).sort((a, b) => compareTargetCards(a, b, field) * sign);
+  const filtered = filterCardsByName(targetCards, query).sort((a, b) => compareTargetCards(a, b, field, sign));
   document.getElementById("target-collection")!.innerHTML = filtered
     .map((c) => renderSelectableCard(c, "request-qty", requestQuantities, targetFemaleVariants, targetFormLabels))
     .join("");
