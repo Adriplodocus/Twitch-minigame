@@ -307,35 +307,82 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .card.card-rarity-epic { border-color: var(--purple); }
 .card.card-rarity-legendary { border-color: var(--gold); }
 
-.card.foil.card-rarity-rare {
-  background: linear-gradient(115deg, var(--surface) 20%, #d8f3f7 40%, var(--surface) 60%);
-  background-size: 250% 250%;
-  animation: card-in-fade 0.3s ease both, foil-shift 5s ease-in-out infinite;
-}
-.card.foil.card-rarity-epic {
-  background: linear-gradient(115deg, var(--surface) 15%, #eaddfb 35%, #d8f3f7 50%, #eaddfb 65%, var(--surface) 85%);
-  background-size: 280% 280%;
-  animation: card-in-fade 0.3s ease both, foil-shift 4s ease-in-out infinite;
+.card.foil {
+  background: var(--surface);
+  animation: card-in-fade 0.3s ease both;
 }
 .card.foil.card-rarity-legendary {
-  background: linear-gradient(115deg, var(--surface) 10%, #fbe9b8 30%, #eaddfb 45%, #d8f3f7 60%, #fbe9b8 75%, var(--surface) 90%);
-  background-size: 320% 320%;
-  animation: card-in-fade 0.3s ease both, foil-shift 3.2s ease-in-out infinite;
   box-shadow: 0 4px 16px rgba(120, 90, 60, 0.10), 0 0 14px rgba(232, 185, 58, 0.4);
 }
 .card.foil.card-rarity-legendary:hover {
   box-shadow: 0 10px 26px rgba(120, 90, 60, 0.18), 0 0 14px rgba(232, 185, 58, 0.4);
 }
-@keyframes foil-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
 
 .card.foil.shiny.card-rarity-common {
   border-color: #b9bec4;
+}
+
+/* GPU-composited stand-in for the old whole-background `foil-shift`
+   animation (animated `background-position`, which repaints every frame on
+   every foil card on screen). Same gradient + same numeric motion as before,
+   just carried by an oversized `::before` moved with `transform` instead —
+   compositor-only, no repaint. Sizing/offsets are derived from the original
+   `background-size` percentages so the sweep distance matches exactly:
+   translateX range = -(size - 100%) expressed as a % of the layer's own
+   (oversized) width, and the layer is pre-centered vertically since the old
+   animation never moved background-position-y off 50%. */
+.foil-shine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  pointer-events: none;
+}
+.foil-shine::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  will-change: transform;
+}
+.card-rarity-rare .foil-shine::before {
+  top: -75%;
+  width: 250%;
+  height: 250%;
+  background: linear-gradient(115deg, var(--surface) 20%, #d8f3f7 40%, var(--surface) 60%);
+  animation: foil-shift-rare 5s ease-in-out infinite;
+}
+.card-rarity-epic .foil-shine::before {
+  top: -90%;
+  width: 280%;
+  height: 280%;
+  background: linear-gradient(115deg, var(--surface) 15%, #eaddfb 35%, #d8f3f7 50%, #eaddfb 65%, var(--surface) 85%);
+  animation: foil-shift-epic 4s ease-in-out infinite;
+}
+.card-rarity-legendary .foil-shine::before {
+  top: -110%;
+  width: 320%;
+  height: 320%;
+  background: linear-gradient(115deg, var(--surface) 10%, #fbe9b8 30%, #eaddfb 45%, #d8f3f7 60%, #fbe9b8 75%, var(--surface) 90%);
+  animation: foil-shift-legendary 3.2s ease-in-out infinite;
+}
+.card.shiny.card-rarity-common .foil-shine::before {
+  top: -75%;
+  width: 250%;
+  height: 250%;
   background: linear-gradient(115deg, var(--surface) 20%, #eef1f4 40%, var(--surface) 60%);
-  background-size: 250% 250%;
-  animation: card-in-fade 0.3s ease both, foil-shift 5s ease-in-out infinite;
+  animation: foil-shift-rare 5s ease-in-out infinite;
+}
+@keyframes foil-shift-rare {
+  0%, 100% { transform: translateX(0%); }
+  50% { transform: translateX(-60%); }
+}
+@keyframes foil-shift-epic {
+  0%, 100% { transform: translateX(0%); }
+  50% { transform: translateX(-64.29%); }
+}
+@keyframes foil-shift-legendary {
+  0%, 100% { transform: translateX(0%); }
+  50% { transform: translateX(-68.75%); }
 }
 
 .glare {
@@ -391,9 +438,8 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card.foil {
+  .foil-shine::before {
     animation: none !important;
-    background-position: 0% 50% !important;
   }
   .sparkle-layer .dot {
     animation: none !important;
