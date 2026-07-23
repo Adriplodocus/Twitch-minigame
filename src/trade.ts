@@ -20,6 +20,7 @@ let myFormLabels = new Map<string, string>();
 let targetFormLabels = new Map<string, string>();
 const offerQuantities = new Map<string, number>();
 const requestQuantities = new Map<string, number>();
+let myQuantityById = new Map<string, number>();
 
 function renderSelectableCard(
   card: CardView,
@@ -43,6 +44,16 @@ function renderSelectableCard(
       ${isLocked ? "disabled" : ""}
     />
   `;
+
+  if (inputClass === "request-qty") {
+    // Grayscale should reflect whether *I* own this card, not whether the
+    // target does (the grid only lists cards the target already has), so
+    // swap in my own quantity for ownership/VFX while keeping the target's
+    // real quantity in the badge.
+    const displayCard: CardView = { ...card, quantity: myQuantityById.get(card.id) ?? 0 };
+    return renderCardHtml(displayCard, input, femaleVariantBaseNames, formLabels, true, `<span class="card-qty">x${card.quantity}</span>`);
+  }
+
   return renderCardHtml(card, input, femaleVariantBaseNames, formLabels);
 }
 
@@ -118,6 +129,7 @@ async function init(): Promise<void> {
 
   const myCollection = await getCollection();
   myCards = myCollection.cards;
+  myQuantityById = new Map(myCards.map((c) => [c.id, c.quantity]));
 
   let target: { username: string; cards: CardView[] };
   try {
