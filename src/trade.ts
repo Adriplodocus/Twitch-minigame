@@ -132,15 +132,21 @@ function sumQuantities(quantities: Map<string, number>): number {
   return Array.from(quantities.values()).reduce((sum, q) => sum + q, 0);
 }
 
+function cardNamesLabel(quantities: Map<string, number>, cards: CardView[]): string {
+  return Array.from(quantities, ([cardId, qty]) => {
+    const name = cards.find((c) => c.id === cardId)?.name ?? cardId;
+    return qty > 1 ? `${qty}x ${name}` : name;
+  }).join(", ");
+}
+
 function updateOfferSummary(): void {
   const offerCount = sumQuantities(offerQuantities);
-  const requestCount = sumQuantities(requestQuantities);
-  const text =
-    offerCount === 0 && requestCount === 0
-      ? "Selecciona cartas para armar tu oferta"
-      : `Ofreces ${offerCount} ${offerCount === 1 ? "carta" : "cartas"} · Pides ${requestCount} ${requestCount === 1 ? "carta" : "cartas"}`;
+  const isEmpty = offerCount === 0 && requestQuantities.size === 0;
+  const text = isEmpty
+    ? "Selecciona cartas para armar tu oferta"
+    : `Recibes ${cardNamesLabel(requestQuantities, targetCards) || "nada"} · Ofreces ${offerCount} ${offerCount === 1 ? "cromo" : "cromos"}`;
   document.getElementById("offer-summary-text")!.textContent = text;
-  (document.getElementById("send-offer-btn") as HTMLButtonElement).disabled = offerCount === 0 && requestCount === 0;
+  (document.getElementById("send-offer-btn") as HTMLButtonElement).disabled = isEmpty;
 }
 
 function quantitiesToItems(quantities: Map<string, number>): { cardId: string; quantity: number }[] {
