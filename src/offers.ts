@@ -47,6 +47,7 @@ function renderOffer(offer: TradeOfferSummary, kind: "sent" | "received"): strin
   return `<div class="offer-card">
     <div class="offer-card-header">
       <span class="offer-card-user">${username}</span>
+      ${offer.isMarketplaceResponse ? '<span class="badge">Respuesta a demanda</span>' : ""}
       <span class="badge offer-status offer-status-${offer.status}">${statusLabel(offer)}</span>
     </div>
     <div class="offer-card-body">
