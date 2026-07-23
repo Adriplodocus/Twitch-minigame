@@ -132,34 +132,33 @@ function sumQuantities(quantities: Map<string, number>): number {
   return Array.from(quantities.values()).reduce((sum, q) => sum + q, 0);
 }
 
-function renderSummaryPopover(
+function renderSummaryCards(
   quantities: Map<string, number>,
   cards: CardView[],
   femaleVariantBaseNames: Set<string>,
   formLabels: Map<string, string>
 ): string {
-  if (quantities.size === 0) return `<p class="offer-info-tooltip-empty">Nada seleccionado</p>`;
-  const cardsHtml = Array.from(quantities, ([cardId, qty]) => {
+  if (quantities.size === 0) return `<p class="offer-drawer-empty">Nada seleccionado todavía</p>`;
+  return Array.from(quantities, ([cardId, qty]) => {
     const card = cards.find((c) => c.id === cardId);
     if (!card) return "";
     return renderCardHtml({ ...card, quantity: qty }, "", femaleVariantBaseNames, formLabels);
   }).join("");
-  return `<div class="card-grid">${cardsHtml}</div>`;
 }
 
 function updateOfferSummary(): void {
   const requestCount = sumQuantities(requestQuantities);
   const offerCount = sumQuantities(offerQuantities);
 
-  document.getElementById("request-summary-text")!.textContent = `Recibes ${requestCount} ${requestCount === 1 ? "cromo" : "cromos"}`;
-  document.getElementById("deliver-summary-text")!.textContent = `Entregas ${offerCount} ${offerCount === 1 ? "cromo" : "cromos"}`;
-  document.getElementById("request-info-tooltip")!.innerHTML = renderSummaryPopover(
+  document.getElementById("request-summary-count")!.textContent = `${requestCount}`;
+  document.getElementById("deliver-summary-count")!.textContent = `${offerCount}`;
+  document.getElementById("offer-drawer-request")!.innerHTML = renderSummaryCards(
     requestQuantities,
     targetCards,
     targetFemaleVariants,
     targetFormLabels
   );
-  document.getElementById("deliver-info-tooltip")!.innerHTML = renderSummaryPopover(offerQuantities, myCards, myFemaleVariants, myFormLabels);
+  document.getElementById("offer-drawer-deliver")!.innerHTML = renderSummaryCards(offerQuantities, myCards, myFemaleVariants, myFormLabels);
   (document.getElementById("send-offer-btn") as HTMLButtonElement).disabled = requestCount === 0 && offerCount === 0;
 }
 
@@ -269,26 +268,31 @@ function wireNameFilterClear(inputId: string, clearId: string, render: () => voi
   });
 }
 
-function wireInfoToggle(btnId: string, tooltipId: string): void {
-  const btn = document.getElementById(btnId)!;
-  const tooltip = document.getElementById(tooltipId)!;
+function wireOfferDrawer(): void {
+  const toggleBtn = document.getElementById("offer-summary-toggle")!;
+  const drawer = document.getElementById("offer-drawer")!;
   const close = () => {
-    tooltip.classList.remove("open");
-    btn.setAttribute("aria-expanded", "false");
+    drawer.classList.remove("open");
+    toggleBtn.setAttribute("aria-expanded", "false");
   };
-  btn.addEventListener("click", (e) => {
+  const open = () => {
+    drawer.classList.add("open");
+    toggleBtn.setAttribute("aria-expanded", "true");
+  };
+  toggleBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    const isOpen = tooltip.classList.contains("open");
-    document.querySelectorAll(".offer-info-tooltip.open").forEach((el) => el.classList.remove("open"));
-    if (!isOpen) {
-      tooltip.classList.add("open");
-      btn.setAttribute("aria-expanded", "true");
-    } else {
-      btn.setAttribute("aria-expanded", "false");
-    }
+    if (drawer.classList.contains("open")) close();
+    else open();
   });
   document.addEventListener("click", (e) => {
-    if (tooltip.classList.contains("open") && !tooltip.contains(e.target as Node) && e.target !== btn) close();
+    if (
+      drawer.classList.contains("open") &&
+      !drawer.contains(e.target as Node) &&
+      e.target !== toggleBtn &&
+      !toggleBtn.contains(e.target as Node)
+    ) {
+      close();
+    }
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") close();
@@ -312,8 +316,7 @@ wireNameFilterClear("my-filter", "my-filter-clear", renderMyGrid);
 document.getElementById("target-collection")!.addEventListener("input", (e) => trackQuantity(e, "request-qty", requestQuantities));
 document.getElementById("my-cards")!.addEventListener("input", (e) => trackQuantity(e, "offer-qty", offerQuantities));
 document.getElementById("send-offer-btn")!.addEventListener("click", sendOffer);
-wireInfoToggle("request-info-btn", "request-info-tooltip");
-wireInfoToggle("deliver-info-btn", "deliver-info-tooltip");
+wireOfferDrawer();
 initUserHeader();
 
 init();
