@@ -98,20 +98,22 @@
         </div>
         <div id="target-collection" class="card-grid"></div>
 
-        <h2 style="margin-top: 1.5rem;">Tus cartas</h2>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
-          <select id="sort-field" class="input">
-            <option value="pokedex">Pokédex</option>
-            <option value="recent">Recientes</option>
-            <option value="quantity">Cantidad</option>
-          </select>
-          <select id="sort-direction" class="input">
-            <option value="asc">Ascendente</option>
-            <option value="desc">Descendente</option>
-          </select>
-          <input class="input" id="my-filter" placeholder="Buscar por nombre" style="flex: 1; min-width: 160px;" />
+        <div id="my-cards-section">
+          <h2 style="margin-top: 1.5rem;">Tus cartas</h2>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
+            <select id="sort-field" class="input">
+              <option value="pokedex">Pokédex</option>
+              <option value="recent">Recientes</option>
+              <option value="quantity">Cantidad</option>
+            </select>
+            <select id="sort-direction" class="input">
+              <option value="asc">Ascendente</option>
+              <option value="desc">Descendente</option>
+            </select>
+            <input class="input" id="my-filter" placeholder="Buscar por nombre" style="flex: 1; min-width: 160px;" />
+          </div>
+          <div id="my-cards" class="card-grid"></div>
         </div>
-        <div id="my-cards" class="card-grid"></div>
 
         <button class="btn" id="send-offer-btn" style="margin-top: 1.5rem;">Enviar oferta</button>
       </div>

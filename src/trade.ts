@@ -152,7 +152,11 @@ async function init(): Promise<void> {
   targetFormLabels = computeFormLabels(targetCards);
 
   renderTargetGrid();
-  renderMyGrid();
+  if (lockedDemandCardId) {
+    document.getElementById("my-cards-section")!.style.display = "none";
+  } else {
+    renderMyGrid();
+  }
   document.getElementById("offer-builder")!.style.display = "block";
 }
 
