@@ -1,5 +1,6 @@
 import { GENERATIONS } from "./generations";
 import { sourceLabel } from "./pack-source-label";
+import { tierLabel } from "./pack-tier-label";
 import { showPackReveal } from "./pack-reveal";
 import type { CardView } from "./api";
 
@@ -86,7 +87,7 @@ function renderHistory(history: HistoryRow[]): void {
     tdUsername.textContent = h.source === "admin" ? `${h.grantedBy ?? "Admin"} -> ${h.username}` : h.username;
     const tdTier = document.createElement("td");
     tdTier.style.padding = "0.4rem";
-    tdTier.textContent = h.tier;
+    tdTier.textContent = tierLabel(h.tier);
     const tdSource = document.createElement("td");
     tdSource.style.padding = "0.4rem";
     tdSource.textContent = sourceLabel(h.source);
