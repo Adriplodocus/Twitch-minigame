@@ -21,6 +21,7 @@ async function sweepExpiredDemands(env: Env): Promise<void> {
 }
 
 marketplace.post("/offers", requireAuth, async (c) => {
+  await sweepExpiredDemands(c.env);
   const user = c.get("user");
   const body = await c.req.json<{ demandCardId?: string }>();
   if (!body.demandCardId) return c.json({ error: "Falta el cromo demandado" }, 400);
