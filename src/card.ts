@@ -140,7 +140,7 @@ export function computeFormLabels(cards: CardView[]): Map<string, string> {
   return labels;
 }
 
-export const RARITY_LABELS: Record<CardView["rarity"], string> = {
+const RARITY_LABELS: Record<CardView["rarity"], string> = {
   common: "Común",
   rare: "Rara",
   epic: "Épica",

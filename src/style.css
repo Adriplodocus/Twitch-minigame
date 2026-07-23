@@ -868,8 +868,20 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
   border-top: 1px solid var(--border);
   box-shadow: 0 -6px 20px rgba(120, 90, 60, 0.12);
 }
-.offer-summary-text { font-weight: 700; color: var(--text-em); }
+.offer-summary-group { display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: var(--text-em); }
 #send-offer-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.offer-info-wrap { position: relative; display: inline-flex; }
+.offer-info-tooltip {
+  left: 0;
+  right: auto;
+  min-width: 240px;
+  max-width: min(90vw, 360px);
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.offer-info-tooltip .card-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem; margin-top: 0; }
+.offer-info-tooltip-empty { font-size: 0.7rem; color: var(--muted); margin: 0; }
 
 .streak-modal {
   display: flex;

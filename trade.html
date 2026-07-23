@@ -156,7 +156,20 @@
       Creado por <a href="https://mrklypp.com/" target="_blank" rel="noopener">MrKlypp</a> · © 2026
     </footer>
     <div class="offer-summary-bar" id="offer-summary-bar" style="display: none;">
-      <span class="offer-summary-text" id="offer-summary-text"></span>
+      <div class="offer-summary-group">
+        <span id="request-summary-text"></span>
+        <span class="offer-info-wrap">
+          <button type="button" class="info-btn" id="request-info-btn" aria-haspopup="true" aria-expanded="false" aria-label="Ver cromos que recibes">i</button>
+          <div class="info-tooltip offer-info-tooltip" id="request-info-tooltip"></div>
+        </span>
+      </div>
+      <div class="offer-summary-group">
+        <span id="deliver-summary-text"></span>
+        <span class="offer-info-wrap">
+          <button type="button" class="info-btn" id="deliver-info-btn" aria-haspopup="true" aria-expanded="false" aria-label="Ver cromos que entregas">i</button>
+          <div class="info-tooltip offer-info-tooltip" id="deliver-info-tooltip"></div>
+        </span>
+      </div>
       <button class="btn" id="send-offer-btn">Enviar oferta</button>
     </div>
     <script type="module" src="/src/trade.ts"></script>
