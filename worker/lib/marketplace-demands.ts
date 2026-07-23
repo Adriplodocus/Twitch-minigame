@@ -4,11 +4,11 @@ export async function closeDemand(env: Env, demandId: number, exceptOfferId?: nu
   const declineStatement =
     exceptOfferId === undefined
       ? env.DB.prepare(
-          "UPDATE trade_offers SET status = 'declined', marketplace_demand_id = NULL WHERE marketplace_demand_id = ? AND status = 'pending'"
+          "UPDATE trade_offers SET status = 'declined' WHERE marketplace_demand_id = ? AND status = 'pending'"
         ).bind(demandId)
       : env.DB.prepare(
-          "UPDATE trade_offers SET status = CASE WHEN status = 'pending' AND id != ? THEN 'declined' ELSE status END, marketplace_demand_id = NULL WHERE marketplace_demand_id = ?"
-        ).bind(exceptOfferId, demandId);
+          "UPDATE trade_offers SET status = 'declined' WHERE marketplace_demand_id = ? AND status = 'pending' AND id != ?"
+        ).bind(demandId, exceptOfferId);
 
-  await env.DB.batch([declineStatement, env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(demandId)]);
+  await env.DB.batch([env.DB.prepare("DELETE FROM marketplace_offers WHERE id = ?").bind(demandId), declineStatement]);
 }
