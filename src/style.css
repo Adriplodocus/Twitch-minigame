@@ -716,14 +716,16 @@ h1 { text-shadow: 0 2px 0 rgba(232, 185, 58, 0.25); }
 .info-popover strong a { color: inherit; text-decoration: none; }
 .info-popover strong a:hover { color: var(--blue); text-decoration: underline; }
 .info-popover span { color: var(--muted); font-size: 0.7rem; }
-.info-popover strong a.info-popover-cta {
-  color: var(--gold);
-  animation: cta-glow 2.4s ease-in-out infinite;
-}
-.info-popover strong a.info-popover-cta:hover { color: var(--blue); }
-@keyframes cta-glow {
-  0%, 100% { text-shadow: 0 0 0 rgba(232, 185, 58, 0); }
-  50% { text-shadow: 0 0 6px rgba(232, 185, 58, 0.7); }
+.info-popover strong a.info-popover-cta::after {
+  content: "";
+  display: inline-block;
+  width: 0.65em;
+  height: 0.65em;
+  margin-left: 0.3em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239C8874' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
 }
 @media (max-width: 480px) {
   .info-popover { min-width: 220px; }
