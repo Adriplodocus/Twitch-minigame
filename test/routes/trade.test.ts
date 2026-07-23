@@ -12,6 +12,8 @@ async function sessionCookie(twitchId: string, username: string): Promise<string
 beforeEach(async () => {
   await env.DB.exec("DELETE FROM trade_items");
   await env.DB.exec("DELETE FROM trade_offers");
+  await env.DB.exec("DELETE FROM marketplace_offer_items");
+  await env.DB.exec("DELETE FROM marketplace_offers");
   await env.DB.exec("DELETE FROM user_cards");
   await env.DB.exec("DELETE FROM cards");
   await env.DB.exec("DELETE FROM users");
@@ -543,4 +545,203 @@ it("excludes an offer older than 7 days from pending-count without first loading
 
   const countRes = await app.request("/api/trade/offers/pending-count", { headers: { Cookie: cookieTo } }, env);
   expect((await countRes.json<{ count: number }>()).count).toBe(0);
+});
+
+it("links a trade offer to the demand it answers", async () => {
+  const { id: demandId } = await env.DB.prepare(
+    "INSERT INTO marketplace_offers (creator_id, demand_card_id) VALUES ('2', 'c1') RETURNING id"
+  ).first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer2",
+        offerCards: [{ cardId: "c1", quantity: 1 }],
+        requestCards: [],
+        marketplaceDemandId: demandId,
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(201);
+  const { id } = await res.json<{ id: number }>();
+
+  const row = await env.DB.prepare("SELECT marketplace_demand_id FROM trade_offers WHERE id = ?")
+    .bind(id)
+    .first<{ marketplace_demand_id: number }>();
+  expect(row?.marketplace_demand_id).toBe(demandId);
+});
+
+it("rejects linking to a demand that no longer exists", async () => {
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer2",
+        offerCards: [{ cardId: "c1", quantity: 1 }],
+        requestCards: [],
+        marketplaceDemandId: 9999,
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(409);
+});
+
+it("rejects linking to a demand whose creator does not match toUsername", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('3', 'viewer3')").run();
+  const { id: demandId } = await env.DB.prepare(
+    "INSERT INTO marketplace_offers (creator_id, demand_card_id) VALUES ('3', 'c1') RETURNING id"
+  ).first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer2", // demand belongs to viewer3, not viewer2
+        offerCards: [{ cardId: "c1", quantity: 1 }],
+        requestCards: [],
+        marketplaceDemandId: demandId,
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("rejects a demand response that doesn't include the demanded card", async () => {
+  const { id: demandId } = await env.DB.prepare(
+    "INSERT INTO marketplace_offers (creator_id, demand_card_id) VALUES ('2', 'c1') RETURNING id"
+  ).first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  const res = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer2",
+        offerCards: [], // missing the demanded card
+        requestCards: [],
+        marketplaceDemandId: demandId,
+      }),
+    },
+    env
+  );
+  expect(res.status).toBe(400);
+});
+
+it("closes the demand and declines sibling responses when a linked offer is accepted", async () => {
+  await env.DB.prepare("INSERT INTO users (twitch_id, username) VALUES ('3', 'viewer3')").run();
+  await env.DB.prepare("INSERT INTO user_cards (user_id, card_id, quantity) VALUES ('3', 'c1', 1)").run();
+
+  const { id: demandId } = await env.DB.prepare(
+    "INSERT INTO marketplace_offers (creator_id, demand_card_id) VALUES ('1', 'c1') RETURNING id"
+  ).first<{ id: number }>();
+
+  const cookieB = await sessionCookie("2", "viewer2");
+  const resB = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieB, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer1",
+        offerCards: [{ cardId: "c1", quantity: 1 }],
+        requestCards: [],
+        marketplaceDemandId: demandId,
+      }),
+    },
+    env
+  );
+  const { id: offerB } = await resB.json<{ id: number }>();
+
+  const cookieC = await sessionCookie("3", "viewer3");
+  const resC = await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookieC, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer1",
+        offerCards: [{ cardId: "c1", quantity: 1 }],
+        requestCards: [],
+        marketplaceDemandId: demandId,
+      }),
+    },
+    env
+  );
+  const { id: offerC } = await resC.json<{ id: number }>();
+
+  const cookieCreator = await sessionCookie("1", "viewer1");
+  const acceptRes = await app.request(
+    `/api/trade/offers/${offerB}/accept`,
+    { method: "POST", headers: { Cookie: cookieCreator } },
+    env
+  );
+  expect(acceptRes.status).toBe(200);
+
+  const demandRow = await env.DB.prepare("SELECT id FROM marketplace_offers WHERE id = ?").bind(demandId).first();
+  expect(demandRow).toBeNull();
+
+  const offerCRow = await env.DB.prepare("SELECT status FROM trade_offers WHERE id = ?")
+    .bind(offerC)
+    .first<{ status: string }>();
+  expect(offerCRow?.status).toBe("declined");
+
+  // Trying to accept the now-declined sibling later correctly 409s via the existing pending-only guard.
+  const secondAccept = await app.request(
+    `/api/trade/offers/${offerC}/accept`,
+    { method: "POST", headers: { Cookie: cookieCreator } },
+    env
+  );
+  expect(secondAccept.status).toBe(409);
+});
+
+it("includes isMarketplaceResponse in the offers list", async () => {
+  const { id: demandId } = await env.DB.prepare(
+    "INSERT INTO marketplace_offers (creator_id, demand_card_id) VALUES ('2', 'c1') RETURNING id"
+  ).first<{ id: number }>();
+
+  const cookie = await sessionCookie("1", "viewer1");
+  await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        toUsername: "viewer2",
+        offerCards: [{ cardId: "c1", quantity: 1 }],
+        requestCards: [],
+        marketplaceDemandId: demandId,
+      }),
+    },
+    env
+  );
+  await app.request(
+    "/api/trade/offers",
+    {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ toUsername: "viewer2", offerCards: [{ cardId: "c1", quantity: 1 }], requestCards: [] }),
+    },
+    env
+  );
+
+  const res = await app.request("/api/trade/offers", { headers: { Cookie: cookie } }, env);
+  const json = await res.json<{ sent: { isMarketplaceResponse: boolean }[] }>();
+  expect(json.sent).toHaveLength(2);
+  expect(json.sent.filter((o) => o.isMarketplaceResponse)).toHaveLength(1);
+  expect(json.sent.filter((o) => !o.isMarketplaceResponse)).toHaveLength(1);
 });

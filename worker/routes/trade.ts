@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Env, SessionUser } from "../types";
 import { requireAuth } from "../middleware/auth";
+import { closeDemand } from "../lib/marketplace-demands";
 
 interface TradeCardInput {
   cardId: string;
@@ -57,6 +58,7 @@ trade.post("/offers", requireAuth, async (c) => {
     toUsername: string;
     offerCards: TradeCardInput[];
     requestCards: TradeCardInput[];
+    marketplaceDemandId?: number;
   }>();
 
   const offerCards = mergeByCardId(body.offerCards);
@@ -66,6 +68,22 @@ trade.post("/offers", requireAuth, async (c) => {
     .bind(body.toUsername)
     .first<{ twitch_id: string }>();
   if (!toUser) return c.json({ error: "Target user not found" }, 404);
+
+  let marketplaceDemandId: number | null = null;
+  if (body.marketplaceDemandId != null) {
+    const demand = await c.env.DB.prepare("SELECT creator_id, demand_card_id FROM marketplace_offers WHERE id = ?")
+      .bind(body.marketplaceDemandId)
+      .first<{ creator_id: string; demand_card_id: string }>();
+    if (!demand) return c.json({ error: "La demanda ya no está disponible" }, 409);
+    if (demand.creator_id !== toUser.twitch_id) {
+      return c.json({ error: "La demanda no coincide con el destinatario" }, 400);
+    }
+    const includesDemandCard = offerCards.some(
+      (item) => item.cardId === demand.demand_card_id && item.quantity === 1
+    );
+    if (!includesDemandCard) return c.json({ error: "Debes ofrecer el cromo demandado" }, 400);
+    marketplaceDemandId = body.marketplaceDemandId;
+  }
 
   for (const item of offerCards) {
     const owned = await ownedQuantity(c.env, user.twitchId, item.cardId);
@@ -77,9 +95,9 @@ trade.post("/offers", requireAuth, async (c) => {
   }
 
   const offerResult = await c.env.DB.prepare(
-    "INSERT INTO trade_offers (from_user, to_user) VALUES (?, ?) RETURNING id"
+    "INSERT INTO trade_offers (from_user, to_user, marketplace_demand_id) VALUES (?, ?, ?) RETURNING id"
   )
-    .bind(user.twitchId, toUser.twitch_id)
+    .bind(user.twitchId, toUser.twitch_id, marketplaceDemandId)
     .first<{ id: number }>();
   const offerId = offerResult!.id;
 
@@ -142,25 +160,28 @@ trade.get("/offers", requireAuth, async (c) => {
   await expireStaleOffers(c.env);
 
   const sent = await c.env.DB.prepare(
-    `SELECT o.id, u.username AS toUser, o.status, o.auto_expired AS autoExpired
+    `SELECT o.id, u.username AS toUser, o.status, o.auto_expired AS autoExpired,
+            o.marketplace_demand_id IS NOT NULL AS isMarketplaceResponse
      FROM trade_offers o JOIN users u ON u.twitch_id = o.to_user
      WHERE o.from_user = ? AND NOT o.hidden_from_sender ORDER BY o.created_at DESC`
   )
     .bind(user.twitchId)
-    .all<{ id: number; toUser: string; status: string; autoExpired: number }>();
+    .all<{ id: number; toUser: string; status: string; autoExpired: number; isMarketplaceResponse: number }>();
   const received = await c.env.DB.prepare(
-    `SELECT o.id, u.username AS fromUser, o.status, o.auto_expired AS autoExpired
+    `SELECT o.id, u.username AS fromUser, o.status, o.auto_expired AS autoExpired,
+            o.marketplace_demand_id IS NOT NULL AS isMarketplaceResponse
      FROM trade_offers o JOIN users u ON u.twitch_id = o.from_user
      WHERE o.to_user = ? AND NOT o.hidden_from_receiver ORDER BY o.created_at DESC`
   )
     .bind(user.twitchId)
-    .all<{ id: number; fromUser: string; status: string; autoExpired: number }>();
+    .all<{ id: number; fromUser: string; status: string; autoExpired: number; isMarketplaceResponse: number }>();
 
   const allIds = [...sent.results, ...received.results].map((o) => o.id);
   const items = await itemsByOfferId(c.env, allIds);
-  const withItems = <T extends { id: number; autoExpired: number }>(offer: T) => ({
+  const withItems = <T extends { id: number; autoExpired: number; isMarketplaceResponse: number }>(offer: T) => ({
     ...offer,
     autoExpired: Boolean(offer.autoExpired),
+    isMarketplaceResponse: Boolean(offer.isMarketplaceResponse),
     items: items.get(offer.id) ?? [],
   });
 
@@ -176,9 +197,11 @@ interface TradeItemRow {
 trade.post("/offers/:id/accept", requireAuth, async (c) => {
   const user = c.get("user");
   const offerId = Number(c.req.param("id"));
-  const offer = await c.env.DB.prepare("SELECT id, from_user, to_user, status FROM trade_offers WHERE id = ?")
+  const offer = await c.env.DB.prepare(
+    "SELECT id, from_user, to_user, status, marketplace_demand_id FROM trade_offers WHERE id = ?"
+  )
     .bind(offerId)
-    .first<{ id: number; from_user: string; to_user: string; status: string }>();
+    .first<{ id: number; from_user: string; to_user: string; status: string; marketplace_demand_id: number | null }>();
   if (!offer || offer.to_user !== user.twitchId) return c.json({ error: "Not found" }, 404);
   if (offer.status !== "pending") return c.json({ error: "Offer is not pending" }, 409);
 
@@ -214,6 +237,10 @@ trade.post("/offers/:id/accept", requireAuth, async (c) => {
   }
   statements.push(c.env.DB.prepare("UPDATE trade_offers SET status = 'accepted' WHERE id = ?").bind(offerId));
   await c.env.DB.batch(statements);
+
+  if (offer.marketplace_demand_id !== null) {
+    await closeDemand(c.env, offer.marketplace_demand_id, offerId);
+  }
 
   return c.json({ status: "accepted" });
 });
