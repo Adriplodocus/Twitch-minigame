@@ -22,6 +22,25 @@ const offerQuantities = new Map<string, number>();
 const requestQuantities = new Map<string, number>();
 let myQuantityById = new Map<string, number>();
 
+type TargetSortField = "pokedex" | "toGet" | "quantity";
+
+// "toGet" isn't a generic SortField: it needs my own ownership (myQuantityById),
+// not the target's, so it's handled separately from card.ts's compareCards.
+// Ascending puts cards I already have first (low-to-high target quantity,
+// highest generation first); the generic asc/desc sign flip in
+// renderTargetGrid then naturally gives the "toGet" default (desc) the
+// intended order: cards I don't have first, most copies first, lowest
+// generation first.
+function compareTargetCards(a: CardView, b: CardView, field: TargetSortField): number {
+  if (field === "toGet") {
+    const aOwned = (myQuantityById.get(a.id) ?? 0) > 0;
+    const bOwned = (myQuantityById.get(b.id) ?? 0) > 0;
+    if (aOwned !== bOwned) return aOwned ? -1 : 1;
+    return a.quantity - b.quantity || b.generation - a.generation;
+  }
+  return compareCards(a, b, field);
+}
+
 function renderSelectableCard(
   card: CardView,
   inputClass: string,
@@ -58,11 +77,11 @@ function renderSelectableCard(
 }
 
 function renderTargetGrid(): void {
-  const field = (document.getElementById("target-sort-field") as HTMLSelectElement).value as SortField;
+  const field = (document.getElementById("target-sort-field") as HTMLSelectElement).value as TargetSortField;
   const direction = (document.getElementById("target-sort-direction") as HTMLSelectElement).value;
   const sign = direction === "desc" ? -1 : 1;
   const query = (document.getElementById("target-filter") as HTMLInputElement).value;
-  const filtered = filterCardsByName(targetCards, query).sort((a, b) => compareCards(a, b, field) * sign);
+  const filtered = filterCardsByName(targetCards, query).sort((a, b) => compareTargetCards(a, b, field) * sign);
   document.getElementById("target-collection")!.innerHTML = filtered
     .map((c) => renderSelectableCard(c, "request-qty", requestQuantities, targetFemaleVariants, targetFormLabels))
     .join("");
@@ -176,7 +195,13 @@ async function sendOffer(): Promise<void> {
 }
 
 document.getElementById("target-filter")!.addEventListener("input", renderTargetGrid);
-document.getElementById("target-sort-field")!.addEventListener("change", renderTargetGrid);
+document.getElementById("target-sort-field")!.addEventListener("change", (e) => {
+  const field = (e.target as HTMLSelectElement).value as TargetSortField;
+  if (field === "toGet") {
+    (document.getElementById("target-sort-direction") as HTMLSelectElement).value = "desc";
+  }
+  renderTargetGrid();
+});
 document.getElementById("target-sort-direction")!.addEventListener("change", renderTargetGrid);
 document.getElementById("sort-field")!.addEventListener("change", renderMyGrid);
 document.getElementById("sort-direction")!.addEventListener("change", renderMyGrid);
